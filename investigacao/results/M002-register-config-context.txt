@@ -1,0 +1,83 @@
+﻿
+  com\dfsek\terra\api\config\ConfigPack.java:15:import com.dfsek.terra.api.util.reflection.TypeKey;
+  com\dfsek\terra\api\config\ConfigPack.java:16:import com.dfsek.terra.api.world.biome.generation.BiomeProvider;
+  com\dfsek\terra\api\config\ConfigPack.java:17:import 
+com.dfsek.terra.api.world.chunk.generation.stage.GenerationStage;
+  com\dfsek\terra\api\config\ConfigPack.java:18:import 
+com.dfsek.terra.api.world.chunk.generation.util.provider.ChunkGeneratorProvider;
+  com\dfsek\terra\api\config\ConfigPack.java:19:import java.util.List;
+  com\dfsek\terra\api\config\ConfigPack.java:20:import java.util.Map;
+  com\dfsek\terra\api\config\ConfigPack.java:21:
+  com\dfsek\terra\api\config\ConfigPack.java:22:public interface ConfigPack extends LoaderRegistrar, 
+ConfigLoadingDelegate, CheckedRegistryHolder, RegistryProvider, Keyed<ConfigPack>, PropertyHolder {
+> com\dfsek\terra\api\config\ConfigPack.java:23:   ConfigPack registerConfigType(ConfigType<?, ?> var1, RegistryKey 
+var2, int var3);
+  com\dfsek\terra\api\config\ConfigPack.java:24:
+  com\dfsek\terra\api\config\ConfigPack.java:25:   Map<BaseAddon, VersionRange> addons();
+  com\dfsek\terra\api\config\ConfigPack.java:26:
+  com\dfsek\terra\api\config\ConfigPack.java:27:   BiomeProvider getBiomeProvider();
+  com\dfsek\terra\api\config\ConfigPack.java:28:
+  com\dfsek\terra\api\config\ConfigPack.java:29:   List<GenerationStage> getStages();
+  com\dfsek\terra\api\config\ConfigPack.java:30:
+  com\dfsek\terra\api\config\ConfigPack.java:31:   Loader getLoader();
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:243:   @Override
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:244:   public void register(TypeRegistry registry) {
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:245:      registry.registerLoader(ConfigType.class, 
+this.configTypeRegistry).registerLoader(BufferedImage.class, new BufferedImageLoader(this.loader, this));
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:246:      this.registryMap.forEach(registry::registerLoader);
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:247:      this.shortcuts.forEach(registry::registerLoader);
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:248:   }
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:249:
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:250:   @Override
+> com\dfsek\terra\config\pack\ConfigPackImpl.java:251:   public ConfigPack registerConfigType(ConfigType<?, ?> type, 
+RegistryKey key, int priority) {
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:252:      Set<RegistryKey> contained = new HashSet<>();
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:253:      this.configTypes.forEach((p, configs) -> 
+configs.forEach(pair -> {
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:254:         if (contained.contains(pair.getLeft())) {
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:255:            throw new IllegalArgumentException("Duplicate config 
+key: " + key);
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:256:         }
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:257:
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:258:         contained.add(key);
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:259:      }));
+  investigacao\ConfigPack.java:15:import com.dfsek.terra.api.util.reflection.TypeKey;
+  investigacao\ConfigPack.java:16:import com.dfsek.terra.api.world.biome.generation.BiomeProvider;
+  investigacao\ConfigPack.java:17:import com.dfsek.terra.api.world.chunk.generation.stage.GenerationStage;
+  investigacao\ConfigPack.java:18:import 
+com.dfsek.terra.api.world.chunk.generation.util.provider.ChunkGeneratorProvider;
+  investigacao\ConfigPack.java:19:import java.util.List;
+  investigacao\ConfigPack.java:20:import java.util.Map;
+  investigacao\ConfigPack.java:21:
+  investigacao\ConfigPack.java:22:public interface ConfigPack extends LoaderRegistrar, ConfigLoadingDelegate, 
+CheckedRegistryHolder, RegistryProvider, Keyed<ConfigPack>, PropertyHolder {
+> investigacao\ConfigPack.java:23:   ConfigPack registerConfigType(ConfigType<?, ?> var1, RegistryKey var2, int var3);
+  investigacao\ConfigPack.java:24:
+  investigacao\ConfigPack.java:25:   Map<BaseAddon, VersionRange> addons();
+  investigacao\ConfigPack.java:26:
+  investigacao\ConfigPack.java:27:   BiomeProvider getBiomeProvider();
+  investigacao\ConfigPack.java:28:
+  investigacao\ConfigPack.java:29:   List<GenerationStage> getStages();
+  investigacao\ConfigPack.java:30:
+  investigacao\ConfigPack.java:31:   Loader getLoader();
+  investigacao\ConfigPackImpl.java:243:   @Override
+  investigacao\ConfigPackImpl.java:244:   public void register(TypeRegistry registry) {
+  investigacao\ConfigPackImpl.java:245:      registry.registerLoader(ConfigType.class, 
+this.configTypeRegistry).registerLoader(BufferedImage.class, new BufferedImageLoader(this.loader, this));
+  investigacao\ConfigPackImpl.java:246:      this.registryMap.forEach(registry::registerLoader);
+  investigacao\ConfigPackImpl.java:247:      this.shortcuts.forEach(registry::registerLoader);
+  investigacao\ConfigPackImpl.java:248:   }
+  investigacao\ConfigPackImpl.java:249:
+  investigacao\ConfigPackImpl.java:250:   @Override
+> investigacao\ConfigPackImpl.java:251:   public ConfigPack registerConfigType(ConfigType<?, ?> type, RegistryKey key, 
+int priority) {
+  investigacao\ConfigPackImpl.java:252:      Set<RegistryKey> contained = new HashSet<>();
+  investigacao\ConfigPackImpl.java:253:      this.configTypes.forEach((p, configs) -> configs.forEach(pair -> {
+  investigacao\ConfigPackImpl.java:254:         if (contained.contains(pair.getLeft())) {
+  investigacao\ConfigPackImpl.java:255:            throw new IllegalArgumentException("Duplicate config key: " + key);
+  investigacao\ConfigPackImpl.java:256:         }
+  investigacao\ConfigPackImpl.java:257:
+  investigacao\ConfigPackImpl.java:258:         contained.add(key);
+  investigacao\ConfigPackImpl.java:259:      }));
+
+

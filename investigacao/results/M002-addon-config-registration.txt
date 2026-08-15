@@ -1,0 +1,95 @@
+﻿
+com\dfsek\terra\AbstractPlatform.java:4:import com.dfsek.terra.addon.BootstrapAddonLoader;
+com\dfsek\terra\AbstractPlatform.java:9:import com.dfsek.terra.api.addon.BaseAddon;
+com\dfsek\terra\AbstractPlatform.java:68:   private final CheckedRegistry<BaseAddon> addonRegistry = new 
+CheckedRegistryImpl<>(new OpenRegistryImpl<>(TypeKey.of(BaseAddon.class)));
+com\dfsek\terra\AbstractPlatform.java:69:   private final Registry<BaseAddon> lockedAddonRegistry = new 
+LockedRegistryImpl<>(this.addonRegistry);
+com\dfsek\terra\AbstractPlatform.java:76:   protected Iterable<BaseAddon> platformAddon() {
+com\dfsek\terra\AbstractPlatform.java:128:      List<BaseAddon> addonList = new ArrayList<>();
+com\dfsek\terra\AbstractPlatform.java:132:      BootstrapAddonLoader bootstrapAddonLoader = new BootstrapAddonLoader();
+com\dfsek\terra\AbstractPlatform.java:137:      bootstrapAddonLoader.loadAddons(addonsFolder, 
+bootstrapAddonClassLoader).forEach(bootstrapAddon -> {
+com\dfsek\terra\AbstractPlatform.java:146:         for (BaseAddon addon : addonList) {
+com\dfsek\terra\AbstractPlatform.java:296:   public Registry<BaseAddon> getAddons() {
+com\dfsek\terra\addon\BootstrapAddonLoader.java:7:import com.dfsek.terra.api.addon.bootstrap.BootstrapBaseAddon;
+com\dfsek\terra\addon\BootstrapAddonLoader.java:20:public class BootstrapAddonLoader implements 
+BootstrapBaseAddon<BootstrapBaseAddon<?>> {
+com\dfsek\terra\addon\BootstrapAddonLoader.java:21:   private static final Logger logger = 
+LoggerFactory.getLogger(BootstrapAddonLoader.class);
+com\dfsek\terra\addon\BootstrapAddonLoader.java:24:   private BootstrapBaseAddon<?> loadAddon(Path addonPath, 
+BootstrapAddonClassLoader parent) {
+com\dfsek\terra\addon\BootstrapAddonLoader.java:36:            if (!(addonObject instanceof BootstrapBaseAddon<?> 
+addon)) {
+com\dfsek\terra\addon\BootstrapAddonLoader.java:37:               throw new AddonLoadException(addonObject.getClass() 
++ " does not extend " + BootstrapBaseAddon.class);
+com\dfsek\terra\addon\BootstrapAddonLoader.java:57:   public Iterable<BootstrapBaseAddon<?>> loadAddons(Path 
+addonsFolder, BootstrapAddonClassLoader parent) {
+com\dfsek\terra\addon\DependencySorter.java:6:import com.dfsek.terra.api.addon.BaseAddon;
+com\dfsek\terra\addon\DependencySorter.java:13:   private final Map<String, BaseAddon> addons = new HashMap<>();
+com\dfsek\terra\addon\DependencySorter.java:15:   private final List<BaseAddon> addonList = new ArrayList<>();
+com\dfsek\terra\addon\DependencySorter.java:17:   public void add(BaseAddon addon) {
+com\dfsek\terra\addon\DependencySorter.java:23:   private void sortDependencies(BaseAddon addon, List<BaseAddon> sort) 
+{
+com\dfsek\terra\addon\DependencySorter.java:27:               BaseAddon dependency = this.get(id, addon);
+com\dfsek\terra\addon\DependencySorter.java:51:   private BaseAddon get(String id, BaseAddon addon) {
+com\dfsek\terra\addon\DependencySorter.java:67:   private void checkDependencies(BaseAddon base, BaseAddon current) {
+com\dfsek\terra\addon\DependencySorter.java:69:         BaseAddon dependency = this.get(id, current);
+com\dfsek\terra\addon\DependencySorter.java:78:   public List<BaseAddon> sort() {
+com\dfsek\terra\addon\DependencySorter.java:79:      List<BaseAddon> sorted = new ArrayList<>();
+com\dfsek\terra\addon\DependencySorter.java:82:         BaseAddon addon = this.addonList.get(i);
+com\dfsek\terra\addon\EphemeralAddon.java:4:import com.dfsek.terra.api.addon.BaseAddon;
+com\dfsek\terra\addon\EphemeralAddon.java:6:public class EphemeralAddon implements BaseAddon {
+com\dfsek\terra\addon\InternalAddon.java:5:import com.dfsek.terra.api.addon.BaseAddon;
+com\dfsek\terra\addon\InternalAddon.java:7:public class InternalAddon implements BaseAddon {
+com\dfsek\terra\api\Platform.java:3:import com.dfsek.terra.api.addon.BaseAddon;
+com\dfsek\terra\api\Platform.java:46:   Registry<BaseAddon> getAddons();
+com\dfsek\terra\api\addon\BaseAddon.java:10:public interface BaseAddon extends StringIdentifiable, Namespaced {
+com\dfsek\terra\api\addon\bootstrap\BootstrapBaseAddon.java:3:import com.dfsek.terra.api.addon.BaseAddon;
+com\dfsek\terra\api\addon\bootstrap\BootstrapBaseAddon.java:6:public interface BootstrapBaseAddon<T extends BaseAddon> 
+extends BaseAddon {
+com\dfsek\terra\api\config\ConfigPack.java:6:import com.dfsek.terra.api.addon.BaseAddon;
+com\dfsek\terra\api\config\ConfigPack.java:23:   ConfigPack registerConfigType(ConfigType<?, ?> var1, RegistryKey 
+var2, int var3);
+com\dfsek\terra\api\config\ConfigPack.java:25:   Map<BaseAddon, VersionRange> addons();
+com\dfsek\terra\api\event\functional\FunctionalEventHandler.java:3:import com.dfsek.terra.api.addon.BaseAddon;
+com\dfsek\terra\api\event\functional\FunctionalEventHandler.java:9:   <T extends Event> EventContext<T> 
+register(BaseAddon var1, Class<T> var2);
+com\dfsek\terra\api\event\functional\FunctionalEventHandler.java:11:   <T extends Event> EventContext<T> 
+register(BaseAddon var1, TypeKey<T> var2);
+com\dfsek\terra\bukkit\BukkitAddon.java:5:import com.dfsek.terra.api.addon.BaseAddon;
+com\dfsek\terra\bukkit\BukkitAddon.java:10:public class BukkitAddon implements BaseAddon {
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSPlatform.java:6:import com.dfsek.terra.api.addon.BaseAddon;
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSPlatform.java:88:   protected Iterable<BaseAddon> platformAddon() {
+com\dfsek\terra\config\GenericLoaders.java:8:import com.dfsek.terra.api.addon.BaseAddon;
+com\dfsek\terra\config\GenericLoaders.java:41:         registry.registerLoader(BaseAddon.class, 
+this.platform.getAddons())
+com\dfsek\terra\config\pack\ConfigPackAddonsTemplate.java:7:import com.dfsek.terra.api.addon.BaseAddon;
+com\dfsek\terra\config\pack\ConfigPackAddonsTemplate.java:14:   private Map<BaseAddon, VersionRange> addons = new 
+HashMap<>();
+com\dfsek\terra\config\pack\ConfigPackAddonsTemplate.java:16:   public Map<BaseAddon, VersionRange> getAddons() {
+com\dfsek\terra\config\pack\ConfigPackImpl.java:14:import com.dfsek.terra.api.addon.BaseAddon;
+com\dfsek\terra\config\pack\ConfigPackImpl.java:86:   private final Map<BaseAddon, VersionRange> addons;
+com\dfsek\terra\config\pack\ConfigPackImpl.java:251:   public ConfigPack registerConfigType(ConfigType<?, ?> type, 
+RegistryKey key, int priority) {
+com\dfsek\terra\config\pack\ConfigPackImpl.java:265:   public Map<BaseAddon, VersionRange> addons() {
+com\dfsek\terra\event\EventContextImpl.java:3:import com.dfsek.terra.api.addon.BaseAddon;
+com\dfsek\terra\event\EventContextImpl.java:16:   private final BaseAddon addon;
+com\dfsek\terra\event\EventContextImpl.java:23:   public EventContextImpl(BaseAddon addon, Type eventType, 
+FunctionalEventHandlerImpl parent) {
+com\dfsek\terra\event\EventContextImpl.java:76:   public BaseAddon getAddon() {
+com\dfsek\terra\event\FunctionalEventHandlerImpl.java:3:import com.dfsek.terra.api.addon.BaseAddon;
+com\dfsek\terra\event\FunctionalEventHandlerImpl.java:53:   public <T extends Event> EventContext<T> 
+register(BaseAddon addon, Class<T> clazz) {
+com\dfsek\terra\event\FunctionalEventHandlerImpl.java:60:   public <T extends Event> EventContext<T> 
+register(BaseAddon addon, TypeKey<T> clazz) {
+investigacao\ConfigPack.java:6:import com.dfsek.terra.api.addon.BaseAddon;
+investigacao\ConfigPack.java:23:   ConfigPack registerConfigType(ConfigType<?, ?> var1, RegistryKey var2, int var3);
+investigacao\ConfigPack.java:25:   Map<BaseAddon, VersionRange> addons();
+investigacao\ConfigPackImpl.java:14:import com.dfsek.terra.api.addon.BaseAddon;
+investigacao\ConfigPackImpl.java:86:   private final Map<BaseAddon, VersionRange> addons;
+investigacao\ConfigPackImpl.java:251:   public ConfigPack registerConfigType(ConfigType<?, ?> type, RegistryKey key, 
+int priority) {
+investigacao\ConfigPackImpl.java:265:   public Map<BaseAddon, VersionRange> addons() {
+
+

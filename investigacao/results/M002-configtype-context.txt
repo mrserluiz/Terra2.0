@@ -1,0 +1,503 @@
+﻿
+  com\dfsek\terra\api\config\ConfigPack.java:18:import 
+com.dfsek.terra.api.world.chunk.generation.util.provider.ChunkGeneratorProvider;
+  com\dfsek\terra\api\config\ConfigPack.java:19:import java.util.List;
+  com\dfsek\terra\api\config\ConfigPack.java:20:import java.util.Map;
+  com\dfsek\terra\api\config\ConfigPack.java:21:
+  com\dfsek\terra\api\config\ConfigPack.java:22:public interface ConfigPack extends LoaderRegistrar, 
+ConfigLoadingDelegate, CheckedRegistryHolder, RegistryProvider, Keyed<ConfigPack>, PropertyHolder {
+> com\dfsek\terra\api\config\ConfigPack.java:23:   ConfigPack registerConfigType(ConfigType<?, ?> var1, RegistryKey 
+var2, int var3);
+  com\dfsek\terra\api\config\ConfigPack.java:24:
+  com\dfsek\terra\api\config\ConfigPack.java:25:   Map<BaseAddon, VersionRange> addons();
+  com\dfsek\terra\api\config\ConfigPack.java:26:
+  com\dfsek\terra\api\config\ConfigPack.java:27:   BiomeProvider getBiomeProvider();
+  com\dfsek\terra\api\config\ConfigPack.java:28:
+  com\dfsek\terra\api\config\ConfigType.java:1:package com.dfsek.terra.api.config;
+  com\dfsek\terra\api\config\ConfigType.java:2:
+  com\dfsek\terra\api\config\ConfigType.java:3:import com.dfsek.terra.api.Platform;
+  com\dfsek\terra\api\config\ConfigType.java:4:import com.dfsek.terra.api.util.reflection.TypeKey;
+  com\dfsek\terra\api\config\ConfigType.java:5:
+> com\dfsek\terra\api\config\ConfigType.java:6:public interface ConfigType<T extends AbstractableTemplate, R> {
+  com\dfsek\terra\api\config\ConfigType.java:7:   T getTemplate(ConfigPack var1, Platform var2);
+  com\dfsek\terra\api\config\ConfigType.java:8:
+  com\dfsek\terra\api\config\ConfigType.java:9:   ConfigFactory<T, R> getFactory();
+  com\dfsek\terra\api\config\ConfigType.java:10:
+  com\dfsek\terra\api\config\ConfigType.java:11:   TypeKey<R> getTypeKey();
+  com\dfsek\terra\api\event\events\config\ConfigurationLoadEvent.java:1:package 
+com.dfsek.terra.api.event.events.config;
+  com\dfsek\terra\api\event\events\config\ConfigurationLoadEvent.java:2:
+  com\dfsek\terra\api\event\events\config\ConfigurationLoadEvent.java:3:import 
+com.dfsek.tectonic.api.config.template.ConfigTemplate;
+  com\dfsek\terra\api\event\events\config\ConfigurationLoadEvent.java:4:import 
+com.dfsek.tectonic.impl.abstraction.AbstractConfiguration;
+  com\dfsek\terra\api\event\events\config\ConfigurationLoadEvent.java:5:import com.dfsek.terra.api.config.ConfigPack;
+> com\dfsek\terra\api\event\events\config\ConfigurationLoadEvent.java:6:import com.dfsek.terra.api.config.ConfigType;
+  com\dfsek\terra\api\event\events\config\ConfigurationLoadEvent.java:7:import 
+com.dfsek.terra.api.event.events.FailThroughEvent;
+  com\dfsek\terra\api\event\events\config\ConfigurationLoadEvent.java:8:import 
+com.dfsek.terra.api.event.events.PackEvent;
+  com\dfsek\terra\api\event\events\config\ConfigurationLoadEvent.java:9:import 
+com.dfsek.terra.api.util.reflection.ReflectionUtil;
+  com\dfsek\terra\api\event\events\config\ConfigurationLoadEvent.java:10:import java.util.function.Consumer;
+  com\dfsek\terra\api\event\events\config\ConfigurationLoadEvent.java:11:
+  com\dfsek\terra\api\event\events\config\ConfigurationLoadEvent.java:12:public class ConfigurationLoadEvent 
+implements PackEvent, FailThroughEvent {
+  com\dfsek\terra\api\event\events\config\ConfigurationLoadEvent.java:13:   private final ConfigPack pack;
+  com\dfsek\terra\api\event\events\config\ConfigurationLoadEvent.java:14:   private final AbstractConfiguration 
+configuration;
+  com\dfsek\terra\api\event\events\config\ConfigurationLoadEvent.java:15:   private final Consumer<ConfigTemplate> 
+loader;
+> com\dfsek\terra\api\event\events\config\ConfigurationLoadEvent.java:16:   private final ConfigType<?, ?> type;
+  com\dfsek\terra\api\event\events\config\ConfigurationLoadEvent.java:17:   private final Object loaded;
+  com\dfsek\terra\api\event\events\config\ConfigurationLoadEvent.java:18:
+> com\dfsek\terra\api\event\events\config\ConfigurationLoadEvent.java:19:   public ConfigurationLoadEvent(ConfigPack 
+pack, AbstractConfiguration configuration, Consumer<ConfigTemplate> loader, ConfigType<?, ?> type, Object loaded) {
+  com\dfsek\terra\api\event\events\config\ConfigurationLoadEvent.java:20:      this.pack = pack;
+  com\dfsek\terra\api\event\events\config\ConfigurationLoadEvent.java:21:      this.configuration = configuration;
+  com\dfsek\terra\api\event\events\config\ConfigurationLoadEvent.java:22:      this.loader = loader;
+  com\dfsek\terra\api\event\events\config\ConfigurationLoadEvent.java:23:      this.type = type;
+  com\dfsek\terra\api\event\events\config\ConfigurationLoadEvent.java:24:      this.loaded = loaded;
+  com\dfsek\terra\api\event\events\config\ConfigurationLoadEvent.java:40:
+  com\dfsek\terra\api\event\events\config\ConfigurationLoadEvent.java:41:   public AbstractConfiguration 
+getConfiguration() {
+  com\dfsek\terra\api\event\events\config\ConfigurationLoadEvent.java:42:      return this.configuration;
+  com\dfsek\terra\api\event\events\config\ConfigurationLoadEvent.java:43:   }
+  com\dfsek\terra\api\event\events\config\ConfigurationLoadEvent.java:44:
+> com\dfsek\terra\api\event\events\config\ConfigurationLoadEvent.java:45:   public ConfigType<?, ?> getType() {
+  com\dfsek\terra\api\event\events\config\ConfigurationLoadEvent.java:46:      return this.type;
+  com\dfsek\terra\api\event\events\config\ConfigurationLoadEvent.java:47:   }
+  com\dfsek\terra\api\event\events\config\ConfigurationLoadEvent.java:48:
+  com\dfsek\terra\api\event\events\config\ConfigurationLoadEvent.java:49:   public <T> T getLoadedObject(Class<T> 
+clazz) {
+  com\dfsek\terra\api\event\events\config\ConfigurationLoadEvent.java:50:      if 
+(!clazz.isAssignableFrom(this.type.getTypeKey().getRawType())) {
+  com\dfsek\terra\api\event\events\config\type\ConfigTypeLoadEvent.java:1:package 
+com.dfsek.terra.api.event.events.config.type;
+  com\dfsek\terra\api\event\events\config\type\ConfigTypeLoadEvent.java:2:
+  com\dfsek\terra\api\event\events\config\type\ConfigTypeLoadEvent.java:3:import com.dfsek.terra.api.config.ConfigPack;
+> com\dfsek\terra\api\event\events\config\type\ConfigTypeLoadEvent.java:4:import com.dfsek.terra.api.config.ConfigType;
+  com\dfsek\terra\api\event\events\config\type\ConfigTypeLoadEvent.java:5:import 
+com.dfsek.terra.api.event.events.FailThroughEvent;
+  com\dfsek\terra\api\event\events\config\type\ConfigTypeLoadEvent.java:6:import 
+com.dfsek.terra.api.event.events.PackEvent;
+  com\dfsek\terra\api\event\events\config\type\ConfigTypeLoadEvent.java:7:import 
+com.dfsek.terra.api.registry.CheckedRegistry;
+  com\dfsek\terra\api\event\events\config\type\ConfigTypeLoadEvent.java:8:import 
+com.dfsek.terra.api.util.reflection.ReflectionUtil;
+  com\dfsek\terra\api\event\events\config\type\ConfigTypeLoadEvent.java:9:
+> com\dfsek\terra\api\event\events\config\type\ConfigTypeLoadEvent.java:10:public abstract class ConfigTypeLoadEvent 
+implements PackEvent, FailThroughEvent {
+> com\dfsek\terra\api\event\events\config\type\ConfigTypeLoadEvent.java:11:   private final ConfigType<?, ?> type;
+  com\dfsek\terra\api\event\events\config\type\ConfigTypeLoadEvent.java:12:   private final CheckedRegistry<?> 
+registry;
+  com\dfsek\terra\api\event\events\config\type\ConfigTypeLoadEvent.java:13:   private final ConfigPack pack;
+  com\dfsek\terra\api\event\events\config\type\ConfigTypeLoadEvent.java:14:
+> com\dfsek\terra\api\event\events\config\type\ConfigTypeLoadEvent.java:15:   public ConfigTypeLoadEvent(ConfigType<?, 
+?> type, CheckedRegistry<?> registry, ConfigPack pack) {
+  com\dfsek\terra\api\event\events\config\type\ConfigTypeLoadEvent.java:16:      this.type = type;
+  com\dfsek\terra\api\event\events\config\type\ConfigTypeLoadEvent.java:17:      this.registry = registry;
+  com\dfsek\terra\api\event\events\config\type\ConfigTypeLoadEvent.java:18:      this.pack = pack;
+  com\dfsek\terra\api\event\events\config\type\ConfigTypeLoadEvent.java:19:   }
+  com\dfsek\terra\api\event\events\config\type\ConfigTypeLoadEvent.java:20:
+  com\dfsek\terra\api\event\events\config\type\ConfigTypePostLoadEvent.java:1:package 
+com.dfsek.terra.api.event.events.config.type;
+  com\dfsek\terra\api\event\events\config\type\ConfigTypePostLoadEvent.java:2:
+  com\dfsek\terra\api\event\events\config\type\ConfigTypePostLoadEvent.java:3:import 
+com.dfsek.terra.api.config.ConfigPack;
+> com\dfsek\terra\api\event\events\config\type\ConfigTypePostLoadEvent.java:4:import 
+com.dfsek.terra.api.config.ConfigType;
+  com\dfsek\terra\api\event\events\config\type\ConfigTypePostLoadEvent.java:5:import 
+com.dfsek.terra.api.registry.CheckedRegistry;
+  com\dfsek\terra\api\event\events\config\type\ConfigTypePostLoadEvent.java:6:
+> com\dfsek\terra\api\event\events\config\type\ConfigTypePostLoadEvent.java:7:public class ConfigTypePostLoadEvent 
+extends ConfigTypeLoadEvent {
+> com\dfsek\terra\api\event\events\config\type\ConfigTypePostLoadEvent.java:8:   public 
+ConfigTypePostLoadEvent(ConfigType<?, ?> type, CheckedRegistry<?> registry, ConfigPack pack) {
+  com\dfsek\terra\api\event\events\config\type\ConfigTypePostLoadEvent.java:9:      super(type, registry, pack);
+  com\dfsek\terra\api\event\events\config\type\ConfigTypePostLoadEvent.java:10:   }
+  com\dfsek\terra\api\event\events\config\type\ConfigTypePostLoadEvent.java:11:}
+  com\dfsek\terra\api\event\events\config\type\ConfigTypePreLoadEvent.java:1:package 
+com.dfsek.terra.api.event.events.config.type;
+  com\dfsek\terra\api\event\events\config\type\ConfigTypePreLoadEvent.java:2:
+  com\dfsek\terra\api\event\events\config\type\ConfigTypePreLoadEvent.java:3:import 
+com.dfsek.terra.api.config.ConfigPack;
+> com\dfsek\terra\api\event\events\config\type\ConfigTypePreLoadEvent.java:4:import 
+com.dfsek.terra.api.config.ConfigType;
+  com\dfsek\terra\api\event\events\config\type\ConfigTypePreLoadEvent.java:5:import 
+com.dfsek.terra.api.registry.CheckedRegistry;
+  com\dfsek\terra\api\event\events\config\type\ConfigTypePreLoadEvent.java:6:
+> com\dfsek\terra\api\event\events\config\type\ConfigTypePreLoadEvent.java:7:public class ConfigTypePreLoadEvent 
+extends ConfigTypeLoadEvent {
+> com\dfsek\terra\api\event\events\config\type\ConfigTypePreLoadEvent.java:8:   public 
+ConfigTypePreLoadEvent(ConfigType<?, ?> type, CheckedRegistry<?> registry, ConfigPack pack) {
+  com\dfsek\terra\api\event\events\config\type\ConfigTypePreLoadEvent.java:9:      super(type, registry, pack);
+  com\dfsek\terra\api\event\events\config\type\ConfigTypePreLoadEvent.java:10:   }
+  com\dfsek\terra\api\event\events\config\type\ConfigTypePreLoadEvent.java:11:}
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:11:import com.dfsek.tectonic.api.loader.type.TypeLoader;
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:12:import com.dfsek.tectonic.yaml.YamlConfiguration;
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:13:import com.dfsek.terra.api.Platform;
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:14:import com.dfsek.terra.api.addon.BaseAddon;
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:15:import com.dfsek.terra.api.config.ConfigPack;
+> com\dfsek\terra\config\pack\ConfigPackImpl.java:16:import com.dfsek.terra.api.config.ConfigType;
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:17:import com.dfsek.terra.api.config.Loader;
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:18:import com.dfsek.terra.api.config.meta.Meta;
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:19:import 
+com.dfsek.terra.api.event.events.config.ConfigurationDiscoveryEvent;
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:20:import 
+com.dfsek.terra.api.event.events.config.ConfigurationLoadEvent;
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:21:import 
+com.dfsek.terra.api.event.events.config.pack.ConfigPackPostLoadEvent;
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:22:import 
+com.dfsek.terra.api.event.events.config.pack.ConfigPackPreLoadEvent;
+> com\dfsek\terra\config\pack\ConfigPackImpl.java:23:import 
+com.dfsek.terra.api.event.events.config.type.ConfigTypePostLoadEvent;
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:24:import com.dfsek.terra.api.properties.Context;
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:25:import com.dfsek.terra.api.registry.CheckedRegistry;
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:26:import com.dfsek.terra.api.registry.OpenRegistry;
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:27:import com.dfsek.terra.api.registry.key.RegistryKey;
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:28:import com.dfsek.terra.api.tectonic.ShortcutLoader;
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:73:import org.jetbrains.annotations.NotNull;
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:74:import org.slf4j.Logger;
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:75:import org.slf4j.LoggerFactory;
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:76:
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:77:public class ConfigPackImpl implements ConfigPack {
+> com\dfsek\terra\config\pack\ConfigPackImpl.java:78:   public static final TypeKey<ConfigType<?, ?>> 
+CONFIG_TYPE_TYPE_KEY = new TypeKey<ConfigType<?, ?>>() {};
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:79:   private static final Logger logger = 
+LoggerFactory.getLogger(ConfigPackImpl.class);
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:80:   private final Context context = new Context();
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:81:   private final ConfigPackTemplate template = new 
+ConfigPackTemplate();
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:82:   private final AbstractConfigLoader abstractConfigLoader = new 
+AbstractConfigLoader();
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:83:   private final ConfigLoader selfLoader = new ConfigLoader();
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:85:   private final Loader loader;
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:86:   private final Map<BaseAddon, VersionRange> addons;
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:87:   private final BiomeProvider seededBiomeProvider;
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:88:   private final Map<Type, CheckedRegistryImpl<?>> registryMap = 
+new HashMap<>();
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:89:   private final Map<Type, ShortcutHolder<?>> shortcuts = new 
+HashMap<>();
+> com\dfsek\terra\config\pack\ConfigPackImpl.java:90:   private final OpenRegistry<ConfigType<?, ?>> 
+configTypeRegistry;
+> com\dfsek\terra\config\pack\ConfigPackImpl.java:91:   private final TreeMap<Integer, List<Pair<RegistryKey, 
+ConfigType<?, ?>>>> configTypes = new TreeMap<>();
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:92:   private final RegistryKey key;
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:93:   private final Parser.ParseOptions parseOptions;
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:94:
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:95:   public ConfigPackImpl(File folder, Platform platform) {
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:96:      this(new FolderLoader(folder.toPath()), 
+Construct.construct(() -> {
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:128:
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:129:   private ConfigPackImpl(Loader loader, Configuration 
+packManifest, Platform platform) {
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:130:      long start = System.nanoTime();
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:131:      this.loader = loader;
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:132:      this.platform = platform;
+> com\dfsek\terra\config\pack\ConfigPackImpl.java:133:      this.configTypeRegistry = this.createConfigRegistry();
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:134:      this.register(this.selfLoader);
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:135:      platform.register(this.selfLoader);
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:136:      this.register(this.abstractConfigLoader);
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:137:      platform.register(this.abstractConfigLoader);
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:138:      ConfigPackAddonsTemplate addonsTemplate = new 
+ConfigPackAddonsTemplate();
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:155:         namespace = this.template.getID();
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:156:      }
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:157:
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:158:      this.key = RegistryKey.of(namespace, id);
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:159:      logger.info("Loading config pack \"{}:{}\"", id, 
+namespace);
+> com\dfsek\terra\config\pack\ConfigPackImpl.java:160:      this.configTypes.values().forEach(list -> 
+list.forEach(pair -> this.configTypeRegistry.register(pair.getLeft(), pair.getRight())));
+> com\dfsek\terra\config\pack\ConfigPackImpl.java:161:      ListMultimap<ConfigType<?, ?>, Configuration> multimap = 
+configurations.values()
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:162:         .parallelStream()
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:163:         .collect(() -> Multimaps.newListMultimap(new 
+ConcurrentHashMap<>(), ArrayList::new), (configs, configuration) -> {
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:164:            if (configuration.contains("type")) {
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:165:               ProtoConfig config = new ProtoConfig();
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:166:               this.selfLoader.load(config, configuration);
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:167:               configs.put(config.getType(), configuration);
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:168:            }
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:169:         }, Multimap::putAll);
+> com\dfsek\terra\config\pack\ConfigPackImpl.java:170:      this.configTypeRegistry
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:171:         .forEach(
+> com\dfsek\terra\config\pack\ConfigPackImpl.java:172:            configType -> {
+> com\dfsek\terra\config\pack\ConfigPackImpl.java:173:               CheckedRegistry registry = 
+this.getCheckedRegistry(configType.getTypeKey());
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:174:               this.abstractConfigLoader
+> com\dfsek\terra\config\pack\ConfigPackImpl.java:175:                  .loadConfigs(multimap.get(configType))
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:176:                  .stream()
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:177:                  .parallel()
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:178:                  .map(
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:179:                     configuration -> {
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:180:                        logger.debug("Loading abstract config 
+{}", configuration.getID());
+> com\dfsek\terra\config\pack\ConfigPackImpl.java:181:                        Object loaded = 
+configType.getFactory().build(this.selfLoader.load(configType.getTemplate(this, platform), configuration), platform);
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:182:                        platform.getEventManager()
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:183:                           .callEvent(
+> com\dfsek\terra\config\pack\ConfigPackImpl.java:184:                              new ConfigurationLoadEvent(this, 
+configuration, template -> this.selfLoader.load(template, configuration), configType, loaded)
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:185:                           );
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:186:                        return Pair.of(configuration.getID(), 
+loaded);
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:187:                     }
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:188:                  )
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:189:                  .toList()
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:190:                  .forEach(pair -> 
+registry.register(this.key(pair.getLeft()), pair.getRight()));
+> com\dfsek\terra\config\pack\ConfigPackImpl.java:191:               platform.getEventManager().callEvent(new 
+ConfigTypePostLoadEvent(configType, registry, this));
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:192:            }
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:193:         );
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:194:      platform.getEventManager().callEvent(new 
+ConfigPackPostLoadEvent(this, template -> this.selfLoader.load(template, packManifest)));
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:195:      logger.info(
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:196:         "Loaded config pack \"{}:{}\" v{} by {} in {}ms.",
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:240:      return this;
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:241:   }
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:242:
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:243:   @Override
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:244:   public void register(TypeRegistry registry) {
+> com\dfsek\terra\config\pack\ConfigPackImpl.java:245:      registry.registerLoader(ConfigType.class, 
+this.configTypeRegistry).registerLoader(BufferedImage.class, new BufferedImageLoader(this.loader, this));
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:246:      this.registryMap.forEach(registry::registerLoader);
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:247:      this.shortcuts.forEach(registry::registerLoader);
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:248:   }
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:249:
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:250:   @Override
+> com\dfsek\terra\config\pack\ConfigPackImpl.java:251:   public ConfigPack registerConfigType(ConfigType<?, ?> type, 
+RegistryKey key, int priority) {
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:252:      Set<RegistryKey> contained = new HashSet<>();
+> com\dfsek\terra\config\pack\ConfigPackImpl.java:253:      this.configTypes.forEach((p, configs) -> 
+configs.forEach(pair -> {
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:254:         if (contained.contains(pair.getLeft())) {
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:255:            throw new IllegalArgumentException("Duplicate config 
+key: " + key);
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:256:         }
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:257:
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:258:         contained.add(key);
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:259:      }));
+> com\dfsek\terra\config\pack\ConfigPackImpl.java:260:      this.configTypes.computeIfAbsent(priority, p -> new 
+ArrayList<>()).add(Pair.of(key, type));
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:261:      return this;
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:262:   }
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:263:
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:264:   @Override
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:265:   public Map<BaseAddon, VersionRange> addons() {
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:340:   @Override
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:341:   public ChunkGeneratorProvider getGeneratorProvider() {
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:342:      return this.template.getGeneratorProvider();
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:343:   }
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:344:
+> com\dfsek\terra\config\pack\ConfigPackImpl.java:345:   private OpenRegistry<ConfigType<?, ?>> createConfigRegistry() 
+{
+> com\dfsek\terra\config\pack\ConfigPackImpl.java:346:      return new OpenRegistryImpl<ConfigType<?, ?>>(new 
+LinkedHashMap(), CONFIG_TYPE_TYPE_KEY) {
+> com\dfsek\terra\config\pack\ConfigPackImpl.java:347:         public boolean register(@NotNull RegistryKey key, 
+@NotNull ConfigType<?, ?> value) {
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:348:            if 
+(!ConfigPackImpl.this.registryMap.containsKey(value.getTypeKey().getType())) {
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:349:               OpenRegistry<?> openRegistry = new 
+OpenRegistryImpl<>(value.getTypeKey());
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:350:               
+ConfigPackImpl.this.selfLoader.registerLoader(value.getTypeKey().getType(), openRegistry);
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:351:               
+ConfigPackImpl.this.abstractConfigLoader.registerLoader(value.getTypeKey().getType(), openRegistry);
+  com\dfsek\terra\config\pack\ConfigPackImpl.java:352:               
+ConfigPackImpl.this.registryMap.put(value.getTypeKey().getType(), new CheckedRegistryImpl<>(openRegistry));
+  com\dfsek\terra\config\prototype\ProtoConfig.java:1:package com.dfsek.terra.config.prototype;
+  com\dfsek\terra\config\prototype\ProtoConfig.java:2:
+  com\dfsek\terra\config\prototype\ProtoConfig.java:3:import com.dfsek.tectonic.api.config.template.ConfigTemplate;
+  com\dfsek\terra\config\prototype\ProtoConfig.java:4:import com.dfsek.tectonic.api.config.template.annotations.Value;
+> com\dfsek\terra\config\prototype\ProtoConfig.java:5:import com.dfsek.terra.api.config.ConfigType;
+  com\dfsek\terra\config\prototype\ProtoConfig.java:6:
+  com\dfsek\terra\config\prototype\ProtoConfig.java:7:public class ProtoConfig implements ConfigTemplate {
+  com\dfsek\terra\config\prototype\ProtoConfig.java:8:   @Value("id")
+  com\dfsek\terra\config\prototype\ProtoConfig.java:9:   private String id;
+  com\dfsek\terra\config\prototype\ProtoConfig.java:10:   @Value("type")
+> com\dfsek\terra\config\prototype\ProtoConfig.java:11:   private ConfigType<?, ?> type;
+  com\dfsek\terra\config\prototype\ProtoConfig.java:12:
+  com\dfsek\terra\config\prototype\ProtoConfig.java:13:   public String getId() {
+  com\dfsek\terra\config\prototype\ProtoConfig.java:14:      return this.id;
+  com\dfsek\terra\config\prototype\ProtoConfig.java:15:   }
+  com\dfsek\terra\config\prototype\ProtoConfig.java:16:
+> com\dfsek\terra\config\prototype\ProtoConfig.java:17:   public ConfigType<?, ?> getType() {
+  com\dfsek\terra\config\prototype\ProtoConfig.java:18:      return this.type;
+  com\dfsek\terra\config\prototype\ProtoConfig.java:19:   }
+  com\dfsek\terra\config\prototype\ProtoConfig.java:20:}
+  investigacao\ConfigPack.java:18:import 
+com.dfsek.terra.api.world.chunk.generation.util.provider.ChunkGeneratorProvider;
+  investigacao\ConfigPack.java:19:import java.util.List;
+  investigacao\ConfigPack.java:20:import java.util.Map;
+  investigacao\ConfigPack.java:21:
+  investigacao\ConfigPack.java:22:public interface ConfigPack extends LoaderRegistrar, ConfigLoadingDelegate, 
+CheckedRegistryHolder, RegistryProvider, Keyed<ConfigPack>, PropertyHolder {
+> investigacao\ConfigPack.java:23:   ConfigPack registerConfigType(ConfigType<?, ?> var1, RegistryKey var2, int var3);
+  investigacao\ConfigPack.java:24:
+  investigacao\ConfigPack.java:25:   Map<BaseAddon, VersionRange> addons();
+  investigacao\ConfigPack.java:26:
+  investigacao\ConfigPack.java:27:   BiomeProvider getBiomeProvider();
+  investigacao\ConfigPack.java:28:
+  investigacao\ConfigPackImpl.java:11:import com.dfsek.tectonic.api.loader.type.TypeLoader;
+  investigacao\ConfigPackImpl.java:12:import com.dfsek.tectonic.yaml.YamlConfiguration;
+  investigacao\ConfigPackImpl.java:13:import com.dfsek.terra.api.Platform;
+  investigacao\ConfigPackImpl.java:14:import com.dfsek.terra.api.addon.BaseAddon;
+  investigacao\ConfigPackImpl.java:15:import com.dfsek.terra.api.config.ConfigPack;
+> investigacao\ConfigPackImpl.java:16:import com.dfsek.terra.api.config.ConfigType;
+  investigacao\ConfigPackImpl.java:17:import com.dfsek.terra.api.config.Loader;
+  investigacao\ConfigPackImpl.java:18:import com.dfsek.terra.api.config.meta.Meta;
+  investigacao\ConfigPackImpl.java:19:import com.dfsek.terra.api.event.events.config.ConfigurationDiscoveryEvent;
+  investigacao\ConfigPackImpl.java:20:import com.dfsek.terra.api.event.events.config.ConfigurationLoadEvent;
+  investigacao\ConfigPackImpl.java:21:import com.dfsek.terra.api.event.events.config.pack.ConfigPackPostLoadEvent;
+  investigacao\ConfigPackImpl.java:22:import com.dfsek.terra.api.event.events.config.pack.ConfigPackPreLoadEvent;
+> investigacao\ConfigPackImpl.java:23:import com.dfsek.terra.api.event.events.config.type.ConfigTypePostLoadEvent;
+  investigacao\ConfigPackImpl.java:24:import com.dfsek.terra.api.properties.Context;
+  investigacao\ConfigPackImpl.java:25:import com.dfsek.terra.api.registry.CheckedRegistry;
+  investigacao\ConfigPackImpl.java:26:import com.dfsek.terra.api.registry.OpenRegistry;
+  investigacao\ConfigPackImpl.java:27:import com.dfsek.terra.api.registry.key.RegistryKey;
+  investigacao\ConfigPackImpl.java:28:import com.dfsek.terra.api.tectonic.ShortcutLoader;
+  investigacao\ConfigPackImpl.java:73:import org.jetbrains.annotations.NotNull;
+  investigacao\ConfigPackImpl.java:74:import org.slf4j.Logger;
+  investigacao\ConfigPackImpl.java:75:import org.slf4j.LoggerFactory;
+  investigacao\ConfigPackImpl.java:76:
+  investigacao\ConfigPackImpl.java:77:public class ConfigPackImpl implements ConfigPack {
+> investigacao\ConfigPackImpl.java:78:   public static final TypeKey<ConfigType<?, ?>> CONFIG_TYPE_TYPE_KEY = new 
+TypeKey<ConfigType<?, ?>>() {};
+  investigacao\ConfigPackImpl.java:79:   private static final Logger logger = 
+LoggerFactory.getLogger(ConfigPackImpl.class);
+  investigacao\ConfigPackImpl.java:80:   private final Context context = new Context();
+  investigacao\ConfigPackImpl.java:81:   private final ConfigPackTemplate template = new ConfigPackTemplate();
+  investigacao\ConfigPackImpl.java:82:   private final AbstractConfigLoader abstractConfigLoader = new 
+AbstractConfigLoader();
+  investigacao\ConfigPackImpl.java:83:   private final ConfigLoader selfLoader = new ConfigLoader();
+  investigacao\ConfigPackImpl.java:85:   private final Loader loader;
+  investigacao\ConfigPackImpl.java:86:   private final Map<BaseAddon, VersionRange> addons;
+  investigacao\ConfigPackImpl.java:87:   private final BiomeProvider seededBiomeProvider;
+  investigacao\ConfigPackImpl.java:88:   private final Map<Type, CheckedRegistryImpl<?>> registryMap = new HashMap<>();
+  investigacao\ConfigPackImpl.java:89:   private final Map<Type, ShortcutHolder<?>> shortcuts = new HashMap<>();
+> investigacao\ConfigPackImpl.java:90:   private final OpenRegistry<ConfigType<?, ?>> configTypeRegistry;
+> investigacao\ConfigPackImpl.java:91:   private final TreeMap<Integer, List<Pair<RegistryKey, ConfigType<?, ?>>>> 
+configTypes = new TreeMap<>();
+  investigacao\ConfigPackImpl.java:92:   private final RegistryKey key;
+  investigacao\ConfigPackImpl.java:93:   private final Parser.ParseOptions parseOptions;
+  investigacao\ConfigPackImpl.java:94:
+  investigacao\ConfigPackImpl.java:95:   public ConfigPackImpl(File folder, Platform platform) {
+  investigacao\ConfigPackImpl.java:96:      this(new FolderLoader(folder.toPath()), Construct.construct(() -> {
+  investigacao\ConfigPackImpl.java:128:
+  investigacao\ConfigPackImpl.java:129:   private ConfigPackImpl(Loader loader, Configuration packManifest, Platform 
+platform) {
+  investigacao\ConfigPackImpl.java:130:      long start = System.nanoTime();
+  investigacao\ConfigPackImpl.java:131:      this.loader = loader;
+  investigacao\ConfigPackImpl.java:132:      this.platform = platform;
+> investigacao\ConfigPackImpl.java:133:      this.configTypeRegistry = this.createConfigRegistry();
+  investigacao\ConfigPackImpl.java:134:      this.register(this.selfLoader);
+  investigacao\ConfigPackImpl.java:135:      platform.register(this.selfLoader);
+  investigacao\ConfigPackImpl.java:136:      this.register(this.abstractConfigLoader);
+  investigacao\ConfigPackImpl.java:137:      platform.register(this.abstractConfigLoader);
+  investigacao\ConfigPackImpl.java:138:      ConfigPackAddonsTemplate addonsTemplate = new ConfigPackAddonsTemplate();
+  investigacao\ConfigPackImpl.java:155:         namespace = this.template.getID();
+  investigacao\ConfigPackImpl.java:156:      }
+  investigacao\ConfigPackImpl.java:157:
+  investigacao\ConfigPackImpl.java:158:      this.key = RegistryKey.of(namespace, id);
+  investigacao\ConfigPackImpl.java:159:      logger.info("Loading config pack \"{}:{}\"", id, namespace);
+> investigacao\ConfigPackImpl.java:160:      this.configTypes.values().forEach(list -> list.forEach(pair -> 
+this.configTypeRegistry.register(pair.getLeft(), pair.getRight())));
+> investigacao\ConfigPackImpl.java:161:      ListMultimap<ConfigType<?, ?>, Configuration> multimap = 
+configurations.values()
+  investigacao\ConfigPackImpl.java:162:         .parallelStream()
+  investigacao\ConfigPackImpl.java:163:         .collect(() -> Multimaps.newListMultimap(new ConcurrentHashMap<>(), 
+ArrayList::new), (configs, configuration) -> {
+  investigacao\ConfigPackImpl.java:164:            if (configuration.contains("type")) {
+  investigacao\ConfigPackImpl.java:165:               ProtoConfig config = new ProtoConfig();
+  investigacao\ConfigPackImpl.java:166:               this.selfLoader.load(config, configuration);
+  investigacao\ConfigPackImpl.java:167:               configs.put(config.getType(), configuration);
+  investigacao\ConfigPackImpl.java:168:            }
+  investigacao\ConfigPackImpl.java:169:         }, Multimap::putAll);
+> investigacao\ConfigPackImpl.java:170:      this.configTypeRegistry
+  investigacao\ConfigPackImpl.java:171:         .forEach(
+> investigacao\ConfigPackImpl.java:172:            configType -> {
+> investigacao\ConfigPackImpl.java:173:               CheckedRegistry registry = 
+this.getCheckedRegistry(configType.getTypeKey());
+  investigacao\ConfigPackImpl.java:174:               this.abstractConfigLoader
+> investigacao\ConfigPackImpl.java:175:                  .loadConfigs(multimap.get(configType))
+  investigacao\ConfigPackImpl.java:176:                  .stream()
+  investigacao\ConfigPackImpl.java:177:                  .parallel()
+  investigacao\ConfigPackImpl.java:178:                  .map(
+  investigacao\ConfigPackImpl.java:179:                     configuration -> {
+  investigacao\ConfigPackImpl.java:180:                        logger.debug("Loading abstract config {}", 
+configuration.getID());
+> investigacao\ConfigPackImpl.java:181:                        Object loaded = 
+configType.getFactory().build(this.selfLoader.load(configType.getTemplate(this, platform), configuration), platform);
+  investigacao\ConfigPackImpl.java:182:                        platform.getEventManager()
+  investigacao\ConfigPackImpl.java:183:                           .callEvent(
+> investigacao\ConfigPackImpl.java:184:                              new ConfigurationLoadEvent(this, configuration, 
+template -> this.selfLoader.load(template, configuration), configType, loaded)
+  investigacao\ConfigPackImpl.java:185:                           );
+  investigacao\ConfigPackImpl.java:186:                        return Pair.of(configuration.getID(), loaded);
+  investigacao\ConfigPackImpl.java:187:                     }
+  investigacao\ConfigPackImpl.java:188:                  )
+  investigacao\ConfigPackImpl.java:189:                  .toList()
+  investigacao\ConfigPackImpl.java:190:                  .forEach(pair -> registry.register(this.key(pair.getLeft()), 
+pair.getRight()));
+> investigacao\ConfigPackImpl.java:191:               platform.getEventManager().callEvent(new 
+ConfigTypePostLoadEvent(configType, registry, this));
+  investigacao\ConfigPackImpl.java:192:            }
+  investigacao\ConfigPackImpl.java:193:         );
+  investigacao\ConfigPackImpl.java:194:      platform.getEventManager().callEvent(new ConfigPackPostLoadEvent(this, 
+template -> this.selfLoader.load(template, packManifest)));
+  investigacao\ConfigPackImpl.java:195:      logger.info(
+  investigacao\ConfigPackImpl.java:196:         "Loaded config pack \"{}:{}\" v{} by {} in {}ms.",
+  investigacao\ConfigPackImpl.java:240:      return this;
+  investigacao\ConfigPackImpl.java:241:   }
+  investigacao\ConfigPackImpl.java:242:
+  investigacao\ConfigPackImpl.java:243:   @Override
+  investigacao\ConfigPackImpl.java:244:   public void register(TypeRegistry registry) {
+> investigacao\ConfigPackImpl.java:245:      registry.registerLoader(ConfigType.class, 
+this.configTypeRegistry).registerLoader(BufferedImage.class, new BufferedImageLoader(this.loader, this));
+  investigacao\ConfigPackImpl.java:246:      this.registryMap.forEach(registry::registerLoader);
+  investigacao\ConfigPackImpl.java:247:      this.shortcuts.forEach(registry::registerLoader);
+  investigacao\ConfigPackImpl.java:248:   }
+  investigacao\ConfigPackImpl.java:249:
+  investigacao\ConfigPackImpl.java:250:   @Override
+> investigacao\ConfigPackImpl.java:251:   public ConfigPack registerConfigType(ConfigType<?, ?> type, RegistryKey key, 
+int priority) {
+  investigacao\ConfigPackImpl.java:252:      Set<RegistryKey> contained = new HashSet<>();
+> investigacao\ConfigPackImpl.java:253:      this.configTypes.forEach((p, configs) -> configs.forEach(pair -> {
+  investigacao\ConfigPackImpl.java:254:         if (contained.contains(pair.getLeft())) {
+  investigacao\ConfigPackImpl.java:255:            throw new IllegalArgumentException("Duplicate config key: " + key);
+  investigacao\ConfigPackImpl.java:256:         }
+  investigacao\ConfigPackImpl.java:257:
+  investigacao\ConfigPackImpl.java:258:         contained.add(key);
+  investigacao\ConfigPackImpl.java:259:      }));
+> investigacao\ConfigPackImpl.java:260:      this.configTypes.computeIfAbsent(priority, p -> new 
+ArrayList<>()).add(Pair.of(key, type));
+  investigacao\ConfigPackImpl.java:261:      return this;
+  investigacao\ConfigPackImpl.java:262:   }
+  investigacao\ConfigPackImpl.java:263:
+  investigacao\ConfigPackImpl.java:264:   @Override
+  investigacao\ConfigPackImpl.java:265:   public Map<BaseAddon, VersionRange> addons() {
+  investigacao\ConfigPackImpl.java:340:   @Override
+  investigacao\ConfigPackImpl.java:341:   public ChunkGeneratorProvider getGeneratorProvider() {
+  investigacao\ConfigPackImpl.java:342:      return this.template.getGeneratorProvider();
+  investigacao\ConfigPackImpl.java:343:   }
+  investigacao\ConfigPackImpl.java:344:
+> investigacao\ConfigPackImpl.java:345:   private OpenRegistry<ConfigType<?, ?>> createConfigRegistry() {
+> investigacao\ConfigPackImpl.java:346:      return new OpenRegistryImpl<ConfigType<?, ?>>(new LinkedHashMap(), 
+CONFIG_TYPE_TYPE_KEY) {
+> investigacao\ConfigPackImpl.java:347:         public boolean register(@NotNull RegistryKey key, @NotNull 
+ConfigType<?, ?> value) {
+  investigacao\ConfigPackImpl.java:348:            if 
+(!ConfigPackImpl.this.registryMap.containsKey(value.getTypeKey().getType())) {
+  investigacao\ConfigPackImpl.java:349:               OpenRegistry<?> openRegistry = new 
+OpenRegistryImpl<>(value.getTypeKey());
+  investigacao\ConfigPackImpl.java:350:               
+ConfigPackImpl.this.selfLoader.registerLoader(value.getTypeKey().getType(), openRegistry);
+  investigacao\ConfigPackImpl.java:351:               
+ConfigPackImpl.this.abstractConfigLoader.registerLoader(value.getTypeKey().getType(), openRegistry);
+  investigacao\ConfigPackImpl.java:352:               
+ConfigPackImpl.this.registryMap.put(value.getTypeKey().getType(), new CheckedRegistryImpl<>(openRegistry));
+
+
