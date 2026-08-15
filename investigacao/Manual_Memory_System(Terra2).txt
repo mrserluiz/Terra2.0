@@ -1,6 +1,175 @@
 ================================
 UPDATES:
 =============================
+UPDATE > 15/08/26 - M002I
+
+M002I
+├── arquitetura do BiomeNoiseProperties ✓
+├── base/elevation/carving ✓
+├── NoiseSampler ✓
+├── blending ✓
+└── origem dos NoiseSampler 🔎
+
+[M002I][FACT]
+BiomeNoiseProperties foi analisado diretamente através do bytecode do addon:
+
+Terra-chunk-generator-noise-3d-1.2.1-BETA+451683aff-all.jar
+
+Classe:
+com.dfsek.terra.addons.chunkgenerator.config.noise.BiomeNoiseProperties
+
+A classe é:
+public final class ... extends java.lang.Record
+implements com.dfsek.terra.api.properties.Properties
+
+Campos confirmados:
+- NoiseSampler base
+- NoiseSampler elevation
+- NoiseSampler carving
+- int blendDistance
+- int blendStep
+- double blendWeight
+- double elevationWeight
+- ThreadLocalNoiseHolder noiseHolder
+
+Construtor confirmado:
+BiomeNoiseProperties(
+    NoiseSampler base,
+    NoiseSampler elevation,
+    NoiseSampler carving,
+    int blendDistance,
+    int blendStep,
+    double blendWeight,
+    double elevationWeight,
+    ThreadLocalNoiseHolder noiseHolder
+)
+
+[M002I][FACT]
+BiomeNoiseProperties NÃO cria os NoiseSampler.
+
+Os três NoiseSampler são recebidos prontos pelo construtor.
+
+Portanto:
+BiomeNoiseProperties = container/record de propriedades de geração
+já resolvidas, e não a fábrica dos Noise.
+
+[M002I][FACT]
+Métodos confirmados:
+- base() -> NoiseSampler
+- elevation() -> NoiseSampler
+- carving() -> NoiseSampler
+- blendDistance() -> int
+- blendStep() -> int
+- blendWeight() -> double
+- elevationWeight() -> double
+- noiseHolder() -> ThreadLocalNoiseHolder
+
+[M002I][FACT]
+A descoberta de carving adiciona uma terceira camada de Noise específica
+ao sistema de terreno:
+
+BiomeNoiseProperties
+├── base
+├── elevation
+└── carving
+
+[M002I][FACT]
+BiomeNoiseProperties está localizado no addon:
+Terra-chunk-generator-noise-3d
+
+Não foi encontrado BiomeNoiseProperties nos outros JARs durante a busca
+por nome de classe.
+
+[M002I][FACT]
+As implementações de NoiseSampler estão distribuídas principalmente no:
+Terra-config-noise-function-1.2.0
+
+Exemplos identificados anteriormente incluem:
+- DimensionApplicableNoiseSampler
+- CubicSplineNoiseSampler
+- GaussianNoiseSampler
+- PositiveWhiteNoiseSampler
+- WhiteNoiseSampler
+- GaborNoiseSampler
+
+[M002I][ARCHITECTURE]
+O fluxo já comprovado é:
+
+Biome
+  -> Context
+  -> PropertyKey<BiomeNoiseProperties>
+  -> BiomeNoiseProperties
+  -> base/elevation/carving
+  -> NoiseSampler
+  -> ChunkInterpolator / ElevationInterpolator / carving pipeline
+
+[M002I][IMPORTANT]
+Ainda NÃO foi localizado quem executa:
+new BiomeNoiseProperties(...)
+
+Também ainda não está comprovado o caminho completo:
+
+Pack
+ -> configuração de Noise
+ -> NoiseFunction
+ -> NoiseSampler
+ -> BiomeNoiseProperties
+
+Essa ligação continua sendo hipótese até encontrarmos o código
+responsável pela criação/injeção.
+
+[M002I][INFERENCE]
+A arquitetura indica forte desacoplamento:
+
+configuração
+  -> NoiseSampler
+  -> BiomeNoiseProperties
+  -> generator
+
+O gerador trabalha com a interface NoiseSampler e não precisa conhecer
+a implementação matemática específica do Noise.
+
+Isso é considerado um princípio arquitetural desejável para o Terra 2.0.
+
+[M002I][NEXT]
+Próximo alvo:
+1. Mapear classes de configuração do addon
+   Terra-chunk-generator-noise-3d.
+2. Mapear classes de configuração do
+   Terra-config-noise-function-1.2.0.
+3. Localizar a classe/factory/provider que constrói
+   BiomeNoiseProperties.
+4. Localizar quem transforma configuração em NoiseSampler.
+5. Somente depois investigar Noise individuais.
+
+[M002I][DECISION]
+Não investigar Simplex, Perlin, Cellular ou outros Noise matemáticos
+individualmente neste momento.
+
+Primeiro descobrir:
+CONFIG -> NoiseFunction -> NoiseSampler -> BiomeNoiseProperties
+
+[M002I][EVIDENCE]
+Arquivos:
+investigacao/results/M002I-BiomeNoiseProperties-javap.txt
+investigacao/results/M002I-BiomeNoiseProperties-signature.txt
+investigacao/results/M002I-BiomeNoiseProperties-allrefs.txt
+investigacao/results/M002I-BiomeNoiseProperties-map.txt
+investigacao/results/M002I-BiomeNoiseProperties-refs.txt
+investigacao/results/M002I-biome-noise-map.txt
+investigacao/results/M002I-NoiseSampler-map.txt
+
+[M002I][NEW COLLECTION]
+Foram solicitados/gerados mapas:
+investigacao/results/M002I-chunk-generator-config-map.txt
+investigacao/results/M002I-noise-function-config-map.txt
+
+Esses resultados devem ser analisados antes de qualquer nova coleta.
+
+[CONTINUITY]
+Ao continuar a investigação, consultar esta atualização antes de
+interpretar M002I ou iniciar M002J.
+Separar sempre FACT, INFERENCE e HYPOTHESIS.
 UPDATE > 15/08/26 - M002H
 
 [M002H][FACT]
