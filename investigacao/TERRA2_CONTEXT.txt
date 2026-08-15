@@ -459,3 +459,17 @@ CHECKLIST:
 [ ] DataPack bridge
 [ ] TerraPack v2
 [ ] Custom TerraFormation packs
+
+MILESTONE:M001
+NAME=Core API execution path identified
+STATUS=COMPLETED
+
+RESULT:
+ConfigPack -> GeneratorProvider -> ChunkGenerator
+and
+ConfigPack -> GenerationStage[]
+are confirmed execution paths.
+
+NEXT=M002
+NAME=Identify configuration mechanism that populates generatorProvider
+STATUS=ACTIVE
