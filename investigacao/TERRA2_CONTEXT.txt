@@ -550,7 +550,82 @@ NEXT=M002
 NAME=Identify configuration mechanism that populates generatorProvider
 STATUS=ACTIVE
 
+=================================
 UPDATES:
+=============================
+UPDATE > 15/08/26 - 16:38
+MILESTONE:M002B
+NAME=Addon architecture identified
+STATUS=CONFIRMED/PENDING_JAR_ANALYSIS
+
+FACT:F031
+SOURCE=repository/investigacao/results/M002-addon-directories.txt
+CLAIM=The Terra project contains a dedicated addons/ directory.
+STATUS=CONFIRMED
+
+FACT:F032
+SOURCE=repository/investigacao/results/M002-addon-files.txt
+CLAIM=The addons directory contains Terra-command-addons and bootstrap addon loader JARs, while the core contains BootstrapAddonLoader, EphemeralAddon, InternalAddon, BaseAddon, BukkitAddon, NMSAddon and ConfigPackAddonsTemplate.
+STATUS=CONFIRMED
+
+FACT:F033
+SOURCE=repository/investigacao/results/M002-concrete-config-types.txt
+CLAIM=No concrete ConfigType implementation was found in the currently investigated Java source tree.
+STATUS=CONFIRMED
+
+FACT:F034
+SOURCE=repository/investigacao/results/M002-config-factories.txt
+CLAIM=No concrete ConfigFactory implementation was found in the currently investigated Java source tree.
+STATUS=CONFIRMED
+
+FACT:F035
+SOURCE=repository/investigacao/results/M002-register-config-types.txt
+CLAIM=ConfigPack exposes registerConfigType(), but no concrete registration call was found in the investigated core Java source.
+STATUS=CONFIRMED
+
+FACT:F036
+SOURCE=repository/investigacao/results/M002-config-type-registry.txt
+CLAIM=ConfigPackImpl maintains a ConfigType registry and resolves configuration objects through ConfigType.getFactory().build(...).
+STATUS=CONFIRMED
+
+FACT:F037
+SOURCE=repository/investigacao/results/M002-config-load-events.txt
+CLAIM=Configuration loading uses ProtoConfig and ConfigType before materializing configuration objects.
+STATUS=CONFIRMED
+
+HYPOTHESIS:H008
+CLAIM=Concrete ConfigType/ConfigFactory implementations are supplied by Terra addons or external addon modules rather than the investigated core.
+STATUS=STRONG
+REQUIRES=M002-addon-jar-analysis
+
+HYPOTHESIS:H009
+CLAIM=The concrete ChunkGeneratorProvider may be implemented inside an addon JAR and registered into the Terra ConfigType system during addon initialization.
+STATUS=STRONG
+REQUIRES=M002-addon-jar-analysis
+
+ARCH_UPDATE:
+Terra Core
+ -> Addon System
+ -> external/internal addon JAR
+ -> ConfigType registration
+ -> ConfigFactory
+ -> runtime configuration object
+ -> possible GeneratorProvider
+ -> ChunkGenerator
+
+NEXT_TARGET:M002C
+Inspect addon JAR contents, manifests, entrypoints and generation-related classes.
+
+EVIDENCE_REQUIRED:
+investigacao/results/M002-addon-jar-tree.txt
+investigacao/results/M002-addon-generation-classes.txt
+investigacao/results/M002-addon-manifests.txt
+
+RULE:
+Do not modify addon JARs yet.
+First identify ownership, entrypoints, dependencies, registration mechanism and generation classes.
+
+UPDATE > 15/08/26 - 15:40
 MILESTONE:M002
 NAME=Configuration pipeline identified
 STATUS=PARTIALLY_COMPLETED
