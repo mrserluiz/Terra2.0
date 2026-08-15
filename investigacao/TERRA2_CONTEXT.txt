@@ -1,3 +1,281 @@
+=================================
+UPDATES:
+=============================
+UPDATE > 15/08/26 - 16:40
+
+MEMORY_PROTOCOL_UPDATE:
+TERRA2_CONTEXT.txt permanece como a MEMÓRIA OPERACIONAL EXTERNA PRINCIPAL do projeto e da interação técnica.
+
+MEMORY_STRUCTURE:
+- FACTS = fatos confirmados por código/evidência.
+- HYPOTHESES = interpretações ainda não totalmente comprovadas.
+- DECISIONS = decisões arquiteturais do projeto Terra 2.0.
+- CURRENT_STATUS = estado consolidado da investigação.
+- CURRENT_TARGET = objetivo técnico imediato.
+- NEXT_STEP = próximo passo recomendado.
+- UPDATE = histórico cronológico das mudanças relevantes.
+
+UPDATE_RULE:
+Quando uma descoberta alterar significativamente o entendimento da arquitetura, investigação ou objetivo do projeto, registrar um novo bloco:
+UPDATE > DD/MM/AA - HH:MM
+
+O UPDATE deve registrar de forma compacta:
+- milestone;
+- novas descobertas;
+- fatos confirmados;
+- hipóteses criadas/confirmadas/refutadas;
+- mudanças arquiteturais;
+- decisões;
+- estado atual;
+- próximo objetivo.
+
+HISTORY_RULE:
+Não apagar updates históricos.
+Não reescrever fatos antigos sem registrar a alteração.
+Updates representam evolução cronológica da investigação.
+A memória consolidada deve refletir o estado atual, enquanto UPDATE preserva como esse estado foi alcançado.
+
+ASSISTANT_MEMORY_BEHAVIOR:
+Antes de continuar uma investigação complexa:
+1=Consultar TERRA2_CONTEXT.txt no GitHub.
+2=Consultar os evidence files relevantes em investigacao/results/.
+3=Usar os FACTS já confirmados para evitar repetir investigação.
+4=Usar HYPOTHESES somente como hipóteses.
+5=Verificar se novas evidências confirmam/refutam hipóteses anteriores.
+6=Continuar a partir de CURRENT_TARGET.
+7=Quando houver marco relevante, informar USER que uma atualização de memória é necessária.
+8=Fornecer o bloco UPDATE pronto para ser adicionado ao TERRA2_CONTEXT.txt.
+9=Não exigir que USER copie grandes resultados para o chat quando eles puderem ser persistidos no GitHub.
+10=Quando faltar evidência local, fornecer o comando PowerShell para gerar um arquivo em investigacao/results/.
+11=Após o USER atualizar o GitHub, consultar diretamente o arquivo/repositório e continuar a investigação.
+
+EVIDENCE_MEMORY_RELATION:
+investigacao/results/*.txt = evidência bruta produzida pelos comandos locais.
+investigacao/*.java = arquivos de investigação selecionados.
+investigacao/default-pack-tree.txt = evidência estrutural do default pack.
+TERRA2_CONTEXT.txt = conhecimento consolidado + estado + histórico.
+GitHub = fonte persistente de continuidade técnica.
+
+GITHUB_WORKFLOW:
+USER executa comando local
+ -> saída é salva em investigacao/results/
+ -> USER atualiza GitHub
+ -> ASSISTANT verifica GitHub
+ -> ASSISTANT analisa evidência
+ -> ASSISTANT atualiza entendimento
+ -> se necessário, ASSISTANT fornece UPDATE para TERRA2_CONTEXT.txt
+ -> investigação continua.
+
+MEMORY_UPDATE_TRIGGER:
+Atualizar memória quando:
+- novo núcleo arquitetural for identificado;
+- uma hipótese importante for confirmada/refutada;
+- novo componente crítico for localizado;
+- pipeline de geração for confirmado;
+- decisão arquitetural do Terra 2.0 for tomada;
+- objetivo/ordem da investigação mudar;
+- nova dependência importante for descoberta.
+
+DO_NOT_UPDATE_FOR:
+- resultados triviais;
+- buscas sem resultado que não alterem o entendimento;
+- pequenos comandos auxiliares;
+- informações já registradas sem mudança de estado.
+
+CURRENT_MEMORY_FORMAT:
+FACTS/HYPOTHESES/DECISIONS = estado consolidado.
+UPDATE = histórico cronológico.
+RESULTS = evidências brutas.
+
+PROJECT_INTERACTION_PRINCIPLE:
+A memória não deve servir somente para lembrar a investigação.
+Ela deve preservar a continuidade técnica do projeto Terra 2.0 e das decisões tomadas durante sua construção.
+
+M002_MEMORY_STATE:
+A investigação confirmou a existência de uma camada de configuração baseada em ConfigType/ConfigFactory/registry e identificou uma arquitetura de Addons contendo JARs externos e loaders.
+Nenhum ConfigType ou ConfigFactory concreto foi encontrado no núcleo Java investigado até o momento.
+Hipótese atual: componentes concretos podem ser fornecidos/registrados por Addons.
+Esta hipótese ainda requer análise direta dos JARs.
+
+CURRENT_TARGET:
+M002C=Analisar arquitetura dos Addon JARs.
+
+NEXT_INVESTIGATION:
+1=Listar conteúdo dos Addon JARs.
+2=Identificar manifests.
+3=Identificar entrypoints/classes principais.
+4=Localizar ConfigType/ConfigFactory dentro dos Addons.
+5=Localizar GeneratorProvider.
+6=Seguir GeneratorProvider.newInstance(pack).
+7=Localizar ChunkGenerator concreto.
+8=Somente depois investigar Noise e demais sistemas de TerraFormação.
+
+END_UPDATE
+
+UPDATE > 15/08/26 - 16:38
+MILESTONE:M002B
+NAME=Addon architecture identified
+STATUS=CONFIRMED/PENDING_JAR_ANALYSIS
+
+FACT:F031
+SOURCE=repository/investigacao/results/M002-addon-directories.txt
+CLAIM=The Terra project contains a dedicated addons/ directory.
+STATUS=CONFIRMED
+
+FACT:F032
+SOURCE=repository/investigacao/results/M002-addon-files.txt
+CLAIM=The addons directory contains Terra-command-addons and bootstrap addon loader JARs, while the core contains BootstrapAddonLoader, EphemeralAddon, InternalAddon, BaseAddon, BukkitAddon, NMSAddon and ConfigPackAddonsTemplate.
+STATUS=CONFIRMED
+
+FACT:F033
+SOURCE=repository/investigacao/results/M002-concrete-config-types.txt
+CLAIM=No concrete ConfigType implementation was found in the currently investigated Java source tree.
+STATUS=CONFIRMED
+
+FACT:F034
+SOURCE=repository/investigacao/results/M002-config-factories.txt
+CLAIM=No concrete ConfigFactory implementation was found in the currently investigated Java source tree.
+STATUS=CONFIRMED
+
+FACT:F035
+SOURCE=repository/investigacao/results/M002-register-config-types.txt
+CLAIM=ConfigPack exposes registerConfigType(), but no concrete registration call was found in the investigated core Java source.
+STATUS=CONFIRMED
+
+FACT:F036
+SOURCE=repository/investigacao/results/M002-config-type-registry.txt
+CLAIM=ConfigPackImpl maintains a ConfigType registry and resolves configuration objects through ConfigType.getFactory().build(...).
+STATUS=CONFIRMED
+
+FACT:F037
+SOURCE=repository/investigacao/results/M002-config-load-events.txt
+CLAIM=Configuration loading uses ProtoConfig and ConfigType before materializing configuration objects.
+STATUS=CONFIRMED
+
+HYPOTHESIS:H008
+CLAIM=Concrete ConfigType/ConfigFactory implementations are supplied by Terra addons or external addon modules rather than the investigated core.
+STATUS=STRONG
+REQUIRES=M002-addon-jar-analysis
+
+HYPOTHESIS:H009
+CLAIM=The concrete ChunkGeneratorProvider may be implemented inside an addon JAR and registered into the Terra ConfigType system during addon initialization.
+STATUS=STRONG
+REQUIRES=M002-addon-jar-analysis
+
+ARCH_UPDATE:
+Terra Core
+ -> Addon System
+ -> external/internal addon JAR
+ -> ConfigType registration
+ -> ConfigFactory
+ -> runtime configuration object
+ -> possible GeneratorProvider
+ -> ChunkGenerator
+
+NEXT_TARGET:M002C
+Inspect addon JAR contents, manifests, entrypoints and generation-related classes.
+
+EVIDENCE_REQUIRED:
+investigacao/results/M002-addon-jar-tree.txt
+investigacao/results/M002-addon-generation-classes.txt
+investigacao/results/M002-addon-manifests.txt
+
+RULE:
+Do not modify addon JARs yet.
+First identify ownership, entrypoints, dependencies, registration mechanism and generation classes.
+
+END_UPDATE
+
+UPDATE > 15/08/26 - 15:40
+MILESTONE:M002
+NAME=Configuration pipeline identified
+STATUS=PARTIALLY_COMPLETED
+
+FACT:F024
+SOURCE=com/dfsek/terra/config/pack/ConfigPackImpl.java
+CLAIM=ConfigPackImpl creates ConfigPackTemplate and loads it through selfLoader.load(template, packManifest).
+STATUS=CONFIRMED
+
+FACT:F025
+SOURCE=com/dfsek/terra/config/pack/ConfigPackImpl.java
+CLAIM=Before loading ConfigPackTemplate, Terra discovers configurations and registers Meta preprocessors through registerMeta().
+STATUS=CONFIRMED
+
+FACT:F026
+SOURCE=com/dfsek/terra/config/pack/ConfigPackTemplate.java
+CLAIM=generator is mapped by @Value("generator") to a @Meta ChunkGeneratorProvider field.
+STATUS=CONFIRMED
+
+FACT:F027
+SOURCE=com/dfsek/terra/config/preprocessor/MetaValuePreprocessor.java
+CLAIM=@Meta string values beginning with $ can resolve another discovered configuration using file:key syntax.
+STATUS=CONFIRMED
+
+FACT:F028
+SOURCE=com/dfsek/terra/api/config/ConfigType.java
+CLAIM=ConfigType provides getTemplate(), getFactory(), and getTypeKey().
+STATUS=CONFIRMED
+
+FACT:F029
+SOURCE=com/dfsek/terra/api/config/ConfigFactory.java
+CLAIM=ConfigFactory.build(template, platform) constructs the runtime object represented by a configuration type.
+STATUS=CONFIRMED
+
+FACT:F030
+SOURCE=com/dfsek/terra/config/pack/ConfigPackImpl.java
+CLAIM=Discovered configurations containing "type" are grouped by ConfigType and materialized through ConfigType.getFactory().build(...).
+STATUS=CONFIRMED
+
+ARCH_UPDATE:
+ConfigPackImpl
+ -> discoverConfigurations()
+ -> registerMeta()
+ -> selfLoader.load(ConfigPackTemplate, packManifest)
+ -> @Meta generator
+ -> configuration resolution
+ -> ConfigType/ConfigFactory system
+ -> runtime object
+
+M002_RESULT:
+The concrete ChunkGeneratorProvider is likely supplied through Terra's configuration/type system rather than directly instantiated by ConfigPackTemplate Java code.
+
+M002_STATUS:
+CONFIGURATION_PIPELINE=CONFIRMED
+CONCRETE_GENERATOR_PROVIDER=UNKNOWN
+CHUNK_GENERATOR=UNKNOWN
+
+NEXT_TARGET:
+Identify ConfigType/ConfigFactory registration responsible for ChunkGeneratorProvider.
+
+NEXT_SEARCH:
+Search for:
+- ConfigType implementations related to ChunkGeneratorProvider
+- ConfigFactory implementations returning ChunkGeneratorProvider
+- registerConfigType(...)
+- TypeKey<ChunkGeneratorProvider>
+- generator configuration files containing "type"
+- addon registration of generator-related ConfigTypes
+
+M002 — Configuration / Addon Architecture
+
+ConfigPackTemplate              ✓
+@Meta                           ✓
+Tectonic                        ✓
+ConfigType registry             ✓
+ConfigFactory                   ✓
+Concrete ConfigType no Core     ✗
+Concrete Factory no Core        ✗
+Addon directory                 ✓
+Addon JARs                      ✓ ← NOVA DESCOBERTA
+Addon loader                    ✓
+Generation addon                ? ← PRÓXIMO
+GeneratorProvider               ?
+ChunkGenerator                  ?
+
+END_UPDATE
+
+START_MEMORY_SYSTEM
+
 T2CTX|v1.0
 PROJECT=Terra2.0
 PROJECT_TYPE=REVIVE_MODERNIZE_EXPAND
@@ -550,163 +828,3 @@ NEXT=M002
 NAME=Identify configuration mechanism that populates generatorProvider
 STATUS=ACTIVE
 
-=================================
-UPDATES:
-=============================
-UPDATE > 15/08/26 - 16:38
-MILESTONE:M002B
-NAME=Addon architecture identified
-STATUS=CONFIRMED/PENDING_JAR_ANALYSIS
-
-FACT:F031
-SOURCE=repository/investigacao/results/M002-addon-directories.txt
-CLAIM=The Terra project contains a dedicated addons/ directory.
-STATUS=CONFIRMED
-
-FACT:F032
-SOURCE=repository/investigacao/results/M002-addon-files.txt
-CLAIM=The addons directory contains Terra-command-addons and bootstrap addon loader JARs, while the core contains BootstrapAddonLoader, EphemeralAddon, InternalAddon, BaseAddon, BukkitAddon, NMSAddon and ConfigPackAddonsTemplate.
-STATUS=CONFIRMED
-
-FACT:F033
-SOURCE=repository/investigacao/results/M002-concrete-config-types.txt
-CLAIM=No concrete ConfigType implementation was found in the currently investigated Java source tree.
-STATUS=CONFIRMED
-
-FACT:F034
-SOURCE=repository/investigacao/results/M002-config-factories.txt
-CLAIM=No concrete ConfigFactory implementation was found in the currently investigated Java source tree.
-STATUS=CONFIRMED
-
-FACT:F035
-SOURCE=repository/investigacao/results/M002-register-config-types.txt
-CLAIM=ConfigPack exposes registerConfigType(), but no concrete registration call was found in the investigated core Java source.
-STATUS=CONFIRMED
-
-FACT:F036
-SOURCE=repository/investigacao/results/M002-config-type-registry.txt
-CLAIM=ConfigPackImpl maintains a ConfigType registry and resolves configuration objects through ConfigType.getFactory().build(...).
-STATUS=CONFIRMED
-
-FACT:F037
-SOURCE=repository/investigacao/results/M002-config-load-events.txt
-CLAIM=Configuration loading uses ProtoConfig and ConfigType before materializing configuration objects.
-STATUS=CONFIRMED
-
-HYPOTHESIS:H008
-CLAIM=Concrete ConfigType/ConfigFactory implementations are supplied by Terra addons or external addon modules rather than the investigated core.
-STATUS=STRONG
-REQUIRES=M002-addon-jar-analysis
-
-HYPOTHESIS:H009
-CLAIM=The concrete ChunkGeneratorProvider may be implemented inside an addon JAR and registered into the Terra ConfigType system during addon initialization.
-STATUS=STRONG
-REQUIRES=M002-addon-jar-analysis
-
-ARCH_UPDATE:
-Terra Core
- -> Addon System
- -> external/internal addon JAR
- -> ConfigType registration
- -> ConfigFactory
- -> runtime configuration object
- -> possible GeneratorProvider
- -> ChunkGenerator
-
-NEXT_TARGET:M002C
-Inspect addon JAR contents, manifests, entrypoints and generation-related classes.
-
-EVIDENCE_REQUIRED:
-investigacao/results/M002-addon-jar-tree.txt
-investigacao/results/M002-addon-generation-classes.txt
-investigacao/results/M002-addon-manifests.txt
-
-RULE:
-Do not modify addon JARs yet.
-First identify ownership, entrypoints, dependencies, registration mechanism and generation classes.
-
-UPDATE > 15/08/26 - 15:40
-MILESTONE:M002
-NAME=Configuration pipeline identified
-STATUS=PARTIALLY_COMPLETED
-
-FACT:F024
-SOURCE=com/dfsek/terra/config/pack/ConfigPackImpl.java
-CLAIM=ConfigPackImpl creates ConfigPackTemplate and loads it through selfLoader.load(template, packManifest).
-STATUS=CONFIRMED
-
-FACT:F025
-SOURCE=com/dfsek/terra/config/pack/ConfigPackImpl.java
-CLAIM=Before loading ConfigPackTemplate, Terra discovers configurations and registers Meta preprocessors through registerMeta().
-STATUS=CONFIRMED
-
-FACT:F026
-SOURCE=com/dfsek/terra/config/pack/ConfigPackTemplate.java
-CLAIM=generator is mapped by @Value("generator") to a @Meta ChunkGeneratorProvider field.
-STATUS=CONFIRMED
-
-FACT:F027
-SOURCE=com/dfsek/terra/config/preprocessor/MetaValuePreprocessor.java
-CLAIM=@Meta string values beginning with $ can resolve another discovered configuration using file:key syntax.
-STATUS=CONFIRMED
-
-FACT:F028
-SOURCE=com/dfsek/terra/api/config/ConfigType.java
-CLAIM=ConfigType provides getTemplate(), getFactory(), and getTypeKey().
-STATUS=CONFIRMED
-
-FACT:F029
-SOURCE=com/dfsek/terra/api/config/ConfigFactory.java
-CLAIM=ConfigFactory.build(template, platform) constructs the runtime object represented by a configuration type.
-STATUS=CONFIRMED
-
-FACT:F030
-SOURCE=com/dfsek/terra/config/pack/ConfigPackImpl.java
-CLAIM=Discovered configurations containing "type" are grouped by ConfigType and materialized through ConfigType.getFactory().build(...).
-STATUS=CONFIRMED
-
-ARCH_UPDATE:
-ConfigPackImpl
- -> discoverConfigurations()
- -> registerMeta()
- -> selfLoader.load(ConfigPackTemplate, packManifest)
- -> @Meta generator
- -> configuration resolution
- -> ConfigType/ConfigFactory system
- -> runtime object
-
-M002_RESULT:
-The concrete ChunkGeneratorProvider is likely supplied through Terra's configuration/type system rather than directly instantiated by ConfigPackTemplate Java code.
-
-M002_STATUS:
-CONFIGURATION_PIPELINE=CONFIRMED
-CONCRETE_GENERATOR_PROVIDER=UNKNOWN
-CHUNK_GENERATOR=UNKNOWN
-
-NEXT_TARGET:
-Identify ConfigType/ConfigFactory registration responsible for ChunkGeneratorProvider.
-
-NEXT_SEARCH:
-Search for:
-- ConfigType implementations related to ChunkGeneratorProvider
-- ConfigFactory implementations returning ChunkGeneratorProvider
-- registerConfigType(...)
-- TypeKey<ChunkGeneratorProvider>
-- generator configuration files containing "type"
-- addon registration of generator-related ConfigTypes
-
-M002 — Configuration / Addon Architecture
-
-ConfigPackTemplate              ✓
-@Meta                           ✓
-Tectonic                        ✓
-ConfigType registry             ✓
-ConfigFactory                   ✓
-Concrete ConfigType no Core     ✗
-Concrete Factory no Core        ✗
-Addon directory                 ✓
-Addon JARs                      ✓ ← NOVA DESCOBERTA
-Addon loader                    ✓
-Generation addon                ? ← PRÓXIMO
-GeneratorProvider               ?
-ChunkGenerator                  ?
