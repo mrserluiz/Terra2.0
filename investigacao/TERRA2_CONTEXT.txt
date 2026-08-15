@@ -619,3 +619,19 @@ Search for:
 - TypeKey<ChunkGeneratorProvider>
 - generator configuration files containing "type"
 - addon registration of generator-related ConfigTypes
+
+M002 — Configuration / Addon Architecture
+
+ConfigPackTemplate              ✓
+@Meta                           ✓
+Tectonic                        ✓
+ConfigType registry             ✓
+ConfigFactory                   ✓
+Concrete ConfigType no Core     ✗
+Concrete Factory no Core        ✗
+Addon directory                 ✓
+Addon JARs                      ✓ ← NOVA DESCOBERTA
+Addon loader                    ✓
+Generation addon                ? ← PRÓXIMO
+GeneratorProvider               ?
+ChunkGenerator                  ?
