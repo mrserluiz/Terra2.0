@@ -1,0 +1,15 @@
+﻿
+com\dfsek\terra\api\config\ConfigPack.java:18:import 
+com.dfsek.terra.api.world.chunk.generation.util.provider.ChunkGeneratorProvider;
+com\dfsek\terra\api\config\ConfigPack.java:45:   ChunkGeneratorProvider getGeneratorProvider();
+com\dfsek\terra\api\world\chunk\generation\util\provider\ChunkGeneratorProvider.java:6:public interface 
+ChunkGeneratorProvider {
+com\dfsek\terra\config\pack\ConfigPackImpl.java:35:import 
+com.dfsek.terra.api.world.chunk.generation.util.provider.ChunkGeneratorProvider;
+com\dfsek\terra\config\pack\ConfigPackImpl.java:341:   public ChunkGeneratorProvider getGeneratorProvider() {
+com\dfsek\terra\config\pack\ConfigPackTemplate.java:9:import 
+com.dfsek.terra.api.world.chunk.generation.util.provider.ChunkGeneratorProvider;
+com\dfsek\terra\config\pack\ConfigPackTemplate.java:69:   private @Meta ChunkGeneratorProvider generatorProvider;
+com\dfsek\terra\config\pack\ConfigPackTemplate.java:114:   public ChunkGeneratorProvider getGeneratorProvider() {
+
+

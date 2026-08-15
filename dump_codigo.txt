@@ -1,0 +1,1015 @@
+﻿========================================
+TERRA 2.0 - INVESTIGAÇÃO AUTOMÁTICA
+========================================
+
+DATA: 08/15/2026 13:37:25
+
+========================================
+1. CHUNK GENERATOR PROVIDER
+========================================
+
+
+com\dfsek\terra\api\config\ConfigPack.java:18:import 
+com.dfsek.terra.api.world.chunk.generation.util.provider.ChunkGeneratorProvider;
+com\dfsek\terra\api\config\ConfigPack.java:45:   ChunkGeneratorProvider getGeneratorProvider();
+com\dfsek\terra\api\world\chunk\generation\util\provider\ChunkGeneratorProvider.java:6:public interface 
+ChunkGeneratorProvider {
+com\dfsek\terra\config\pack\ConfigPackImpl.java:35:import 
+com.dfsek.terra.api.world.chunk.generation.util.provider.ChunkGeneratorProvider;
+com\dfsek\terra\config\pack\ConfigPackImpl.java:341:   public ChunkGeneratorProvider getGeneratorProvider() {
+com\dfsek\terra\config\pack\ConfigPackTemplate.java:9:import 
+com.dfsek.terra.api.world.chunk.generation.util.provider.ChunkGeneratorProvider;
+com\dfsek\terra\config\pack\ConfigPackTemplate.java:69:   private @Meta ChunkGeneratorProvider generatorProvider;
+com\dfsek\terra\config\pack\ConfigPackTemplate.java:114:   public ChunkGeneratorProvider getGeneratorProvider() {
+
+
+
+========================================
+2. GENERATOR PROVIDER IMPLEMENTATIONS
+========================================
+
+
+========================================
+3. GENERATOR PROVIDER CREATION
+========================================
+
+
+com\dfsek\terra\api\world\chunk\generation\util\provider\ChunkGeneratorProvider.java:7:   ChunkGenerator 
+newInstance(ConfigPack var1);
+com\dfsek\terra\api\world\chunk\generation\util\provider\GenerationStageProvider.java:7:   GenerationStage 
+newInstance(ConfigPack var1);
+com\dfsek\terra\bukkit\TerraBukkitPlugin.java:118:         return pack.getGeneratorProvider().newInstance(pack);
+com\dfsek\terra\bukkit\generator\BukkitChunkGeneratorWrapper.java:76:      
+this.setDelegate(pack.getGeneratorProvider().newInstance(pack));
+com\dfsek\terra\bukkit\hooks\MultiverseGeneratorPluginHook.java:46:      
+MultiverseCoreApi.get().getGeneratorProvider().registerGeneratorPlugin(new MultiverseGeneratorPluginHook(platform));
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSChunkGeneratorDelegate.java:43:      this.delegate = 
+pack.getGeneratorProvider().newInstance(pack);
+
+
+
+========================================
+4. CONFIG PACK TEMPLATE
+========================================
+
+
+com\dfsek\terra\config\pack\ConfigPackImpl.java:81:   private final ConfigPackTemplate template = new 
+ConfigPackTemplate();
+com\dfsek\terra\config\pack\ConfigPackImpl.java:369:   public ConfigPackTemplate getTemplate() {
+com\dfsek\terra\config\pack\ConfigPackTemplate.java:15:public class ConfigPackTemplate implements ConfigTemplate {
+
+
+
+========================================
+5. TECTONIC
+========================================
+
+
+com\dfsek\tectonic\api\TypeRegistry.java:1:package com.dfsek.tectonic.api;
+com\dfsek\tectonic\api\TypeRegistry.java:3:import com.dfsek.tectonic.api.config.template.object.ObjectTemplate;
+com\dfsek\tectonic\api\TypeRegistry.java:4:import com.dfsek.tectonic.api.loader.type.TypeLoader;
+com\dfsek\tectonic\api\config\Configuration.java:1:package com.dfsek.tectonic.api.config;
+com\dfsek\tectonic\api\config\template\ConfigTemplate.java:1:package com.dfsek.tectonic.api.config.template;
+com\dfsek\tectonic\api\config\template\ConfigTemplate.java:3:import com.dfsek.tectonic.api.loader.TemplateLoader;
+com\dfsek\tectonic\api\config\template\ConfigTemplate.java:4:import 
+com.dfsek.tectonic.impl.loading.template.ReflectiveTemplateLoader;
+com\dfsek\tectonic\api\config\template\ValidatedConfigTemplate.java:1:package com.dfsek.tectonic.api.config.template;
+com\dfsek\tectonic\api\config\template\ValidatedConfigTemplate.java:3:import 
+com.dfsek.tectonic.api.exception.ValidationException;
+com\dfsek\tectonic\api\config\template\annotations\Default.java:1:package 
+com.dfsek.tectonic.api.config.template.annotations;
+com\dfsek\tectonic\api\config\template\annotations\Description.java:1:package 
+com.dfsek.tectonic.api.config.template.annotations;
+com\dfsek\tectonic\api\config\template\annotations\Final.java:1:package 
+com.dfsek.tectonic.api.config.template.annotations;
+com\dfsek\tectonic\api\config\template\annotations\Value.java:1:package 
+com.dfsek.tectonic.api.config.template.annotations;
+com\dfsek\tectonic\api\config\template\dynamic\DynamicTemplate.java:1:package 
+com.dfsek.tectonic.api.config.template.dynamic;
+com\dfsek\tectonic\api\config\template\dynamic\DynamicTemplate.java:3:import 
+com.dfsek.tectonic.api.config.template.ConfigTemplate;
+com\dfsek\tectonic\api\config\template\dynamic\DynamicTemplate.java:4:import 
+com.dfsek.tectonic.api.loader.TemplateLoader;
+com\dfsek\tectonic\api\config\template\dynamic\DynamicTemplate.java:5:import 
+com.dfsek.tectonic.impl.annotations.Generated;
+com\dfsek\tectonic\api\config\template\dynamic\DynamicTemplateLoader.java:1:package 
+com.dfsek.tectonic.api.config.template.dynamic;
+com\dfsek\tectonic\api\config\template\dynamic\DynamicTemplateLoader.java:3:import 
+com.dfsek.tectonic.api.config.Configuration;
+com\dfsek\tectonic\api\config\template\dynamic\DynamicTemplateLoader.java:4:import 
+com.dfsek.tectonic.api.config.template.ConfigTemplate;
+com\dfsek\tectonic\api\config\template\dynamic\DynamicTemplateLoader.java:5:import 
+com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\tectonic\api\config\template\dynamic\DynamicTemplateLoader.java:6:import 
+com.dfsek.tectonic.api.exception.ValueMissingException;
+com\dfsek\tectonic\api\config\template\dynamic\DynamicTemplateLoader.java:7:import 
+com.dfsek.tectonic.api.loader.TemplateLoader;
+com\dfsek\tectonic\api\config\template\dynamic\DynamicTemplateLoader.java:8:import 
+com.dfsek.tectonic.api.loader.ValueLoader;
+com\dfsek\tectonic\api\config\template\dynamic\DynamicValue.java:1:package 
+com.dfsek.tectonic.api.config.template.dynamic;
+com\dfsek\tectonic\api\config\template\dynamic\DynamicValue.java:3:import 
+com.dfsek.tectonic.util.ClassAnnotatedTypeImpl;
+com\dfsek\tectonic\api\config\template\object\ObjectTemplate.java:1:package 
+com.dfsek.tectonic.api.config.template.object;
+com\dfsek\tectonic\api\config\template\object\ObjectTemplate.java:3:import 
+com.dfsek.tectonic.api.config.template.ConfigTemplate;
+com\dfsek\tectonic\api\depth\DepthTracker.java:1:package com.dfsek.tectonic.api.depth;
+com\dfsek\tectonic\api\depth\DepthTracker.java:3:import com.dfsek.tectonic.api.config.Configuration;
+com\dfsek\tectonic\api\depth\EntryLevel.java:1:package com.dfsek.tectonic.api.depth;
+com\dfsek\tectonic\api\depth\IndexLevel.java:1:package com.dfsek.tectonic.api.depth;
+com\dfsek\tectonic\api\depth\InjectingIntrinsicLevel.java:1:package com.dfsek.tectonic.api.depth;
+com\dfsek\tectonic\api\depth\IntrinsicLevel.java:1:package com.dfsek.tectonic.api.depth;
+com\dfsek\tectonic\api\depth\Level.java:1:package com.dfsek.tectonic.api.depth;
+com\dfsek\tectonic\api\exception\ConfigException.java:1:package com.dfsek.tectonic.api.exception;
+com\dfsek\tectonic\api\exception\ConfigException.java:3:import com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\tectonic\api\exception\InvalidTemplateException.java:1:package com.dfsek.tectonic.api.exception;
+com\dfsek\tectonic\api\exception\InvalidTemplateException.java:3:import com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\tectonic\api\exception\LoadException.java:1:package com.dfsek.tectonic.api.exception;
+com\dfsek\tectonic\api\exception\LoadException.java:3:import com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\tectonic\api\exception\ReflectiveAccessException.java:1:package com.dfsek.tectonic.api.exception;
+com\dfsek\tectonic\api\exception\ValidationException.java:1:package com.dfsek.tectonic.api.exception;
+com\dfsek\tectonic\api\exception\ValueMissingException.java:1:package com.dfsek.tectonic.api.exception;
+com\dfsek\tectonic\api\exception\ValueMissingException.java:3:import com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\tectonic\api\exception\abstraction\AbstractionException.java:1:package 
+com.dfsek.tectonic.api.exception.abstraction;
+com\dfsek\tectonic\api\exception\abstraction\CircularInheritanceException.java:1:package 
+com.dfsek.tectonic.api.exception.abstraction;
+com\dfsek\tectonic\api\exception\abstraction\ParentNotFoundException.java:1:package 
+com.dfsek.tectonic.api.exception.abstraction;
+com\dfsek\tectonic\api\loader\AbstractConfigLoader.java:1:package com.dfsek.tectonic.api.loader;
+com\dfsek\tectonic\api\loader\AbstractConfigLoader.java:3:import com.dfsek.tectonic.api.TypeRegistry;
+com\dfsek\tectonic\api\loader\AbstractConfigLoader.java:4:import com.dfsek.tectonic.api.config.Configuration;
+com\dfsek\tectonic\api\loader\AbstractConfigLoader.java:5:import com.dfsek.tectonic.api.config.template.ConfigTemplate;
+com\dfsek\tectonic\api\loader\AbstractConfigLoader.java:6:import 
+com.dfsek.tectonic.api.config.template.object.ObjectTemplate;
+com\dfsek\tectonic\api\loader\AbstractConfigLoader.java:7:import com.dfsek.tectonic.api.exception.ConfigException;
+com\dfsek\tectonic\api\loader\AbstractConfigLoader.java:8:import com.dfsek.tectonic.api.loader.type.TypeLoader;
+com\dfsek\tectonic\api\loader\AbstractConfigLoader.java:9:import com.dfsek.tectonic.api.preprocessor.ValuePreprocessor;
+com\dfsek\tectonic\api\loader\AbstractConfigLoader.java:10:import 
+com.dfsek.tectonic.impl.abstraction.AbstractConfiguration;
+com\dfsek\tectonic\api\loader\AbstractConfigLoader.java:11:import com.dfsek.tectonic.impl.abstraction.AbstractPool;
+com\dfsek\tectonic\api\loader\AbstractConfigLoader.java:12:import com.dfsek.tectonic.impl.abstraction.Prototype;
+com\dfsek\tectonic\api\loader\ConfigLoader.java:1:package com.dfsek.tectonic.api.loader;
+com\dfsek\tectonic\api\loader\ConfigLoader.java:3:import com.dfsek.tectonic.api.TypeRegistry;
+com\dfsek\tectonic\api\loader\ConfigLoader.java:4:import com.dfsek.tectonic.api.config.Configuration;
+com\dfsek\tectonic\api\loader\ConfigLoader.java:5:import com.dfsek.tectonic.api.config.template.ConfigTemplate;
+com\dfsek\tectonic\api\loader\ConfigLoader.java:6:import 
+com.dfsek.tectonic.api.config.template.ValidatedConfigTemplate;
+com\dfsek\tectonic\api\loader\ConfigLoader.java:7:import com.dfsek.tectonic.api.config.template.object.ObjectTemplate;
+com\dfsek\tectonic\api\loader\ConfigLoader.java:8:import com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\tectonic\api\loader\ConfigLoader.java:9:import com.dfsek.tectonic.api.exception.ConfigException;
+com\dfsek\tectonic\api\loader\ConfigLoader.java:10:import com.dfsek.tectonic.api.exception.LoadException;
+com\dfsek\tectonic\api\loader\ConfigLoader.java:11:import com.dfsek.tectonic.api.exception.ValidationException;
+com\dfsek\tectonic\api\loader\ConfigLoader.java:12:import com.dfsek.tectonic.api.exception.ValueMissingException;
+com\dfsek\tectonic\api\loader\ConfigLoader.java:13:import com.dfsek.tectonic.api.loader.type.TypeLoader;
+com\dfsek\tectonic\api\loader\ConfigLoader.java:14:import com.dfsek.tectonic.api.preprocessor.Result;
+com\dfsek\tectonic\api\loader\ConfigLoader.java:15:import com.dfsek.tectonic.api.preprocessor.ValuePreprocessor;
+com\dfsek\tectonic\api\loader\ConfigLoader.java:16:import com.dfsek.tectonic.impl.abstraction.AbstractConfiguration;
+com\dfsek\tectonic\api\loader\ConfigLoader.java:17:import com.dfsek.tectonic.impl.loading.loaders.EnumLoader;
+com\dfsek\tectonic\api\loader\ConfigLoader.java:18:import com.dfsek.tectonic.impl.loading.loaders.StringLoader;
+com\dfsek\tectonic\api\loader\ConfigLoader.java:19:import 
+com.dfsek.tectonic.impl.loading.loaders.generic.ArrayListLoader;
+com\dfsek\tectonic\api\loader\ConfigLoader.java:20:import 
+com.dfsek.tectonic.impl.loading.loaders.generic.HashMapLoader;
+com\dfsek\tectonic\api\loader\ConfigLoader.java:21:import 
+com.dfsek.tectonic.impl.loading.loaders.generic.HashSetLoader;
+com\dfsek\tectonic\api\loader\ConfigLoader.java:22:import com.dfsek.tectonic.impl.loading.loaders.other.DurationLoader;
+com\dfsek\tectonic\api\loader\ConfigLoader.java:23:import 
+com.dfsek.tectonic.impl.loading.loaders.primitives.BooleanLoader;
+com\dfsek\tectonic\api\loader\ConfigLoader.java:24:import 
+com.dfsek.tectonic.impl.loading.loaders.primitives.ByteLoader;
+com\dfsek\tectonic\api\loader\ConfigLoader.java:25:import 
+com.dfsek.tectonic.impl.loading.loaders.primitives.CharLoader;
+com\dfsek\tectonic\api\loader\ConfigLoader.java:26:import 
+com.dfsek.tectonic.impl.loading.loaders.primitives.DoubleLoader;
+com\dfsek\tectonic\api\loader\ConfigLoader.java:27:import 
+com.dfsek.tectonic.impl.loading.loaders.primitives.FloatLoader;
+com\dfsek\tectonic\api\loader\ConfigLoader.java:28:import com.dfsek.tectonic.impl.loading.loaders.primitives.IntLoader;
+com\dfsek\tectonic\api\loader\ConfigLoader.java:29:import 
+com.dfsek.tectonic.impl.loading.loaders.primitives.LongLoader;
+com\dfsek\tectonic\api\loader\ConfigLoader.java:30:import 
+com.dfsek.tectonic.impl.loading.loaders.primitives.ShortLoader;
+com\dfsek\tectonic\api\loader\ConfigLoader.java:31:import com.dfsek.tectonic.impl.loading.object.ObjectTemplateLoader;
+com\dfsek\tectonic\api\loader\ConfigLoader.java:32:import com.dfsek.tectonic.util.ReflectionUtil;
+com\dfsek\tectonic\api\loader\TemplateLoader.java:1:package com.dfsek.tectonic.api.loader;
+com\dfsek\tectonic\api\loader\TemplateLoader.java:3:import com.dfsek.tectonic.api.config.Configuration;
+com\dfsek\tectonic\api\loader\TemplateLoader.java:4:import com.dfsek.tectonic.api.config.template.ConfigTemplate;
+com\dfsek\tectonic\api\loader\TemplateLoader.java:5:import com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\tectonic\api\loader\ValueLoader.java:1:package com.dfsek.tectonic.api.loader;
+com\dfsek\tectonic\api\loader\ValueLoader.java:3:import com.dfsek.tectonic.api.config.Configuration;
+com\dfsek\tectonic\api\loader\ValueLoader.java:4:import com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\tectonic\api\loader\type\TypeLoader.java:1:package com.dfsek.tectonic.api.loader.type;
+com\dfsek\tectonic\api\loader\type\TypeLoader.java:3:import com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\tectonic\api\loader\type\TypeLoader.java:4:import com.dfsek.tectonic.api.exception.LoadException;
+com\dfsek\tectonic\api\loader\type\TypeLoader.java:5:import com.dfsek.tectonic.api.loader.ConfigLoader;
+com\dfsek\tectonic\api\loader\type\TypeLoader.java:6:import com.dfsek.tectonic.util.ClassAnnotatedTypeImpl;
+com\dfsek\tectonic\api\preprocessor\Result.java:1:package com.dfsek.tectonic.api.preprocessor;
+com\dfsek\tectonic\api\preprocessor\Result.java:3:import com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\tectonic\api\preprocessor\ValuePreprocessor.java:1:package com.dfsek.tectonic.api.preprocessor;
+com\dfsek\tectonic\api\preprocessor\ValuePreprocessor.java:3:import com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\tectonic\api\preprocessor\ValuePreprocessor.java:4:import com.dfsek.tectonic.api.loader.ConfigLoader;
+com\dfsek\tectonic\impl\MapConfiguration.java:1:package com.dfsek.tectonic.impl;
+com\dfsek\tectonic\impl\MapConfiguration.java:3:import com.dfsek.tectonic.api.config.Configuration;
+com\dfsek\tectonic\impl\abstraction\AbstractConfiguration.java:1:package com.dfsek.tectonic.impl.abstraction;
+com\dfsek\tectonic\impl\abstraction\AbstractConfiguration.java:3:import com.dfsek.tectonic.api.config.Configuration;
+com\dfsek\tectonic\impl\abstraction\AbstractPool.java:1:package com.dfsek.tectonic.impl.abstraction;
+com\dfsek\tectonic\impl\abstraction\AbstractPool.java:3:import 
+com.dfsek.tectonic.api.exception.abstraction.AbstractionException;
+com\dfsek\tectonic\impl\abstraction\Prototype.java:1:package com.dfsek.tectonic.impl.abstraction;
+com\dfsek\tectonic\impl\abstraction\Prototype.java:3:import com.dfsek.tectonic.api.config.Configuration;
+com\dfsek\tectonic\impl\abstraction\Prototype.java:4:import 
+com.dfsek.tectonic.api.config.template.ValidatedConfigTemplate;
+com\dfsek\tectonic\impl\abstraction\Prototype.java:5:import com.dfsek.tectonic.api.config.template.annotations.Default;
+com\dfsek\tectonic\impl\abstraction\Prototype.java:6:import com.dfsek.tectonic.api.config.template.annotations.Final;
+com\dfsek\tectonic\impl\abstraction\Prototype.java:7:import com.dfsek.tectonic.api.config.template.annotations.Value;
+com\dfsek\tectonic\impl\abstraction\Prototype.java:8:import com.dfsek.tectonic.api.exception.ConfigException;
+com\dfsek\tectonic\impl\abstraction\Prototype.java:9:import com.dfsek.tectonic.api.exception.ValidationException;
+com\dfsek\tectonic\impl\abstraction\Prototype.java:10:import 
+com.dfsek.tectonic.api.exception.abstraction.AbstractionException;
+com\dfsek\tectonic\impl\abstraction\Prototype.java:11:import 
+com.dfsek.tectonic.api.exception.abstraction.CircularInheritanceException;
+com\dfsek\tectonic\impl\abstraction\Prototype.java:12:import 
+com.dfsek.tectonic.api.exception.abstraction.ParentNotFoundException;
+com\dfsek\tectonic\impl\abstraction\Prototype.java:13:import com.dfsek.tectonic.api.loader.ConfigLoader;
+com\dfsek\tectonic\impl\annotations\Generated.java:1:package com.dfsek.tectonic.impl.annotations;
+com\dfsek\tectonic\impl\loading\loaders\EnumLoader.java:1:package com.dfsek.tectonic.impl.loading.loaders;
+com\dfsek\tectonic\impl\loading\loaders\EnumLoader.java:3:import com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\tectonic\impl\loading\loaders\EnumLoader.java:4:import com.dfsek.tectonic.api.exception.LoadException;
+com\dfsek\tectonic\impl\loading\loaders\EnumLoader.java:5:import com.dfsek.tectonic.api.loader.ConfigLoader;
+com\dfsek\tectonic\impl\loading\loaders\EnumLoader.java:6:import com.dfsek.tectonic.api.loader.type.TypeLoader;
+com\dfsek\tectonic\impl\loading\loaders\StringLoader.java:1:package com.dfsek.tectonic.impl.loading.loaders;
+com\dfsek\tectonic\impl\loading\loaders\StringLoader.java:3:import com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\tectonic\impl\loading\loaders\StringLoader.java:4:import com.dfsek.tectonic.api.loader.ConfigLoader;
+com\dfsek\tectonic\impl\loading\loaders\StringLoader.java:5:import com.dfsek.tectonic.api.loader.type.TypeLoader;
+com\dfsek\tectonic\impl\loading\loaders\generic\ArrayListLoader.java:1:package 
+com.dfsek.tectonic.impl.loading.loaders.generic;
+com\dfsek\tectonic\impl\loading\loaders\generic\ArrayListLoader.java:3:import 
+com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\tectonic\impl\loading\loaders\generic\ArrayListLoader.java:4:import 
+com.dfsek.tectonic.api.exception.LoadException;
+com\dfsek\tectonic\impl\loading\loaders\generic\ArrayListLoader.java:5:import 
+com.dfsek.tectonic.api.loader.ConfigLoader;
+com\dfsek\tectonic\impl\loading\loaders\generic\ArrayListLoader.java:6:import 
+com.dfsek.tectonic.api.loader.type.TypeLoader;
+com\dfsek\tectonic\impl\loading\loaders\generic\HashMapLoader.java:1:package 
+com.dfsek.tectonic.impl.loading.loaders.generic;
+com\dfsek\tectonic\impl\loading\loaders\generic\HashMapLoader.java:3:import com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\tectonic\impl\loading\loaders\generic\HashMapLoader.java:4:import 
+com.dfsek.tectonic.api.exception.LoadException;
+com\dfsek\tectonic\impl\loading\loaders\generic\HashMapLoader.java:5:import com.dfsek.tectonic.api.loader.ConfigLoader;
+com\dfsek\tectonic\impl\loading\loaders\generic\HashMapLoader.java:6:import 
+com.dfsek.tectonic.api.loader.type.TypeLoader;
+com\dfsek\tectonic\impl\loading\loaders\generic\HashSetLoader.java:1:package 
+com.dfsek.tectonic.impl.loading.loaders.generic;
+com\dfsek\tectonic\impl\loading\loaders\generic\HashSetLoader.java:3:import com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\tectonic\impl\loading\loaders\generic\HashSetLoader.java:4:import 
+com.dfsek.tectonic.api.exception.LoadException;
+com\dfsek\tectonic\impl\loading\loaders\generic\HashSetLoader.java:5:import com.dfsek.tectonic.api.loader.ConfigLoader;
+com\dfsek\tectonic\impl\loading\loaders\generic\HashSetLoader.java:6:import 
+com.dfsek.tectonic.api.loader.type.TypeLoader;
+com\dfsek\tectonic\impl\loading\loaders\other\DurationLoader.java:1:package 
+com.dfsek.tectonic.impl.loading.loaders.other;
+com\dfsek\tectonic\impl\loading\loaders\other\DurationLoader.java:3:import com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\tectonic\impl\loading\loaders\other\DurationLoader.java:4:import com.dfsek.tectonic.api.loader.ConfigLoader;
+com\dfsek\tectonic\impl\loading\loaders\other\DurationLoader.java:5:import 
+com.dfsek.tectonic.api.loader.type.TypeLoader;
+com\dfsek\tectonic\impl\loading\loaders\primitives\BooleanLoader.java:1:package 
+com.dfsek.tectonic.impl.loading.loaders.primitives;
+com\dfsek\tectonic\impl\loading\loaders\primitives\BooleanLoader.java:3:import 
+com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\tectonic\impl\loading\loaders\primitives\BooleanLoader.java:4:import 
+com.dfsek.tectonic.api.exception.LoadException;
+com\dfsek\tectonic\impl\loading\loaders\primitives\BooleanLoader.java:5:import 
+com.dfsek.tectonic.api.loader.ConfigLoader;
+com\dfsek\tectonic\impl\loading\loaders\primitives\BooleanLoader.java:6:import 
+com.dfsek.tectonic.api.loader.type.TypeLoader;
+com\dfsek\tectonic\impl\loading\loaders\primitives\ByteLoader.java:1:package 
+com.dfsek.tectonic.impl.loading.loaders.primitives;
+com\dfsek\tectonic\impl\loading\loaders\primitives\ByteLoader.java:3:import com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\tectonic\impl\loading\loaders\primitives\ByteLoader.java:4:import 
+com.dfsek.tectonic.api.exception.LoadException;
+com\dfsek\tectonic\impl\loading\loaders\primitives\ByteLoader.java:5:import com.dfsek.tectonic.api.loader.ConfigLoader;
+com\dfsek\tectonic\impl\loading\loaders\primitives\ByteLoader.java:6:import 
+com.dfsek.tectonic.api.loader.type.TypeLoader;
+com\dfsek\tectonic\impl\loading\loaders\primitives\CharLoader.java:1:package 
+com.dfsek.tectonic.impl.loading.loaders.primitives;
+com\dfsek\tectonic\impl\loading\loaders\primitives\CharLoader.java:3:import com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\tectonic\impl\loading\loaders\primitives\CharLoader.java:4:import 
+com.dfsek.tectonic.api.exception.LoadException;
+com\dfsek\tectonic\impl\loading\loaders\primitives\CharLoader.java:5:import com.dfsek.tectonic.api.loader.ConfigLoader;
+com\dfsek\tectonic\impl\loading\loaders\primitives\CharLoader.java:6:import 
+com.dfsek.tectonic.api.loader.type.TypeLoader;
+com\dfsek\tectonic\impl\loading\loaders\primitives\DoubleLoader.java:1:package 
+com.dfsek.tectonic.impl.loading.loaders.primitives;
+com\dfsek\tectonic\impl\loading\loaders\primitives\DoubleLoader.java:3:import 
+com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\tectonic\impl\loading\loaders\primitives\DoubleLoader.java:4:import 
+com.dfsek.tectonic.api.exception.LoadException;
+com\dfsek\tectonic\impl\loading\loaders\primitives\DoubleLoader.java:5:import 
+com.dfsek.tectonic.api.loader.ConfigLoader;
+com\dfsek\tectonic\impl\loading\loaders\primitives\DoubleLoader.java:6:import 
+com.dfsek.tectonic.api.loader.type.TypeLoader;
+com\dfsek\tectonic\impl\loading\loaders\primitives\FloatLoader.java:1:package 
+com.dfsek.tectonic.impl.loading.loaders.primitives;
+com\dfsek\tectonic\impl\loading\loaders\primitives\FloatLoader.java:3:import com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\tectonic\impl\loading\loaders\primitives\FloatLoader.java:4:import 
+com.dfsek.tectonic.api.exception.LoadException;
+com\dfsek\tectonic\impl\loading\loaders\primitives\FloatLoader.java:5:import 
+com.dfsek.tectonic.api.loader.ConfigLoader;
+com\dfsek\tectonic\impl\loading\loaders\primitives\FloatLoader.java:6:import 
+com.dfsek.tectonic.api.loader.type.TypeLoader;
+com\dfsek\tectonic\impl\loading\loaders\primitives\IntLoader.java:1:package 
+com.dfsek.tectonic.impl.loading.loaders.primitives;
+com\dfsek\tectonic\impl\loading\loaders\primitives\IntLoader.java:3:import com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\tectonic\impl\loading\loaders\primitives\IntLoader.java:4:import 
+com.dfsek.tectonic.api.exception.LoadException;
+com\dfsek\tectonic\impl\loading\loaders\primitives\IntLoader.java:5:import com.dfsek.tectonic.api.loader.ConfigLoader;
+com\dfsek\tectonic\impl\loading\loaders\primitives\IntLoader.java:6:import 
+com.dfsek.tectonic.api.loader.type.TypeLoader;
+com\dfsek\tectonic\impl\loading\loaders\primitives\LongLoader.java:1:package 
+com.dfsek.tectonic.impl.loading.loaders.primitives;
+com\dfsek\tectonic\impl\loading\loaders\primitives\LongLoader.java:3:import com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\tectonic\impl\loading\loaders\primitives\LongLoader.java:4:import 
+com.dfsek.tectonic.api.exception.LoadException;
+com\dfsek\tectonic\impl\loading\loaders\primitives\LongLoader.java:5:import com.dfsek.tectonic.api.loader.ConfigLoader;
+com\dfsek\tectonic\impl\loading\loaders\primitives\LongLoader.java:6:import 
+com.dfsek.tectonic.api.loader.type.TypeLoader;
+com\dfsek\tectonic\impl\loading\loaders\primitives\ShortLoader.java:1:package 
+com.dfsek.tectonic.impl.loading.loaders.primitives;
+com\dfsek\tectonic\impl\loading\loaders\primitives\ShortLoader.java:3:import com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\tectonic\impl\loading\loaders\primitives\ShortLoader.java:4:import 
+com.dfsek.tectonic.api.exception.LoadException;
+com\dfsek\tectonic\impl\loading\loaders\primitives\ShortLoader.java:5:import 
+com.dfsek.tectonic.api.loader.ConfigLoader;
+com\dfsek\tectonic\impl\loading\loaders\primitives\ShortLoader.java:6:import 
+com.dfsek.tectonic.api.loader.type.TypeLoader;
+com\dfsek\tectonic\impl\loading\object\ObjectTemplateLoader.java:1:package com.dfsek.tectonic.impl.loading.object;
+com\dfsek\tectonic\impl\loading\object\ObjectTemplateLoader.java:3:import 
+com.dfsek.tectonic.api.config.template.object.ObjectTemplate;
+com\dfsek\tectonic\impl\loading\object\ObjectTemplateLoader.java:4:import com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\tectonic\impl\loading\object\ObjectTemplateLoader.java:5:import 
+com.dfsek.tectonic.api.exception.LoadException;
+com\dfsek\tectonic\impl\loading\object\ObjectTemplateLoader.java:6:import com.dfsek.tectonic.api.loader.ConfigLoader;
+com\dfsek\tectonic\impl\loading\object\ObjectTemplateLoader.java:7:import 
+com.dfsek.tectonic.api.loader.type.TypeLoader;
+com\dfsek\tectonic\impl\loading\object\ObjectTemplateLoader.java:8:import com.dfsek.tectonic.impl.MapConfiguration;
+com\dfsek\tectonic\impl\loading\template\ReflectiveTemplateLoader.java:1:package 
+com.dfsek.tectonic.impl.loading.template;
+com\dfsek\tectonic\impl\loading\template\ReflectiveTemplateLoader.java:3:import 
+com.dfsek.tectonic.api.config.Configuration;
+com\dfsek\tectonic\impl\loading\template\ReflectiveTemplateLoader.java:4:import 
+com.dfsek.tectonic.api.config.template.ConfigTemplate;
+com\dfsek\tectonic\impl\loading\template\ReflectiveTemplateLoader.java:5:import 
+com.dfsek.tectonic.api.config.template.annotations.Default;
+com\dfsek\tectonic\impl\loading\template\ReflectiveTemplateLoader.java:6:import 
+com.dfsek.tectonic.api.config.template.annotations.Final;
+com\dfsek\tectonic\impl\loading\template\ReflectiveTemplateLoader.java:7:import 
+com.dfsek.tectonic.api.config.template.annotations.Value;
+com\dfsek\tectonic\impl\loading\template\ReflectiveTemplateLoader.java:8:import 
+com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\tectonic\impl\loading\template\ReflectiveTemplateLoader.java:9:import 
+com.dfsek.tectonic.api.exception.InvalidTemplateException;
+com\dfsek\tectonic\impl\loading\template\ReflectiveTemplateLoader.java:10:import 
+com.dfsek.tectonic.api.exception.LoadException;
+com\dfsek\tectonic\impl\loading\template\ReflectiveTemplateLoader.java:11:import 
+com.dfsek.tectonic.api.exception.ValueMissingException;
+com\dfsek\tectonic\impl\loading\template\ReflectiveTemplateLoader.java:12:import 
+com.dfsek.tectonic.api.loader.TemplateLoader;
+com\dfsek\tectonic\impl\loading\template\ReflectiveTemplateLoader.java:13:import 
+com.dfsek.tectonic.api.loader.ValueLoader;
+com\dfsek\tectonic\impl\loading\template\ReflectiveTemplateLoader.java:14:import 
+com.dfsek.tectonic.util.ReflectionUtil;
+com\dfsek\tectonic\util\ClassAnnotatedTypeImpl.java:1:package com.dfsek.tectonic.util;
+com\dfsek\tectonic\util\ReflectionUtil.java:1:package com.dfsek.tectonic.util;
+com\dfsek\tectonic\util\ReflectionUtil.java:3:import com.dfsek.tectonic.api.exception.ReflectiveAccessException;
+com\dfsek\tectonic\yaml\YamlConfiguration.java:1:package com.dfsek.tectonic.yaml;
+com\dfsek\tectonic\yaml\YamlConfiguration.java:3:import com.dfsek.tectonic.api.config.Configuration;
+com\dfsek\terra\AbstractPlatform.java:3:import com.dfsek.tectonic.api.TypeRegistry;
+com\dfsek\terra\api\Platform.java:12:import com.dfsek.terra.api.tectonic.LoaderRegistrar;
+com\dfsek\terra\api\config\AbstractableTemplate.java:3:import com.dfsek.tectonic.api.config.template.ConfigTemplate;
+com\dfsek\terra\api\config\ConfigFactory.java:3:import com.dfsek.tectonic.api.config.template.ConfigTemplate;
+com\dfsek\terra\api\config\ConfigFactory.java:4:import com.dfsek.tectonic.api.exception.LoadException;
+com\dfsek\terra\api\config\ConfigPack.java:12:import com.dfsek.terra.api.tectonic.ConfigLoadingDelegate;
+com\dfsek\terra\api\config\ConfigPack.java:13:import com.dfsek.terra.api.tectonic.LoaderRegistrar;
+com\dfsek\terra\api\config\ConfigPack.java:14:import com.dfsek.terra.api.tectonic.ShortcutLoader;
+com\dfsek\terra\api\config\Loader.java:3:import com.dfsek.tectonic.api.exception.ConfigException;
+com\dfsek\terra\api\event\events\config\ConfigurationDiscoveryEvent.java:3:import 
+com.dfsek.tectonic.api.config.Configuration;
+com\dfsek\terra\api\event\events\config\ConfigurationLoadEvent.java:3:import 
+com.dfsek.tectonic.api.config.template.ConfigTemplate;
+com\dfsek\terra\api\event\events\config\ConfigurationLoadEvent.java:4:import 
+com.dfsek.tectonic.impl.abstraction.AbstractConfiguration;
+com\dfsek\terra\api\event\events\config\pack\ConfigPackLoadEvent.java:3:import 
+com.dfsek.tectonic.api.config.template.ConfigTemplate;
+com\dfsek\terra\api\event\events\config\pack\ConfigPackLoadEvent.java:4:import 
+com.dfsek.tectonic.api.exception.ConfigException;
+com\dfsek\terra\api\event\events\config\pack\ConfigPackPostLoadEvent.java:3:import 
+com.dfsek.tectonic.api.config.template.ConfigTemplate;
+com\dfsek\terra\api\event\events\config\pack\ConfigPackPreLoadEvent.java:3:import 
+com.dfsek.tectonic.api.config.template.ConfigTemplate;
+com\dfsek\terra\api\registry\Registry.java:3:import com.dfsek.tectonic.api.loader.type.TypeLoader;
+com\dfsek\terra\api\tectonic\ConfigLoadingDelegate.java:1:package com.dfsek.terra.api.tectonic;
+com\dfsek\terra\api\tectonic\ConfigLoadingDelegate.java:3:import 
+com.dfsek.tectonic.api.config.template.object.ObjectTemplate;
+com\dfsek\terra\api\tectonic\ConfigLoadingDelegate.java:4:import com.dfsek.tectonic.api.loader.type.TypeLoader;
+com\dfsek\terra\api\tectonic\LoaderRegistrar.java:1:package com.dfsek.terra.api.tectonic;
+com\dfsek\terra\api\tectonic\LoaderRegistrar.java:3:import com.dfsek.tectonic.api.TypeRegistry;
+com\dfsek\terra\api\tectonic\ShortcutLoader.java:1:package com.dfsek.terra.api.tectonic;
+com\dfsek\terra\api\tectonic\ShortcutLoader.java:3:import com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\terra\api\tectonic\ShortcutLoader.java:4:import com.dfsek.tectonic.api.loader.ConfigLoader;
+com\dfsek\terra\api\util\reflection\TypeKey.java:3:import com.dfsek.tectonic.util.ClassAnnotatedTypeImpl;
+com\dfsek\terra\bukkit\PlatformImpl.java:3:import com.dfsek.tectonic.api.TypeRegistry;
+com\dfsek\terra\bukkit\PlatformImpl.java:4:import com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\terra\bukkit\PlatformImpl.java:5:import com.dfsek.tectonic.api.exception.LoadException;
+com\dfsek\terra\bukkit\config\PreLoadCompatibilityOptions.java:3:import 
+com.dfsek.tectonic.api.config.template.ConfigTemplate;
+com\dfsek\terra\bukkit\config\PreLoadCompatibilityOptions.java:4:import 
+com.dfsek.tectonic.api.config.template.annotations.Default;
+com\dfsek\terra\bukkit\config\PreLoadCompatibilityOptions.java:5:import 
+com.dfsek.tectonic.api.config.template.annotations.Value;
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSPlatform.java:3:import com.dfsek.tectonic.api.TypeRegistry;
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSPlatform.java:4:import com.dfsek.tectonic.api.exception.LoadException;
+com\dfsek\terra\bukkit\nms\v1_21_8\config\BiomeAdditionsSoundTemplate.java:3:import 
+com.dfsek.tectonic.api.config.template.annotations.Default;
+com\dfsek\terra\bukkit\nms\v1_21_8\config\BiomeAdditionsSoundTemplate.java:4:import 
+com.dfsek.tectonic.api.config.template.annotations.Value;
+com\dfsek\terra\bukkit\nms\v1_21_8\config\BiomeAdditionsSoundTemplate.java:5:import 
+com.dfsek.tectonic.api.config.template.object.ObjectTemplate;
+com\dfsek\terra\bukkit\nms\v1_21_8\config\BiomeMoodSoundTemplate.java:3:import 
+com.dfsek.tectonic.api.config.template.annotations.Default;
+com\dfsek\terra\bukkit\nms\v1_21_8\config\BiomeMoodSoundTemplate.java:4:import 
+com.dfsek.tectonic.api.config.template.annotations.Value;
+com\dfsek\terra\bukkit\nms\v1_21_8\config\BiomeMoodSoundTemplate.java:5:import 
+com.dfsek.tectonic.api.config.template.object.ObjectTemplate;
+com\dfsek\terra\bukkit\nms\v1_21_8\config\BiomeParticleConfigTemplate.java:3:import 
+com.dfsek.tectonic.api.config.template.annotations.Default;
+com\dfsek\terra\bukkit\nms\v1_21_8\config\BiomeParticleConfigTemplate.java:4:import 
+com.dfsek.tectonic.api.config.template.annotations.Value;
+com\dfsek\terra\bukkit\nms\v1_21_8\config\BiomeParticleConfigTemplate.java:5:import 
+com.dfsek.tectonic.api.config.template.object.ObjectTemplate;
+com\dfsek\terra\bukkit\nms\v1_21_8\config\EntityTypeTemplate.java:3:import 
+com.dfsek.tectonic.api.config.template.annotations.Default;
+com\dfsek\terra\bukkit\nms\v1_21_8\config\EntityTypeTemplate.java:4:import 
+com.dfsek.tectonic.api.config.template.annotations.Value;
+com\dfsek\terra\bukkit\nms\v1_21_8\config\EntityTypeTemplate.java:5:import 
+com.dfsek.tectonic.api.config.template.object.ObjectTemplate;
+com\dfsek\terra\bukkit\nms\v1_21_8\config\MusicSoundTemplate.java:3:import 
+com.dfsek.tectonic.api.config.template.annotations.Default;
+com\dfsek\terra\bukkit\nms\v1_21_8\config\MusicSoundTemplate.java:4:import 
+com.dfsek.tectonic.api.config.template.annotations.Value;
+com\dfsek\terra\bukkit\nms\v1_21_8\config\MusicSoundTemplate.java:5:import 
+com.dfsek.tectonic.api.config.template.object.ObjectTemplate;
+com\dfsek\terra\bukkit\nms\v1_21_8\config\SoundEventTemplate.java:3:import 
+com.dfsek.tectonic.api.config.template.annotations.Default;
+com\dfsek\terra\bukkit\nms\v1_21_8\config\SoundEventTemplate.java:4:import 
+com.dfsek.tectonic.api.config.template.annotations.Value;
+com\dfsek\terra\bukkit\nms\v1_21_8\config\SoundEventTemplate.java:5:import 
+com.dfsek.tectonic.api.config.template.object.ObjectTemplate;
+com\dfsek\terra\bukkit\nms\v1_21_8\config\SpawnCostConfig.java:3:import 
+com.dfsek.tectonic.api.config.template.annotations.Default;
+com\dfsek\terra\bukkit\nms\v1_21_8\config\SpawnCostConfig.java:4:import 
+com.dfsek.tectonic.api.config.template.annotations.Value;
+com\dfsek\terra\bukkit\nms\v1_21_8\config\SpawnCostConfig.java:5:import 
+com.dfsek.tectonic.api.config.template.object.ObjectTemplate;
+com\dfsek\terra\bukkit\nms\v1_21_8\config\SpawnEntryConfig.java:3:import 
+com.dfsek.tectonic.api.config.template.annotations.Default;
+com\dfsek\terra\bukkit\nms\v1_21_8\config\SpawnEntryConfig.java:4:import 
+com.dfsek.tectonic.api.config.template.annotations.Value;
+com\dfsek\terra\bukkit\nms\v1_21_8\config\SpawnEntryConfig.java:5:import 
+com.dfsek.tectonic.api.config.template.object.ObjectTemplate;
+com\dfsek\terra\bukkit\nms\v1_21_8\config\SpawnSettingsTemplate.java:3:import 
+com.dfsek.tectonic.api.config.template.annotations.Default;
+com\dfsek\terra\bukkit\nms\v1_21_8\config\SpawnSettingsTemplate.java:4:import 
+com.dfsek.tectonic.api.config.template.annotations.Value;
+com\dfsek\terra\bukkit\nms\v1_21_8\config\SpawnSettingsTemplate.java:5:import 
+com.dfsek.tectonic.api.config.template.object.ObjectTemplate;
+com\dfsek\terra\bukkit\nms\v1_21_8\config\SpawnTypeConfig.java:3:import 
+com.dfsek.tectonic.api.config.template.annotations.Default;
+com\dfsek\terra\bukkit\nms\v1_21_8\config\SpawnTypeConfig.java:4:import 
+com.dfsek.tectonic.api.config.template.annotations.Value;
+com\dfsek\terra\bukkit\nms\v1_21_8\config\SpawnTypeConfig.java:5:import 
+com.dfsek.tectonic.api.config.template.object.ObjectTemplate;
+com\dfsek\terra\bukkit\nms\v1_21_8\config\VanillaBiomeProperties.java:3:import 
+com.dfsek.tectonic.api.config.template.ConfigTemplate;
+com\dfsek\terra\bukkit\nms\v1_21_8\config\VanillaBiomeProperties.java:4:import 
+com.dfsek.tectonic.api.config.template.annotations.Default;
+com\dfsek\terra\bukkit\nms\v1_21_8\config\VanillaBiomeProperties.java:5:import 
+com.dfsek.tectonic.api.config.template.annotations.Value;
+com\dfsek\terra\bukkit\nms\v1_21_8\config\VillagerTypeTemplate.java:3:import 
+com.dfsek.tectonic.api.config.template.annotations.Default;
+com\dfsek\terra\bukkit\nms\v1_21_8\config\VillagerTypeTemplate.java:4:import 
+com.dfsek.tectonic.api.config.template.annotations.Value;
+com\dfsek\terra\bukkit\nms\v1_21_8\config\VillagerTypeTemplate.java:5:import 
+com.dfsek.tectonic.api.config.template.object.ObjectTemplate;
+com\dfsek\terra\config\GenericLoaders.java:6:import com.dfsek.tectonic.api.TypeRegistry;
+com\dfsek\terra\config\GenericLoaders.java:11:import com.dfsek.terra.api.tectonic.LoaderRegistrar;
+com\dfsek\terra\config\PluginConfigImpl.java:3:import com.dfsek.tectonic.api.config.template.ConfigTemplate;
+com\dfsek\terra\config\PluginConfigImpl.java:4:import com.dfsek.tectonic.api.config.template.annotations.Default;
+com\dfsek\terra\config\PluginConfigImpl.java:5:import com.dfsek.tectonic.api.config.template.annotations.Value;
+com\dfsek\terra\config\PluginConfigImpl.java:6:import com.dfsek.tectonic.api.exception.ConfigException;
+com\dfsek\terra\config\PluginConfigImpl.java:7:import com.dfsek.tectonic.api.loader.ConfigLoader;
+com\dfsek\terra\config\PluginConfigImpl.java:8:import com.dfsek.tectonic.yaml.YamlConfiguration;
+com\dfsek\terra\config\fileloaders\LoaderImpl.java:3:import com.dfsek.tectonic.api.exception.ConfigException;
+com\dfsek\terra\config\loaders\ExpressionParserOptionsTemplate.java:4:import 
+com.dfsek.tectonic.api.config.template.annotations.Default;
+com\dfsek\terra\config\loaders\ExpressionParserOptionsTemplate.java:5:import 
+com.dfsek.tectonic.api.config.template.annotations.Value;
+com\dfsek\terra\config\loaders\ExpressionParserOptionsTemplate.java:6:import 
+com.dfsek.tectonic.api.config.template.object.ObjectTemplate;
+com\dfsek\terra\config\loaders\GenericTemplateSupplierLoader.java:3:import 
+com.dfsek.tectonic.api.config.template.object.ObjectTemplate;
+com\dfsek\terra\config\loaders\GenericTemplateSupplierLoader.java:4:import com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\terra\config\loaders\GenericTemplateSupplierLoader.java:5:import 
+com.dfsek.tectonic.api.exception.LoadException;
+com\dfsek\terra\config\loaders\GenericTemplateSupplierLoader.java:6:import com.dfsek.tectonic.api.loader.ConfigLoader;
+com\dfsek\terra\config\loaders\GenericTemplateSupplierLoader.java:7:import 
+com.dfsek.tectonic.api.loader.type.TypeLoader;
+com\dfsek\terra\config\loaders\GenericTemplateSupplierLoader.java:8:import com.dfsek.tectonic.impl.MapConfiguration;
+com\dfsek\terra\config\loaders\LinkedHashMapLoader.java:3:import com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\terra\config\loaders\LinkedHashMapLoader.java:4:import com.dfsek.tectonic.api.exception.LoadException;
+com\dfsek\terra\config\loaders\LinkedHashMapLoader.java:5:import com.dfsek.tectonic.api.loader.ConfigLoader;
+com\dfsek\terra\config\loaders\LinkedHashMapLoader.java:6:import com.dfsek.tectonic.api.loader.type.TypeLoader;
+com\dfsek\terra\config\loaders\MaterialSetLoader.java:3:import com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\terra\config\loaders\MaterialSetLoader.java:4:import com.dfsek.tectonic.api.exception.LoadException;
+com\dfsek\terra\config\loaders\MaterialSetLoader.java:5:import com.dfsek.tectonic.api.loader.ConfigLoader;
+com\dfsek\terra\config\loaders\MaterialSetLoader.java:6:import com.dfsek.tectonic.api.loader.type.TypeLoader;
+com\dfsek\terra\config\loaders\ProbabilityCollectionLoader.java:3:import com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\terra\config\loaders\ProbabilityCollectionLoader.java:4:import 
+com.dfsek.tectonic.api.exception.LoadException;
+com\dfsek\terra\config\loaders\ProbabilityCollectionLoader.java:5:import com.dfsek.tectonic.api.loader.ConfigLoader;
+com\dfsek\terra\config\loaders\ProbabilityCollectionLoader.java:6:import com.dfsek.tectonic.api.loader.type.TypeLoader;
+com\dfsek\terra\config\loaders\RangeLoader.java:3:import com.dfsek.tectonic.api.config.template.annotations.Value;
+com\dfsek\terra\config\loaders\RangeLoader.java:4:import com.dfsek.tectonic.api.config.template.object.ObjectTemplate;
+com\dfsek\terra\config\loaders\RangeLoader.java:5:import com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\terra\config\loaders\RangeLoader.java:6:import com.dfsek.tectonic.api.exception.LoadException;
+com\dfsek\terra\config\loaders\RangeLoader.java:7:import com.dfsek.tectonic.api.loader.ConfigLoader;
+com\dfsek\terra\config\loaders\RangeLoader.java:8:import com.dfsek.tectonic.api.loader.type.TypeLoader;
+com\dfsek\terra\config\loaders\RangeLoader.java:9:import com.dfsek.tectonic.impl.MapConfiguration;
+com\dfsek\terra\config\loaders\VersionLoader.java:6:import com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\terra\config\loaders\VersionLoader.java:7:import com.dfsek.tectonic.api.exception.LoadException;
+com\dfsek\terra\config\loaders\VersionLoader.java:8:import com.dfsek.tectonic.api.loader.ConfigLoader;
+com\dfsek\terra\config\loaders\VersionLoader.java:9:import com.dfsek.tectonic.api.loader.type.TypeLoader;
+com\dfsek\terra\config\loaders\VersionRangeLoader.java:6:import com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\terra\config\loaders\VersionRangeLoader.java:7:import com.dfsek.tectonic.api.exception.LoadException;
+com\dfsek\terra\config\loaders\VersionRangeLoader.java:8:import com.dfsek.tectonic.api.loader.ConfigLoader;
+com\dfsek\terra\config\loaders\VersionRangeLoader.java:9:import com.dfsek.tectonic.api.loader.type.TypeLoader;
+com\dfsek\terra\config\loaders\config\BufferedImageLoader.java:3:import com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\terra\config\loaders\config\BufferedImageLoader.java:4:import com.dfsek.tectonic.api.exception.LoadException;
+com\dfsek\terra\config\loaders\config\BufferedImageLoader.java:5:import com.dfsek.tectonic.api.loader.ConfigLoader;
+com\dfsek\terra\config\loaders\config\BufferedImageLoader.java:6:import com.dfsek.tectonic.api.loader.type.TypeLoader;
+com\dfsek\terra\config\pack\ConfigPackAddonsTemplate.java:4:import 
+com.dfsek.tectonic.api.config.template.ConfigTemplate;
+com\dfsek\terra\config\pack\ConfigPackAddonsTemplate.java:5:import 
+com.dfsek.tectonic.api.config.template.annotations.Default;
+com\dfsek\terra\config\pack\ConfigPackAddonsTemplate.java:6:import 
+com.dfsek.tectonic.api.config.template.annotations.Value;
+com\dfsek\terra\config\pack\ConfigPackExpressionOptionsTemplate.java:4:import 
+com.dfsek.tectonic.api.config.template.ConfigTemplate;
+com\dfsek\terra\config\pack\ConfigPackExpressionOptionsTemplate.java:5:import 
+com.dfsek.tectonic.api.config.template.annotations.Default;
+com\dfsek\terra\config\pack\ConfigPackExpressionOptionsTemplate.java:6:import 
+com.dfsek.tectonic.api.config.template.annotations.Value;
+com\dfsek\terra\config\pack\ConfigPackImpl.java:6:import com.dfsek.tectonic.api.TypeRegistry;
+com\dfsek\terra\config\pack\ConfigPackImpl.java:7:import com.dfsek.tectonic.api.config.Configuration;
+com\dfsek\terra\config\pack\ConfigPackImpl.java:8:import com.dfsek.tectonic.api.config.template.object.ObjectTemplate;
+com\dfsek\terra\config\pack\ConfigPackImpl.java:9:import com.dfsek.tectonic.api.loader.AbstractConfigLoader;
+com\dfsek\terra\config\pack\ConfigPackImpl.java:10:import com.dfsek.tectonic.api.loader.ConfigLoader;
+com\dfsek\terra\config\pack\ConfigPackImpl.java:11:import com.dfsek.tectonic.api.loader.type.TypeLoader;
+com\dfsek\terra\config\pack\ConfigPackImpl.java:12:import com.dfsek.tectonic.yaml.YamlConfiguration;
+com\dfsek\terra\config\pack\ConfigPackImpl.java:28:import com.dfsek.terra.api.tectonic.ShortcutLoader;
+com\dfsek\terra\config\pack\ConfigPackPostTemplate.java:3:import com.dfsek.tectonic.api.config.template.ConfigTemplate;
+com\dfsek\terra\config\pack\ConfigPackPostTemplate.java:4:import 
+com.dfsek.tectonic.api.config.template.annotations.Value;
+com\dfsek\terra\config\pack\ConfigPackTemplate.java:4:import com.dfsek.tectonic.api.config.template.ConfigTemplate;
+com\dfsek\terra\config\pack\ConfigPackTemplate.java:5:import 
+com.dfsek.tectonic.api.config.template.annotations.Default;
+com\dfsek\terra\config\pack\ConfigPackTemplate.java:6:import com.dfsek.tectonic.api.config.template.annotations.Value;
+com\dfsek\terra\config\preprocessor\MetaListLikePreprocessor.java:3:import com.dfsek.tectonic.api.config.Configuration;
+com\dfsek\terra\config\preprocessor\MetaListLikePreprocessor.java:4:import com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\terra\config\preprocessor\MetaListLikePreprocessor.java:5:import com.dfsek.tectonic.api.depth.IndexLevel;
+com\dfsek\terra\config\preprocessor\MetaListLikePreprocessor.java:6:import 
+com.dfsek.tectonic.api.exception.LoadException;
+com\dfsek\terra\config\preprocessor\MetaListLikePreprocessor.java:7:import com.dfsek.tectonic.api.loader.ConfigLoader;
+com\dfsek\terra\config\preprocessor\MetaListLikePreprocessor.java:8:import com.dfsek.tectonic.api.preprocessor.Result;
+com\dfsek\terra\config\preprocessor\MetaMapPreprocessor.java:3:import com.dfsek.tectonic.api.config.Configuration;
+com\dfsek\terra\config\preprocessor\MetaMapPreprocessor.java:4:import com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\terra\config\preprocessor\MetaMapPreprocessor.java:5:import com.dfsek.tectonic.api.depth.EntryLevel;
+com\dfsek\terra\config\preprocessor\MetaMapPreprocessor.java:6:import com.dfsek.tectonic.api.exception.LoadException;
+com\dfsek\terra\config\preprocessor\MetaMapPreprocessor.java:7:import com.dfsek.tectonic.api.loader.ConfigLoader;
+com\dfsek\terra\config\preprocessor\MetaMapPreprocessor.java:8:import com.dfsek.tectonic.api.preprocessor.Result;
+com\dfsek\terra\config\preprocessor\MetaNumberPreprocessor.java:5:import com.dfsek.tectonic.api.config.Configuration;
+com\dfsek\terra\config\preprocessor\MetaNumberPreprocessor.java:6:import com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\terra\config\preprocessor\MetaNumberPreprocessor.java:7:import 
+com.dfsek.tectonic.api.exception.LoadException;
+com\dfsek\terra\config\preprocessor\MetaNumberPreprocessor.java:8:import com.dfsek.tectonic.api.loader.ConfigLoader;
+com\dfsek\terra\config\preprocessor\MetaNumberPreprocessor.java:9:import com.dfsek.tectonic.api.preprocessor.Result;
+com\dfsek\terra\config\preprocessor\MetaPreprocessor.java:3:import com.dfsek.tectonic.api.config.Configuration;
+com\dfsek\terra\config\preprocessor\MetaPreprocessor.java:4:import com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\terra\config\preprocessor\MetaPreprocessor.java:5:import com.dfsek.tectonic.api.exception.LoadException;
+com\dfsek\terra\config\preprocessor\MetaPreprocessor.java:6:import 
+com.dfsek.tectonic.api.preprocessor.ValuePreprocessor;
+com\dfsek\terra\config\preprocessor\MetaStringPreprocessor.java:3:import com.dfsek.tectonic.api.config.Configuration;
+com\dfsek\terra\config\preprocessor\MetaStringPreprocessor.java:4:import com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\terra\config\preprocessor\MetaStringPreprocessor.java:5:import 
+com.dfsek.tectonic.api.exception.LoadException;
+com\dfsek\terra\config\preprocessor\MetaStringPreprocessor.java:6:import com.dfsek.tectonic.api.loader.ConfigLoader;
+com\dfsek\terra\config\preprocessor\MetaStringPreprocessor.java:7:import com.dfsek.tectonic.api.preprocessor.Result;
+com\dfsek\terra\config\preprocessor\MetaValuePreprocessor.java:3:import com.dfsek.tectonic.api.config.Configuration;
+com\dfsek\terra\config\preprocessor\MetaValuePreprocessor.java:4:import com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\terra\config\preprocessor\MetaValuePreprocessor.java:5:import com.dfsek.tectonic.api.loader.ConfigLoader;
+com\dfsek\terra\config\preprocessor\MetaValuePreprocessor.java:6:import com.dfsek.tectonic.api.preprocessor.Result;
+com\dfsek\terra\config\prototype\ProtoConfig.java:3:import com.dfsek.tectonic.api.config.template.ConfigTemplate;
+com\dfsek\terra\config\prototype\ProtoConfig.java:4:import com.dfsek.tectonic.api.config.template.annotations.Value;
+com\dfsek\terra\registry\CheckedRegistryImpl.java:3:import com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\terra\registry\CheckedRegistryImpl.java:4:import com.dfsek.tectonic.api.exception.LoadException;
+com\dfsek\terra\registry\CheckedRegistryImpl.java:5:import com.dfsek.tectonic.api.loader.ConfigLoader;
+com\dfsek\terra\registry\LockedRegistryImpl.java:3:import com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\terra\registry\LockedRegistryImpl.java:4:import com.dfsek.tectonic.api.exception.LoadException;
+com\dfsek\terra\registry\LockedRegistryImpl.java:5:import com.dfsek.tectonic.api.loader.ConfigLoader;
+com\dfsek\terra\registry\OpenRegistryImpl.java:3:import com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\terra\registry\OpenRegistryImpl.java:4:import com.dfsek.tectonic.api.exception.LoadException;
+com\dfsek\terra\registry\OpenRegistryImpl.java:5:import com.dfsek.tectonic.api.loader.ConfigLoader;
+com\dfsek\terra\registry\ShortcutHolder.java:3:import com.dfsek.tectonic.api.depth.DepthTracker;
+com\dfsek\terra\registry\ShortcutHolder.java:4:import com.dfsek.tectonic.api.exception.LoadException;
+com\dfsek\terra\registry\ShortcutHolder.java:5:import com.dfsek.tectonic.api.loader.ConfigLoader;
+com\dfsek\terra\registry\ShortcutHolder.java:6:import com.dfsek.tectonic.api.loader.type.TypeLoader;
+com\dfsek\terra\registry\ShortcutHolder.java:8:import com.dfsek.terra.api.tectonic.ShortcutLoader;
+com\dfsek\terra\registry\master\ConfigRegistry.java:3:import com.dfsek.tectonic.api.exception.ConfigException;
+
+
+
+========================================
+6. META
+========================================
+
+
+com\dfsek\terra\config\loaders\RangeLoader.java:29:      private @Meta int min;
+com\dfsek\terra\config\loaders\RangeLoader.java:31:      private @Meta int max;
+com\dfsek\terra\config\pack\ConfigPackPostTemplate.java:10:   private @Meta BiomeProvider providerBuilder;
+com\dfsek\terra\config\pack\ConfigPackTemplate.java:20:   private @Meta Map<String, @Meta Double> variables = new 
+HashMap<>();
+com\dfsek\terra\config\pack\ConfigPackTemplate.java:23:   private @Meta boolean betaCarvers = false;
+com\dfsek\terra\config\pack\ConfigPackTemplate.java:26:   private @Meta Map<@Meta String, @Meta String> locatable = 
+new HashMap<>();
+com\dfsek\terra\config\pack\ConfigPackTemplate.java:29:   private @Meta int elevationBlend = 4;
+com\dfsek\terra\config\pack\ConfigPackTemplate.java:32:   private @Meta boolean vanillaMobs = true;
+com\dfsek\terra\config\pack\ConfigPackTemplate.java:35:   private @Meta boolean vanillaCaves = false;
+com\dfsek\terra\config\pack\ConfigPackTemplate.java:38:   private @Meta boolean vanillaDecorations = false;
+com\dfsek\terra\config\pack\ConfigPackTemplate.java:41:   private @Meta boolean vanillaStructures = false;
+com\dfsek\terra\config\pack\ConfigPackTemplate.java:47:   private @Meta boolean disableSaplings = false;
+com\dfsek\terra\config\pack\ConfigPackTemplate.java:50:   private @Meta List<@Meta GenerationStage> stages = 
+Collections.emptyList();
+com\dfsek\terra\config\pack\ConfigPackTemplate.java:55:   private @Meta boolean disableCarvers = false;
+com\dfsek\terra\config\pack\ConfigPackTemplate.java:58:   private @Meta boolean disableStructures = false;
+com\dfsek\terra\config\pack\ConfigPackTemplate.java:61:   private @Meta boolean disableOres = false;
+com\dfsek\terra\config\pack\ConfigPackTemplate.java:64:   private @Meta boolean disableTrees = false;
+com\dfsek\terra\config\pack\ConfigPackTemplate.java:67:   private @Meta boolean disableFlora = false;
+com\dfsek\terra\config\pack\ConfigPackTemplate.java:69:   private @Meta ChunkGeneratorProvider generatorProvider;
+
+
+
+========================================
+7. GENERATION STAGE
+========================================
+
+
+com\dfsek\terra\api\config\ConfigPack.java:17:import com.dfsek.terra.api.world.chunk.generation.stage.GenerationStage;
+com\dfsek\terra\api\config\ConfigPack.java:29:   List<GenerationStage> getStages();
+com\dfsek\terra\api\world\chunk\generation\stage\GenerationStage.java:5:public interface GenerationStage {
+com\dfsek\terra\api\world\chunk\generation\util\provider\GenerationStageProvider.java:4:import 
+com.dfsek.terra.api.world.chunk.generation.stage.GenerationStage;
+com\dfsek\terra\api\world\chunk\generation\util\provider\GenerationStageProvider.java:6:public interface 
+GenerationStageProvider {
+com\dfsek\terra\api\world\chunk\generation\util\provider\GenerationStageProvider.java:7:   GenerationStage 
+newInstance(ConfigPack var1);
+com\dfsek\terra\bukkit\generator\BukkitBlockPopulator.java:26:      this.pack.getStages().forEach(generationStage -> 
+generationStage.populate(new BukkitProtoWorld(limitedRegion, this.air, this.pack.getBiomeProvider())));
+com\dfsek\terra\config\pack\ConfigPackImpl.java:34:import 
+com.dfsek.terra.api.world.chunk.generation.stage.GenerationStage;
+com\dfsek\terra\config\pack\ConfigPackImpl.java:306:   public List<GenerationStage> getStages() {
+com\dfsek\terra\config\pack\ConfigPackTemplate.java:8:import 
+com.dfsek.terra.api.world.chunk.generation.stage.GenerationStage;
+com\dfsek\terra\config\pack\ConfigPackTemplate.java:50:   private @Meta List<@Meta GenerationStage> stages = 
+Collections.emptyList();
+com\dfsek\terra\config\pack\ConfigPackTemplate.java:118:   public List<GenerationStage> getStages() {
+
+
+
+========================================
+8. CHUNK GENERATOR
+========================================
+
+
+com\dfsek\terra\api\config\ConfigPack.java:18:import 
+com.dfsek.terra.api.world.chunk.generation.util.provider.ChunkGeneratorProvider;
+com\dfsek\terra\api\config\ConfigPack.java:45:   ChunkGeneratorProvider getGeneratorProvider();
+com\dfsek\terra\api\world\BufferedWorld.java:10:import com.dfsek.terra.api.world.chunk.generation.ChunkGenerator;
+com\dfsek\terra\api\world\BufferedWorld.java:68:   public ChunkGenerator getGenerator() {
+com\dfsek\terra\api\world\World.java:5:import com.dfsek.terra.api.world.chunk.generation.ChunkGenerator;
+com\dfsek\terra\api\world\World.java:9:   ChunkGenerator getGenerator();
+com\dfsek\terra\api\world\chunk\generation\ChunkGenerator.java:11:public interface ChunkGenerator {
+com\dfsek\terra\api\world\chunk\generation\ChunkGenerator.java:12:   void generateChunkData(@NotNull ProtoChunk var1, 
+@NotNull WorldProperties var2, @NotNull BiomeProvider var3, int var4, int var5);
+com\dfsek\terra\api\world\chunk\generation\util\GeneratorWrapper.java:4:import 
+com.dfsek.terra.api.world.chunk.generation.ChunkGenerator;
+com\dfsek\terra\api\world\chunk\generation\util\GeneratorWrapper.java:7:   ChunkGenerator getHandle();
+com\dfsek\terra\api\world\chunk\generation\util\provider\ChunkGeneratorProvider.java:4:import 
+com.dfsek.terra.api.world.chunk.generation.ChunkGenerator;
+com\dfsek\terra\api\world\chunk\generation\util\provider\ChunkGeneratorProvider.java:6:public interface 
+ChunkGeneratorProvider {
+com\dfsek\terra\api\world\chunk\generation\util\provider\ChunkGeneratorProvider.java:7:   ChunkGenerator 
+newInstance(ConfigPack var1);
+com\dfsek\terra\bukkit\PlatformImpl.java:11:import com.dfsek.terra.bukkit.generator.BukkitChunkGeneratorWrapper;
+com\dfsek\terra\bukkit\PlatformImpl.java:52:         if (world.getGenerator() instanceof BukkitChunkGeneratorWrapper 
+wrapper) {
+com\dfsek\terra\bukkit\TerraBukkitPlugin.java:7:import com.dfsek.terra.api.world.chunk.generation.ChunkGenerator;
+com\dfsek\terra\bukkit\TerraBukkitPlugin.java:8:import com.dfsek.terra.bukkit.generator.BukkitChunkGeneratorWrapper;
+com\dfsek\terra\bukkit\TerraBukkitPlugin.java:34:   private final Map<String, ChunkGenerator> generatorMap = new 
+HashMap<>();
+com\dfsek\terra\bukkit\TerraBukkitPlugin.java:115:   public ChunkGenerator getDefaultWorldGenerator(@NotNull String 
+worldName, String id) {
+com\dfsek\terra\bukkit\TerraBukkitPlugin.java:116:      return id != null && !id.trim().isEmpty() ? new 
+BukkitChunkGeneratorWrapper(this.generatorMap.computeIfAbsent(worldName, name -> {
+com\dfsek\terra\bukkit\generator\BukkitChunkGeneratorWrapper.java:13:import org.bukkit.generator.ChunkGenerator;
+com\dfsek\terra\bukkit\generator\BukkitChunkGeneratorWrapper.java:15:import 
+org.bukkit.generator.ChunkGenerator.ChunkData;
+com\dfsek\terra\bukkit\generator\BukkitChunkGeneratorWrapper.java:21:public class BukkitChunkGeneratorWrapper extends 
+ChunkGenerator implements GeneratorWrapper {
+com\dfsek\terra\bukkit\generator\BukkitChunkGeneratorWrapper.java:22:   private static final Logger LOGGER = 
+LoggerFactory.getLogger(BukkitChunkGeneratorWrapper.class);
+com\dfsek\terra\bukkit\generator\BukkitChunkGeneratorWrapper.java:25:   private 
+com.dfsek.terra.api.world.chunk.generation.ChunkGenerator delegate;
+com\dfsek\terra\bukkit\generator\BukkitChunkGeneratorWrapper.java:28:   public 
+BukkitChunkGeneratorWrapper(com.dfsek.terra.api.world.chunk.generation.ChunkGenerator delegate, ConfigPack pack, 
+BlockState air) {
+com\dfsek\terra\bukkit\generator\BukkitChunkGeneratorWrapper.java:35:   public void 
+setDelegate(com.dfsek.terra.api.world.chunk.generation.ChunkGenerator delegate) {
+com\dfsek\terra\bukkit\generator\BukkitChunkGeneratorWrapper.java:46:      this.delegate.generateChunkData(new 
+BukkitProtoChunk(chunkData), properties, this.pack.getBiomeProvider(), x, z);
+com\dfsek\terra\bukkit\generator\BukkitChunkGeneratorWrapper.java:80:   public 
+com.dfsek.terra.api.world.chunk.generation.ChunkGenerator getHandle() {
+com\dfsek\terra\bukkit\generator\BukkitChunkGeneratorWrapper.java:87:         return !(obj instanceof 
+BukkitChunkGeneratorWrapper.SeededVector that)
+com\dfsek\terra\bukkit\generator\BukkitProtoChunk.java:6:import org.bukkit.generator.ChunkGenerator.ChunkData;
+com\dfsek\terra\bukkit\listeners\CommonListener.java:5:import 
+com.dfsek.terra.bukkit.generator.BukkitChunkGeneratorWrapper;
+com\dfsek\terra\bukkit\listeners\CommonListener.java:52:         if (world.getGenerator() instanceof 
+BukkitChunkGeneratorWrapper wrapper) {
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSChunkGeneratorDelegate.java:23:import 
+net.minecraft.world.level.chunk.ChunkGenerator;
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSChunkGeneratorDelegate.java:34:public class NMSChunkGeneratorDelegate extends 
+ChunkGenerator {
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSChunkGeneratorDelegate.java:35:   private static final Logger LOGGER = 
+LoggerFactory.getLogger(NMSChunkGeneratorDelegate.class);
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSChunkGeneratorDelegate.java:36:   private final 
+com.dfsek.terra.api.world.chunk.generation.ChunkGenerator delegate;
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSChunkGeneratorDelegate.java:37:   private final ChunkGenerator vanilla;
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSChunkGeneratorDelegate.java:41:   public 
+NMSChunkGeneratorDelegate(ChunkGenerator vanilla, ConfigPack pack, NMSBiomeProvider biomeProvider, long seed) {
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSChunkGeneratorDelegate.java:50:   protected MapCodec<? extends ChunkGenerator> 
+codec() {
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSChunkGeneratorDelegate.java:51:      return 
+MapCodec.assumeMapUnsafe(ChunkGenerator.CODEC);
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSInjectListener.java:4:import 
+com.dfsek.terra.bukkit.generator.BukkitChunkGeneratorWrapper;
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSInjectListener.java:10:import net.minecraft.world.level.chunk.ChunkGenerator;
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSInjectListener.java:27:      if (!INJECTED.contains(event.getWorld()) && 
+event.getWorld().getGenerator() instanceof BukkitChunkGeneratorWrapper bukkitChunkGeneratorWrapper) {
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSInjectListener.java:33:         ConfigPack pack = 
+bukkitChunkGeneratorWrapper.getPack();
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSInjectListener.java:34:         ChunkGenerator vanilla = 
+serverWorld.getChunkSource().getGenerator();
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSInjectListener.java:43:                  new NMSChunkGeneratorDelegate(vanilla, 
+pack, provider, craftWorld.getSeed()),
+com\dfsek\terra\bukkit\world\BukkitProtoWorld.java:10:import com.dfsek.terra.api.world.chunk.generation.ChunkGenerator;
+com\dfsek\terra\bukkit\world\BukkitProtoWorld.java:13:import 
+com.dfsek.terra.bukkit.generator.BukkitChunkGeneratorWrapper;
+com\dfsek\terra\bukkit\world\BukkitProtoWorld.java:96:   public ChunkGenerator getGenerator() {
+com\dfsek\terra\bukkit\world\BukkitProtoWorld.java:97:      return 
+((BukkitChunkGeneratorWrapper)this.delegate.getWorld().getGenerator()).getHandle();
+com\dfsek\terra\bukkit\world\BukkitProtoWorld.java:107:      return 
+((BukkitChunkGeneratorWrapper)this.delegate.getWorld().getGenerator()).getPack();
+com\dfsek\terra\bukkit\world\BukkitServerWorld.java:11:import 
+com.dfsek.terra.api.world.chunk.generation.ChunkGenerator;
+com\dfsek\terra\bukkit\world\BukkitServerWorld.java:13:import 
+com.dfsek.terra.bukkit.generator.BukkitChunkGeneratorWrapper;
+com\dfsek\terra\bukkit\world\BukkitServerWorld.java:67:   public ChunkGenerator getGenerator() {
+com\dfsek\terra\bukkit\world\BukkitServerWorld.java:68:      return 
+((BukkitChunkGeneratorWrapper)this.delegate.getGenerator()).getHandle();
+com\dfsek\terra\bukkit\world\BukkitServerWorld.java:73:      return 
+((BukkitChunkGeneratorWrapper)this.delegate.getGenerator()).getPack().getBiomeProvider();
+com\dfsek\terra\bukkit\world\BukkitServerWorld.java:78:      return 
+((BukkitChunkGeneratorWrapper)this.delegate.getGenerator()).getPack();
+com\dfsek\terra\config\pack\ConfigPackImpl.java:35:import 
+com.dfsek.terra.api.world.chunk.generation.util.provider.ChunkGeneratorProvider;
+com\dfsek\terra\config\pack\ConfigPackImpl.java:341:   public ChunkGeneratorProvider getGeneratorProvider() {
+com\dfsek\terra\config\pack\ConfigPackTemplate.java:9:import 
+com.dfsek.terra.api.world.chunk.generation.util.provider.ChunkGeneratorProvider;
+com\dfsek\terra\config\pack\ConfigPackTemplate.java:69:   private @Meta ChunkGeneratorProvider generatorProvider;
+com\dfsek\terra\config\pack\ConfigPackTemplate.java:114:   public ChunkGeneratorProvider getGeneratorProvider() {
+
+
+
+========================================
+9. BIOME PROVIDER
+========================================
+
+
+com\dfsek\terra\api\config\ConfigPack.java:16:import com.dfsek.terra.api.world.biome.generation.BiomeProvider;
+com\dfsek\terra\api\config\ConfigPack.java:27:   BiomeProvider getBiomeProvider();
+com\dfsek\terra\api\world\BufferedWorld.java:9:import com.dfsek.terra.api.world.biome.generation.BiomeProvider;
+com\dfsek\terra\api\world\BufferedWorld.java:73:   public BiomeProvider getBiomeProvider() {
+com\dfsek\terra\api\world\BufferedWorld.java:74:      return this.delegate.getBiomeProvider();
+com\dfsek\terra\api\world\World.java:4:import com.dfsek.terra.api.world.biome.generation.BiomeProvider;
+com\dfsek\terra\api\world\World.java:11:   BiomeProvider getBiomeProvider();
+com\dfsek\terra\api\world\biome\generation\BiomeColumn.java:7:   private final BiomeProvider biomeProvider;
+com\dfsek\terra\api\world\biome\generation\BiomeColumn.java:14:   protected BiomeColumn(BiomeProvider biomeProvider, 
+int min, int max, int x, int z, long seed) {
+com\dfsek\terra\api\world\biome\generation\BiomeColumn.java:15:      this.biomeProvider = biomeProvider;
+com\dfsek\terra\api\world\biome\generation\BiomeColumn.java:44:      return this.biomeProvider.getBiome(this.x, y, 
+this.z, this.seed);
+com\dfsek\terra\api\world\biome\generation\BiomeProvider.java:14:public interface BiomeProvider {
+com\dfsek\terra\api\world\biome\generation\BiomeProvider.java:48:   default CachingBiomeProvider caching(Platform 
+platform) {
+com\dfsek\terra\api\world\biome\generation\BiomeProvider.java:49:      return this instanceof CachingBiomeProvider 
+cachingBiomeProvider ? cachingBiomeProvider : new CachingBiomeProvider(this);
+com\dfsek\terra\api\world\biome\generation\CachingBiomeProvider.java:14:public class CachingBiomeProvider implements 
+BiomeProvider, Handle {
+com\dfsek\terra\api\world\biome\generation\CachingBiomeProvider.java:15:   protected final BiomeProvider delegate;
+com\dfsek\terra\api\world\biome\generation\CachingBiomeProvider.java:20:   protected 
+CachingBiomeProvider(BiomeProvider delegate) {
+com\dfsek\terra\api\world\biome\generation\CachingBiomeProvider.java:57:   public BiomeProvider getHandle() {
+com\dfsek\terra\api\world\chunk\generation\ChunkGenerator.java:6:import 
+com.dfsek.terra.api.world.biome.generation.BiomeProvider;
+com\dfsek\terra\api\world\chunk\generation\ChunkGenerator.java:12:   void generateChunkData(@NotNull ProtoChunk var1, 
+@NotNull WorldProperties var2, @NotNull BiomeProvider var3, int var4, int var5);
+com\dfsek\terra\api\world\chunk\generation\ChunkGenerator.java:14:   BlockState getBlock(WorldProperties var1, int 
+var2, int var3, int var4, BiomeProvider var5);
+com\dfsek\terra\api\world\chunk\generation\ChunkGenerator.java:16:   default BlockState getBlock(WorldProperties 
+world, Vector3 vector3, BiomeProvider biomeProvider) {
+com\dfsek\terra\api\world\chunk\generation\ChunkGenerator.java:17:      return this.getBlock(world, 
+vector3.getBlockX(), vector3.getBlockY(), vector3.getBlockZ(), biomeProvider);
+com\dfsek\terra\api\world\chunk\generation\ChunkGenerator.java:20:   default BlockState getBlock(WorldProperties 
+world, Vector3Int vector3, BiomeProvider biomeProvider) {
+com\dfsek\terra\api\world\chunk\generation\ChunkGenerator.java:21:      return this.getBlock(world, vector3.getX(), 
+vector3.getY(), vector3.getZ(), biomeProvider);
+com\dfsek\terra\api\world\chunk\generation\ChunkGenerator.java:24:   Palette getPalette(int var1, int var2, int var3, 
+WorldProperties var4, BiomeProvider var5);
+com\dfsek\terra\bukkit\generator\BukkitBiomeProvider.java:8:import org.bukkit.generator.BiomeProvider;
+com\dfsek\terra\bukkit\generator\BukkitBiomeProvider.java:12:public class BukkitBiomeProvider extends BiomeProvider 
+implements Handle {
+com\dfsek\terra\bukkit\generator\BukkitBiomeProvider.java:13:   private final 
+com.dfsek.terra.api.world.biome.generation.BiomeProvider delegate;
+com\dfsek\terra\bukkit\generator\BukkitBiomeProvider.java:15:   public 
+BukkitBiomeProvider(com.dfsek.terra.api.world.biome.generation.BiomeProvider delegate) {
+com\dfsek\terra\bukkit\generator\BukkitBlockPopulator.java:26:      this.pack.getStages().forEach(generationStage -> 
+generationStage.populate(new BukkitProtoWorld(limitedRegion, this.air, this.pack.getBiomeProvider())));
+com\dfsek\terra\bukkit\generator\BukkitChunkGeneratorWrapper.java:11:import org.bukkit.generator.BiomeProvider;
+com\dfsek\terra\bukkit\generator\BukkitChunkGeneratorWrapper.java:40:   public BiomeProvider 
+getDefaultBiomeProvider(@NotNull WorldInfo worldInfo) {
+com\dfsek\terra\bukkit\generator\BukkitChunkGeneratorWrapper.java:41:      return new 
+BukkitBiomeProvider(this.pack.getBiomeProvider());
+com\dfsek\terra\bukkit\generator\BukkitChunkGeneratorWrapper.java:46:      this.delegate.generateChunkData(new 
+BukkitProtoChunk(chunkData), properties, this.pack.getBiomeProvider(), x, z);
+com\dfsek\terra\bukkit\listeners\CommonListener.java:56:               pack.getBiomeProvider().stream().filter(biome 
+-> {
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSBiomeProvider.java:3:import 
+com.dfsek.terra.api.world.biome.generation.BiomeProvider;
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSBiomeProvider.java:14:public class NMSBiomeProvider extends BiomeSource {
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSBiomeProvider.java:15:   private final BiomeProvider delegate;
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSBiomeProvider.java:19:   public NMSBiomeProvider(BiomeProvider delegate, long 
+seed) {
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSChunkGeneratorDelegate.java:4:import 
+com.dfsek.terra.api.world.biome.generation.BiomeProvider;
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSChunkGeneratorDelegate.java:41:   public 
+NMSChunkGeneratorDelegate(ChunkGenerator vanilla, ConfigPack pack, NMSBiomeProvider biomeProvider, long seed) {
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSChunkGeneratorDelegate.java:42:      super(biomeProvider);
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSChunkGeneratorDelegate.java:84:         BiomeProvider biomeProvider = 
+this.pack.getBiomeProvider();
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSChunkGeneratorDelegate.java:87:            this.beard(structureAccessor, chunk, 
+new BukkitWorldProperties(level.getMinecraftWorld().getWorld()), biomeProvider, compatibilityOptions);
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSChunkGeneratorDelegate.java:98:      BiomeProvider biomeProvider,
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSChunkGeneratorDelegate.java:117:                              .getPalette(x + 
+xi, y, z + zi, world, biomeProvider)
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSChunkGeneratorDelegate.java:145:      BiomeProvider biomeProvider = 
+this.pack.getBiomeProvider();
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSChunkGeneratorDelegate.java:149:            && 
+!heightmap.isOpaque().test(((CraftBlockData)this.delegate.getBlock(properties, x, y - 1, z, 
+biomeProvider).getHandle()).getState())
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSChunkGeneratorDelegate.java:161:      BiomeProvider biomeProvider = 
+this.pack.getBiomeProvider();
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSChunkGeneratorDelegate.java:164:         array[y - properties.getMinHeight()] = 
+((CraftBlockData)this.delegate.getBlock(properties, x, y, z, biomeProvider).getHandle()).getState();
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSInjectListener.java:35:         NMSBiomeProvider provider = new 
+NMSBiomeProvider(pack.getBiomeProvider(), craftWorld.getSeed());
+com\dfsek\terra\bukkit\world\BukkitProtoWorld.java:9:import com.dfsek.terra.api.world.biome.generation.BiomeProvider;
+com\dfsek\terra\bukkit\world\BukkitProtoWorld.java:32:   private final BiomeProvider biomeProvider;
+com\dfsek\terra\bukkit\world\BukkitProtoWorld.java:34:   public BukkitProtoWorld(LimitedRegion delegate, BlockState 
+air, BiomeProvider provider) {
+com\dfsek\terra\bukkit\world\BukkitProtoWorld.java:37:      this.biomeProvider = provider;
+com\dfsek\terra\bukkit\world\BukkitProtoWorld.java:101:   public BiomeProvider getBiomeProvider() {
+com\dfsek\terra\bukkit\world\BukkitProtoWorld.java:102:      return this.biomeProvider;
+com\dfsek\terra\bukkit\world\BukkitServerWorld.java:9:import com.dfsek.terra.api.world.biome.generation.BiomeProvider;
+com\dfsek\terra\bukkit\world\BukkitServerWorld.java:72:   public BiomeProvider getBiomeProvider() {
+com\dfsek\terra\bukkit\world\BukkitServerWorld.java:73:      return 
+((BukkitChunkGeneratorWrapper)this.delegate.getGenerator()).getPack().getBiomeProvider();
+com\dfsek\terra\config\pack\ConfigPackImpl.java:33:import com.dfsek.terra.api.world.biome.generation.BiomeProvider;
+com\dfsek\terra\config\pack\ConfigPackImpl.java:87:   private final BiomeProvider seededBiomeProvider;
+com\dfsek\terra\config\pack\ConfigPackImpl.java:201:      this.seededBiomeProvider = this.template.getBiomeCache()
+com\dfsek\terra\config\pack\ConfigPackImpl.java:270:   public BiomeProvider getBiomeProvider() {
+com\dfsek\terra\config\pack\ConfigPackImpl.java:271:      return this.seededBiomeProvider;
+com\dfsek\terra\config\pack\ConfigPackPostTemplate.java:6:import 
+com.dfsek.terra.api.world.biome.generation.BiomeProvider;
+com\dfsek\terra\config\pack\ConfigPackPostTemplate.java:10:   private @Meta BiomeProvider providerBuilder;
+com\dfsek\terra\config\pack\ConfigPackPostTemplate.java:12:   public BiomeProvider getProviderBuilder() {
+
+
+
+========================================
+10. NOISE
+========================================
+
+
+com\dfsek\terra\api\noise\DerivativeNoiseSampler.java:1:package com.dfsek.terra.api.noise;
+com\dfsek\terra\api\noise\DerivativeNoiseSampler.java:3:public interface DerivativeNoiseSampler extends NoiseSampler {
+com\dfsek\terra\api\noise\DerivativeNoiseSampler.java:4:   static boolean isDifferentiable(NoiseSampler sampler) {
+com\dfsek\terra\api\noise\DerivativeNoiseSampler.java:5:      return sampler instanceof DerivativeNoiseSampler 
+dSampler && dSampler.isDifferentiable();
+com\dfsek\terra\api\noise\DerivativeNoiseSampler.java:10:   double[] noised(long var1, double var3, double var5);
+com\dfsek\terra\api\noise\DerivativeNoiseSampler.java:12:   double[] noised(long var1, double var3, double var5, 
+double var7);
+com\dfsek\terra\api\noise\NoiseSampler.java:1:package com.dfsek.terra.api.noise;
+com\dfsek\terra\api\noise\NoiseSampler.java:8:public interface NoiseSampler {
+com\dfsek\terra\api\noise\NoiseSampler.java:9:   static NoiseSampler zero() {
+com\dfsek\terra\api\noise\NoiseSampler.java:10:      return new NoiseSampler() {
+com\dfsek\terra\api\noise\NoiseSampler.java:12:         public double noise(long seed, double x, double y) {
+com\dfsek\terra\api\noise\NoiseSampler.java:17:         public double noise(long seed, double x, double y, double z) {
+com\dfsek\terra\api\noise\NoiseSampler.java:23:   default double noise(Vector3 vector3, long seed) {
+com\dfsek\terra\api\noise\NoiseSampler.java:24:      return this.noise(seed, vector3.getX(), vector3.getY(), 
+vector3.getZ());
+com\dfsek\terra\api\noise\NoiseSampler.java:27:   default double noise(Vector3Int vector3, long seed) {
+com\dfsek\terra\api\noise\NoiseSampler.java:28:      return this.noise(seed, vector3.getX(), vector3.getY(), 
+vector3.getZ());
+com\dfsek\terra\api\noise\NoiseSampler.java:31:   default double noise(Vector2 vector2, long seed) {
+com\dfsek\terra\api\noise\NoiseSampler.java:32:      return this.noise(seed, vector2.getX(), vector2.getZ());
+com\dfsek\terra\api\noise\NoiseSampler.java:35:   default double noise(Vector2Int vector2, long seed) {
+com\dfsek\terra\api\noise\NoiseSampler.java:36:      return this.noise(seed, vector2.getX(), vector2.getZ());
+com\dfsek\terra\api\noise\NoiseSampler.java:39:   double noise(long var1, double var3, double var5);
+com\dfsek\terra\api\noise\NoiseSampler.java:41:   default double noise(long seed, int x, int y) {
+com\dfsek\terra\api\noise\NoiseSampler.java:42:      return this.noise(seed, (double)x, (double)y);
+com\dfsek\terra\api\noise\NoiseSampler.java:45:   double noise(long var1, double var3, double var5, double var7);
+com\dfsek\terra\api\noise\NoiseSampler.java:47:   default double noise(long seed, int x, int y, int z) {
+com\dfsek\terra\api\noise\NoiseSampler.java:48:      return this.noise(seed, (double)x, (double)y, (double)z);
+com\dfsek\terra\api\util\collection\ProbabilityCollection.java:3:import com.dfsek.terra.api.noise.NoiseSampler;
+com\dfsek\terra\api\util\collection\ProbabilityCollection.java:46:   public E get(NoiseSampler n, double x, double y, 
+double z, long seed) {
+com\dfsek\terra\api\util\collection\ProbabilityCollection.java:47:      return (E)(this.array.length == 0 ? null : 
+this.array[MathUtil.normalizeIndex(n.noise(seed, x, y, z), this.array.length)]);
+com\dfsek\terra\api\util\collection\ProbabilityCollection.java:50:   public E get(NoiseSampler n, Vector3Int 
+vector3Int, long seed) {
+com\dfsek\terra\api\util\collection\ProbabilityCollection.java:53:         : 
+this.array[MathUtil.normalizeIndex(n.noise(seed, vector3Int.getX(), vector3Int.getY(), vector3Int.getZ()), 
+this.array.length)]);
+com\dfsek\terra\api\util\collection\ProbabilityCollection.java:56:   public E get(NoiseSampler n, Vector3 vector3Int, 
+long seed) {
+com\dfsek\terra\api\util\collection\ProbabilityCollection.java:59:         : 
+this.array[MathUtil.normalizeIndex(n.noise(seed, vector3Int.getX(), vector3Int.getY(), vector3Int.getZ()), 
+this.array.length)]);
+com\dfsek\terra\api\util\collection\ProbabilityCollection.java:62:   public E get(NoiseSampler n, double x, double z, 
+long seed) {
+com\dfsek\terra\api\util\collection\ProbabilityCollection.java:63:      return (E)(this.array.length == 0 ? null : 
+this.array[MathUtil.normalizeIndex(n.noise(seed, x, z), this.array.length)]);
+com\dfsek\terra\api\util\collection\ProbabilityCollection.java:189:      public T get(NoiseSampler n, double x, double 
+y, double z, long seed) {
+com\dfsek\terra\api\util\collection\ProbabilityCollection.java:194:      public T get(NoiseSampler n, double x, double 
+z, long seed) {
+com\dfsek\terra\bukkit\generator\BukkitChunkGeneratorWrapper.java:44:   public void generateNoise(@NotNull WorldInfo 
+worldInfo, @NotNull Random random, int x, int z, @NotNull ChunkData chunkData) {
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSBiomeProvider.java:39:   public Holder<Biome> getNoiseBiome(int x, int y, int z, 
+@NotNull Sampler sampler) {
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSChunkGeneratorDelegate.java:16:import net.minecraft.world.level.NoiseColumn;
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSChunkGeneratorDelegate.java:57:      @NotNull RandomState noiseConfig,
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSChunkGeneratorDelegate.java:64:   public void buildSurface(@NotNull 
+WorldGenRegion region, @NotNull StructureManager structures, @NotNull RandomState noiseConfig, @NotNull ChunkAccess 
+chunk) {
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSChunkGeneratorDelegate.java:79:   public CompletableFuture<ChunkAccess> 
+fillFromNoise(
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSChunkGeneratorDelegate.java:80:      @NotNull Blender blender, @NotNull 
+RandomState noiseConfig, @NotNull StructureManager structureAccessor, @NotNull ChunkAccess chunk
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSChunkGeneratorDelegate.java:82:      return this.vanilla.fillFromNoise(blender, 
+noiseConfig, structureAccessor, chunk).thenApply(c -> {
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSChunkGeneratorDelegate.java:112:               double noise = 
+structureWeightSampler.compute(new SinglePointContext(x + xi, y, z + zi));
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSChunkGeneratorDelegate.java:113:               if (noise > threshold) {
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSChunkGeneratorDelegate.java:124:               } else if (noise < airThreshold) {
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSChunkGeneratorDelegate.java:142:   public int getBaseHeight(int x, int z, 
+@NotNull Types heightmap, @NotNull LevelHeightAccessor world, @NotNull RandomState noiseConfig) {
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSChunkGeneratorDelegate.java:158:   public NoiseColumn getBaseColumn(int x, int 
+z, @NotNull LevelHeightAccessor world, @NotNull RandomState noiseConfig) {
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSChunkGeneratorDelegate.java:167:      return new NoiseColumn(this.getMinY(), 
+array);
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSChunkGeneratorDelegate.java:170:   public void addDebugScreenInfo(@NotNull 
+List<String> text, @NotNull RandomState noiseConfig, @NotNull BlockPos pos) {
+
+

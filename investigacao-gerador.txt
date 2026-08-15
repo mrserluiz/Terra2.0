@@ -1,0 +1,46 @@
+﻿
+com\dfsek\terra\api\config\ConfigPack.java:17:import com.dfsek.terra.api.world.chunk.generation.stage.GenerationStage;
+com\dfsek\terra\api\config\ConfigPack.java:18:import 
+com.dfsek.terra.api.world.chunk.generation.util.provider.ChunkGeneratorProvider;
+com\dfsek\terra\api\config\ConfigPack.java:29:   List<GenerationStage> getStages();
+com\dfsek\terra\api\config\ConfigPack.java:45:   ChunkGeneratorProvider getGeneratorProvider();
+com\dfsek\terra\api\world\chunk\generation\ChunkGenerator.java:12:   void generateChunkData(@NotNull ProtoChunk var1, 
+@NotNull WorldProperties var2, @NotNull BiomeProvider var3, int var4, int var5);
+com\dfsek\terra\api\world\chunk\generation\stage\GenerationStage.java:5:public interface GenerationStage {
+com\dfsek\terra\api\world\chunk\generation\util\provider\ChunkGeneratorProvider.java:6:public interface 
+ChunkGeneratorProvider {
+com\dfsek\terra\api\world\chunk\generation\util\provider\GenerationStageProvider.java:4:import 
+com.dfsek.terra.api.world.chunk.generation.stage.GenerationStage;
+com\dfsek\terra\api\world\chunk\generation\util\provider\GenerationStageProvider.java:6:public interface 
+GenerationStageProvider {
+com\dfsek\terra\api\world\chunk\generation\util\provider\GenerationStageProvider.java:7:   GenerationStage 
+newInstance(ConfigPack var1);
+com\dfsek\terra\bukkit\TerraBukkitPlugin.java:118:         return pack.getGeneratorProvider().newInstance(pack);
+com\dfsek\terra\bukkit\generator\BukkitBlockPopulator.java:26:      this.pack.getStages().forEach(generationStage -> 
+generationStage.populate(new BukkitProtoWorld(limitedRegion, this.air, this.pack.getBiomeProvider())));
+com\dfsek\terra\bukkit\generator\BukkitChunkGeneratorWrapper.java:46:      this.delegate.generateChunkData(new 
+BukkitProtoChunk(chunkData), properties, this.pack.getBiomeProvider(), x, z);
+com\dfsek\terra\bukkit\generator\BukkitChunkGeneratorWrapper.java:76:      
+this.setDelegate(pack.getGeneratorProvider().newInstance(pack));
+com\dfsek\terra\bukkit\hooks\MultiverseGeneratorPluginHook.java:46:      
+MultiverseCoreApi.get().getGeneratorProvider().registerGeneratorPlugin(new MultiverseGeneratorPluginHook(platform));
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSChunkGeneratorDelegate.java:43:      this.delegate = 
+pack.getGeneratorProvider().newInstance(pack);
+com\dfsek\terra\config\pack\ConfigPackImpl.java:34:import 
+com.dfsek.terra.api.world.chunk.generation.stage.GenerationStage;
+com\dfsek\terra\config\pack\ConfigPackImpl.java:35:import 
+com.dfsek.terra.api.world.chunk.generation.util.provider.ChunkGeneratorProvider;
+com\dfsek\terra\config\pack\ConfigPackImpl.java:306:   public List<GenerationStage> getStages() {
+com\dfsek\terra\config\pack\ConfigPackImpl.java:341:   public ChunkGeneratorProvider getGeneratorProvider() {
+com\dfsek\terra\config\pack\ConfigPackImpl.java:342:      return this.template.getGeneratorProvider();
+com\dfsek\terra\config\pack\ConfigPackTemplate.java:8:import 
+com.dfsek.terra.api.world.chunk.generation.stage.GenerationStage;
+com\dfsek\terra\config\pack\ConfigPackTemplate.java:9:import 
+com.dfsek.terra.api.world.chunk.generation.util.provider.ChunkGeneratorProvider;
+com\dfsek\terra\config\pack\ConfigPackTemplate.java:50:   private @Meta List<@Meta GenerationStage> stages = 
+Collections.emptyList();
+com\dfsek\terra\config\pack\ConfigPackTemplate.java:69:   private @Meta ChunkGeneratorProvider generatorProvider;
+com\dfsek\terra\config\pack\ConfigPackTemplate.java:114:   public ChunkGeneratorProvider getGeneratorProvider() {
+com\dfsek\terra\config\pack\ConfigPackTemplate.java:118:   public List<GenerationStage> getStages() {
+
+
