@@ -1,0 +1,67 @@
+﻿
+          65: invokeinterface #146,  2          // InterfaceMethod 
+com/dfsek/terra/api/addon/BaseAddon.key:(Ljava/lang/String;)Lcom/dfsek/terra/api/registry/key/RegistryKey;
+          70: aload_0
+          71: aload         4
+          73: aload_1
+          74: aload_2
+>         75: invokedynamic #152,  0            // InvokeDynamic #3:newInstance:(Lcom/dfsek/terra/addons/chunkgenerator
+/NoiseChunkGenerator3DAddon;Lcom/dfsek/terra/addons/chunkgenerator/config/NoiseChunkGeneratorPackConfigTemplate;Lcom/df
+sek/terra/api/properties/PropertyKey;Lcom/dfsek/terra/api/properties/PropertyKey;)Lcom/dfsek/terra/api/world/chunk/gene
+ration/util/provider/ChunkGeneratorProvider;
+          80: invokeinterface #156,  3          // InterfaceMethod com/dfsek/terra/api/registry/CheckedRegistry.registe
+r:(Lcom/dfsek/terra/api/registry/key/RegistryKey;Ljava/lang/Object;)V
+          85: aload_3
+          86: invokevirtual #121                // Method 
+com/dfsek/terra/api/event/events/config/pack/ConfigPackPreLoadEvent.getPack:()Lcom/dfsek/terra/api/config/ConfigPack;
+          89: ldc           #161                // class 
+com/dfsek/terra/addons/chunkgenerator/palette/slant/SlantHolder$Layer
+          91: invokedynamic #163,  0            // InvokeDynamic #4:get:()Ljava/util/function/Supplier;
+          96: invokeinterface #166,  3          // InterfaceMethod com/dfsek/terra/api/config/ConfigPack.applyLoader:(L
+java/lang/Class;Ljava/util/function/Supplier;)Lcom/dfsek/terra/api/tectonic/ConfigLoadingDelegate;
+         101: pop
+         102: return
+  
+    private com.dfsek.terra.api.world.chunk.generation.ChunkGenerator 
+lambda$initialize$1(com.dfsek.terra.addons.chunkgenerator.config.NoiseChunkGeneratorPackConfigTemplate, 
+com.dfsek.terra.api.properties.PropertyKey, com.dfsek.terra.api.properties.PropertyKey, 
+com.dfsek.terra.api.config.ConfigPack);
+      Code:
+           0: new           #169                // class 
+com/dfsek/terra/addons/chunkgenerator/generation/NoiseChunkGenerator3D
+           3: dup
+           4: aload         4
+           6: aload_0
+           7: getfield      #17                 // Field platform:Lcom/dfsek/terra/api/Platform;
+          10: aload_1
+          11: invokevirtual #171                // Method 
+com/dfsek/terra/addons/chunkgenerator/config/NoiseChunkGeneratorPackConfigTemplate.getElevationBlend:()I
+          14: aload_1
+          15: invokevirtual #175                // Method 
+com/dfsek/terra/addons/chunkgenerator/config/NoiseChunkGeneratorPackConfigTemplate.getHorizontalRes:()I
+          18: aload_1
+          19: invokevirtual #178                // Method 
+com/dfsek/terra/addons/chunkgenerator/config/NoiseChunkGeneratorPackConfigTemplate.getVerticalRes:()I
+          22: aload_2
+          23: aload_3
+          24: aload_1
+          25: invokevirtual #97                 // Method com/dfsek/terra/addons/chunkgenerator/config/NoiseChunkGenera
+torPackConfigTemplate.getSlantCalculationMethod:()Lcom/dfsek/terra/addons/chunkgenerator/generation/math/SlantCalculati
+onMethod;
+          28: aload_1
+          29: invokevirtual #181                // Method 
+com/dfsek/terra/addons/chunkgenerator/config/NoiseChunkGeneratorPackConfigTemplate.isSlantPalettesEnabled:()Z
+          32: invokespecial #185                // Method com/dfsek/terra/addons/chunkgenerator/generation/NoiseChunkGe
+nerator3D."<init>":(Lcom/dfsek/terra/api/config/ConfigPack;Lcom/dfsek/terra/api/Platform;IIILcom/dfsek/terra/api/proper
+ties/PropertyKey;Lcom/dfsek/terra/api/properties/PropertyKey;Lcom/dfsek/terra/addons/chunkgenerator/generation/math/Sla
+ntCalculationMethod;Z)V
+          35: areturn
+  
+    private static com.dfsek.terra.addons.chunkgenerator.generation.math.SlantCalculationMethod 
+lambda$initialize$0(java.lang.reflect.AnnotatedType, java.lang.Object, com.dfsek.tectonic.api.loader.ConfigLoader, 
+com.dfsek.tectonic.api.depth.DepthTracker) throws com.dfsek.tectonic.api.exception.LoadException;
+      Code:
+           0: aload_1
+           1: checkcast     #188                // class java/lang/String
+
+
