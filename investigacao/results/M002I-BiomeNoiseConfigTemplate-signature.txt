@@ -1,0 +1,13 @@
+﻿Compiled from "BiomeNoiseConfigTemplate.java"
+public class com.dfsek.terra.addons.chunkgenerator.config.noise.BiomeNoiseConfigTemplate implements com.dfsek.tectonic.api.config.template.object.ObjectTemplate<com.dfsek.terra.addons.chunkgenerator.config.noise.BiomeNoiseProperties> {
+  private com.dfsek.terra.api.noise.NoiseSampler baseSampler;
+  private com.dfsek.terra.api.noise.NoiseSampler elevationSampler;
+  private com.dfsek.terra.api.noise.NoiseSampler carvingSampler;
+  private int blendDistance;
+  private double blendWeight;
+  private int blendStep;
+  private double elevationWeight;
+  public com.dfsek.terra.addons.chunkgenerator.config.noise.BiomeNoiseConfigTemplate();
+  public com.dfsek.terra.addons.chunkgenerator.config.noise.BiomeNoiseProperties get();
+  public java.lang.Object get();
+}

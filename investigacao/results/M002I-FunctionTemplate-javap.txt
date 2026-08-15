@@ -1,0 +1,123 @@
+﻿Compiled from "FunctionTemplate.java"
+public class com.dfsek.terra.addons.noise.config.templates.FunctionTemplate implements com.dfsek.tectonic.api.config.template.object.ObjectTemplate<com.dfsek.terra.addons.noise.config.templates.FunctionTemplate> {
+  private final com.dfsek.paralithic.eval.parser.Parser$ParseOptions parseOptions;
+
+  private java.util.List<java.lang.String> args;
+
+  private java.lang.String function;
+
+  private java.util.LinkedHashMap<java.lang.String, com.dfsek.terra.addons.noise.config.templates.FunctionTemplate> functions;
+
+  public com.dfsek.terra.addons.noise.config.templates.FunctionTemplate(com.dfsek.paralithic.eval.parser.Parser$ParseOptions);
+    Code:
+         0: aload_0
+         1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+         4: aload_0
+         5: new           #7                  // class java/util/LinkedHashMap
+         8: dup
+         9: invokespecial #9                  // Method java/util/LinkedHashMap."<init>":()V
+        12: putfield      #10                 // Field functions:Ljava/util/LinkedHashMap;
+        15: aload_0
+        16: aload_1
+        17: putfield      #16                 // Field parseOptions:Lcom/dfsek/paralithic/eval/parser/Parser$ParseOptions;
+        20: return
+
+  public com.dfsek.terra.addons.noise.config.templates.FunctionTemplate get();
+    Code:
+         0: aload_0
+         1: areturn
+
+  public java.util.List<java.lang.String> getArgs();
+    Code:
+         0: aload_0
+         1: getfield      #20                 // Field args:Ljava/util/List;
+         4: areturn
+
+  public java.lang.String getFunction();
+    Code:
+         0: aload_0
+         1: getfield      #24                 // Field function:Ljava/lang/String;
+         4: areturn
+
+  public java.util.LinkedHashMap<java.lang.String, com.dfsek.terra.addons.noise.config.templates.FunctionTemplate> getFunctions();
+    Code:
+         0: aload_0
+         1: getfield      #10                 // Field functions:Ljava/util/LinkedHashMap;
+         4: areturn
+
+  public com.dfsek.paralithic.eval.parser.Parser$ParseOptions getParseOptions();
+    Code:
+         0: aload_0
+         1: getfield      #16                 // Field parseOptions:Lcom/dfsek/paralithic/eval/parser/Parser$ParseOptions;
+         4: areturn
+
+  public boolean equals(java.lang.Object);
+    Code:
+         0: aload_0
+         1: aload_1
+         2: if_acmpne     7
+         5: iconst_1
+         6: ireturn
+         7: aload_1
+         8: ifnull        22
+        11: aload_0
+        12: invokevirtual #28                 // Method java/lang/Object.getClass:()Ljava/lang/Class;
+        15: aload_1
+        16: invokevirtual #28                 // Method java/lang/Object.getClass:()Ljava/lang/Class;
+        19: if_acmpeq     24
+        22: iconst_0
+        23: ireturn
+        24: aload_1
+        25: checkcast     #11                 // class com/dfsek/terra/addons/noise/config/templates/FunctionTemplate
+        28: astore_2
+        29: aload_0
+        30: getfield      #20                 // Field args:Ljava/util/List;
+        33: aload_2
+        34: getfield      #20                 // Field args:Ljava/util/List;
+        37: invokeinterface #32,  2           // InterfaceMethod java/util/List.equals:(Ljava/lang/Object;)Z
+        42: ifeq          77
+        45: aload_0
+        46: getfield      #24                 // Field function:Ljava/lang/String;
+        49: aload_2
+        50: getfield      #24                 // Field function:Ljava/lang/String;
+        53: invokevirtual #38                 // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+        56: ifeq          77
+        59: aload_0
+        60: getfield      #10                 // Field functions:Ljava/util/LinkedHashMap;
+        63: aload_2
+        64: getfield      #10                 // Field functions:Ljava/util/LinkedHashMap;
+        67: invokevirtual #41                 // Method java/util/LinkedHashMap.equals:(Ljava/lang/Object;)Z
+        70: ifeq          77
+        73: iconst_1
+        74: goto          78
+        77: iconst_0
+        78: ireturn
+
+  public int hashCode();
+    Code:
+         0: iconst_3
+         1: anewarray     #2                  // class java/lang/Object
+         4: dup
+         5: iconst_0
+         6: aload_0
+         7: getfield      #20                 // Field args:Ljava/util/List;
+        10: aastore
+        11: dup
+        12: iconst_1
+        13: aload_0
+        14: getfield      #24                 // Field function:Ljava/lang/String;
+        17: aastore
+        18: dup
+        19: iconst_2
+        20: aload_0
+        21: getfield      #10                 // Field functions:Ljava/util/LinkedHashMap;
+        24: aastore
+        25: invokestatic  #42                 // Method java/util/Objects.hash:([Ljava/lang/Object;)I
+        28: ireturn
+
+  public java.lang.Object get();
+    Code:
+         0: aload_0
+         1: invokevirtual #48                 // Method get:()Lcom/dfsek/terra/addons/noise/config/templates/FunctionTemplate;
+         4: areturn
+}

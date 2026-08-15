@@ -1,0 +1,34 @@
+﻿Compiled from "NoiseConfigPackTemplate.java"
+public class com.dfsek.terra.addons.noise.NoiseConfigPackTemplate implements com.dfsek.tectonic.api.config.template.ConfigTemplate,com.dfsek.terra.api.properties.Properties {
+  private java.util.Map<java.lang.String, com.dfsek.terra.addons.noise.config.DimensionApplicableNoiseSampler> noiseBuilderMap;
+
+  private java.util.LinkedHashMap<java.lang.String, com.dfsek.terra.addons.noise.config.templates.FunctionTemplate> expressions;
+
+  public com.dfsek.terra.addons.noise.NoiseConfigPackTemplate();
+    Code:
+         0: aload_0
+         1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+         4: aload_0
+         5: new           #7                  // class java/util/LinkedHashMap
+         8: dup
+         9: invokespecial #9                  // Method java/util/LinkedHashMap."<init>":()V
+        12: putfield      #10                 // Field noiseBuilderMap:Ljava/util/Map;
+        15: aload_0
+        16: new           #7                  // class java/util/LinkedHashMap
+        19: dup
+        20: invokespecial #9                  // Method java/util/LinkedHashMap."<init>":()V
+        23: putfield      #16                 // Field expressions:Ljava/util/LinkedHashMap;
+        26: return
+
+  public java.util.Map<java.lang.String, com.dfsek.terra.addons.noise.config.DimensionApplicableNoiseSampler> getSamplers();
+    Code:
+         0: aload_0
+         1: getfield      #10                 // Field noiseBuilderMap:Ljava/util/Map;
+         4: areturn
+
+  public java.util.LinkedHashMap<java.lang.String, com.dfsek.terra.addons.noise.config.templates.FunctionTemplate> getFunctions();
+    Code:
+         0: aload_0
+         1: getfield      #16                 // Field expressions:Ljava/util/LinkedHashMap;
+         4: areturn
+}

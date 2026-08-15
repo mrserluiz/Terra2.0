@@ -1,0 +1,8 @@
+﻿Compiled from "NoiseConfigPackTemplate.java"
+public class com.dfsek.terra.addons.noise.NoiseConfigPackTemplate implements com.dfsek.tectonic.api.config.template.ConfigTemplate,com.dfsek.terra.api.properties.Properties {
+  private java.util.Map<java.lang.String, com.dfsek.terra.addons.noise.config.DimensionApplicableNoiseSampler> noiseBuilderMap;
+  private java.util.LinkedHashMap<java.lang.String, com.dfsek.terra.addons.noise.config.templates.FunctionTemplate> expressions;
+  public com.dfsek.terra.addons.noise.NoiseConfigPackTemplate();
+  public java.util.Map<java.lang.String, com.dfsek.terra.addons.noise.config.DimensionApplicableNoiseSampler> getSamplers();
+  public java.util.LinkedHashMap<java.lang.String, com.dfsek.terra.addons.noise.config.templates.FunctionTemplate> getFunctions();
+}

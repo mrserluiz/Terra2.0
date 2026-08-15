@@ -1,0 +1,16 @@
+﻿Compiled from "FunctionTemplate.java"
+public class com.dfsek.terra.addons.noise.config.templates.FunctionTemplate implements com.dfsek.tectonic.api.config.template.object.ObjectTemplate<com.dfsek.terra.addons.noise.config.templates.FunctionTemplate> {
+  private final com.dfsek.paralithic.eval.parser.Parser$ParseOptions parseOptions;
+  private java.util.List<java.lang.String> args;
+  private java.lang.String function;
+  private java.util.LinkedHashMap<java.lang.String, com.dfsek.terra.addons.noise.config.templates.FunctionTemplate> functions;
+  public com.dfsek.terra.addons.noise.config.templates.FunctionTemplate(com.dfsek.paralithic.eval.parser.Parser$ParseOptions);
+  public com.dfsek.terra.addons.noise.config.templates.FunctionTemplate get();
+  public java.util.List<java.lang.String> getArgs();
+  public java.lang.String getFunction();
+  public java.util.LinkedHashMap<java.lang.String, com.dfsek.terra.addons.noise.config.templates.FunctionTemplate> getFunctions();
+  public com.dfsek.paralithic.eval.parser.Parser$ParseOptions getParseOptions();
+  public boolean equals(java.lang.Object);
+  public int hashCode();
+  public java.lang.Object get();
+}
