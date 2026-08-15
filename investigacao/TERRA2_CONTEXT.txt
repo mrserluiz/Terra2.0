@@ -1,0 +1,431 @@
+from pathlib import Path
+
+content = r"""T2CTX|v1.0
+PROJECT=Terra2.0
+PROJECT_TYPE=REVIVE_MODERNIZE_EXPAND
+SOURCE_REPO=https://github.com/mrserluiz/Terra2.0
+ORIGINAL_PLUGIN=Terra
+ORIGINAL_MC=1.21.8
+TARGET_MC=26.2
+LANG=Java
+PRIMARY_SOURCE=GitHub_repository_plus_local_decompiled_source
+
+MISSION:
+1=Ressuscitar o plugin Terra de TerraFormação abandonado pelo desenvolvedor.
+2=Entender completamente seu funcionamento antes de reescrever.
+3=Atualizar inicialmente para Minecraft 26.2.
+4=Preservar/reaproveitar o máximo possível do Core original.
+5=Substituir/modernizar as partes dependentes da versão antiga do Minecraft.
+6=Expandir o sistema de Packs.
+7=Permitir criação de novos TerraPacks altamente personalizados.
+8=Adicionar integração com DataPacks.
+9=Permitir que DataPacks e TerraPacks coexistam de forma controlada.
+10=Transformar o projeto em uma engine moderna de geração de terreno, não apenas em um patch temporário.
+
+PROJECT_PRINCIPLE:
+"Entender primeiro; modificar depois."
+Não reconstruir o Terra do zero sem antes localizar e compreender o pipeline real.
+Não assumir função de uma classe apenas pelo nome.
+Toda afirmação estrutural importante deve ser classificada como FACT, HYPOTHESIS ou DECISION.
+
+PERSISTENCE:
+Este arquivo é a MEMÓRIA OPERACIONAL EXTERNA do projeto.
+Ele existe para preservar continuidade entre conversas.
+O GitHub é a fonte persistente do código, evidências, dumps e estado da investigação.
+Ao iniciar/retomar investigação, ler este arquivo antes de tomar decisões arquiteturais.
+Atualizar este arquivo quando um marco importante for concluído, uma hipótese for confirmada/refutada ou uma decisão arquitetural for tomada.
+Não apagar fatos históricos; alterar status e adicionar novas evidências.
+
+RULES:
+R1=FACT != HYPOTHESIS.
+R2=Não tratar hipótese como fato.
+R3=Não repetir investigação já concluída sem motivo.
+R4=Registrar arquivo/origem das evidências quando possível.
+R5=Seguir o fluxo de execução real, não busca genérica por nomes.
+R6=Não investigar Noise antes de entender quem chama o Noise.
+R7=Não modernizar NMS antes de compreender o Core.
+R8=Preservar arquitetura útil; substituir somente o necessário.
+R9=Manter separação entre Core Terra e Adapter Minecraft.
+R10=Usar GitHub como fonte persistente do projeto.
+
+ARCHITECTURE_CURRENT_MODEL:
+ConfigPack
+ -> ConfigPackTemplate
+ -> ConfigPackImpl
+ -> GeneratorProvider
+ -> ChunkGenerator
+ -> generateChunkData()
+
+ConfigPack
+ -> BiomeProvider
+
+ConfigPack
+ -> GenerationStage[]
+ -> GenerationStage.populate()
+
+Minecraft_boundary:
+TerraBukkitPlugin
+ -> BukkitChunkGeneratorWrapper
+ -> NMSChunkGeneratorDelegate[v1_21_8]
+ -> Terra ChunkGenerator
+
+ARCHITECTURE_TARGET:
+TerraCore
+  |-- ConfigPack
+  |-- GeneratorProvider
+  |-- ChunkGenerator
+  |-- BiomeProvider
+  |-- GenerationStage
+  |-- Noise/Terrain systems
+  |-- Pack system
+  |
+  +--> MinecraftAdapter
+         +--> Paper/Bukkit 26.2
+         +--> NMS/version-specific bridge
+
+TARGET_PACK_ARCHITECTURE:
+TerraPack
+ + pack metadata
+ + generator configuration
+ + biome configuration
+ + stages
+ + addons
+ + terrain/noise configuration
+ + structures/features/vegetation
+ + optional DataPack integration
+
+FACTS_CONFIRMED:
+
+F001:
+SOURCE=investigacao/ConfigPack.java
+CLAIM=ConfigPack exposes getStages() and getGeneratorProvider().
+STATUS=CONFIRMED
+
+F002:
+SOURCE=investigacao/ConfigPackImpl.java
+LINE≈306
+CLAIM=ConfigPackImpl.getStages() exists.
+STATUS=CONFIRMED
+
+F003:
+SOURCE=investigacao/ConfigPackImpl.java
+LINE≈341-342
+CLAIM=ConfigPackImpl.getGeneratorProvider() returns template.getGeneratorProvider().
+STATUS=CONFIRMED
+
+F004:
+SOURCE=investigacao/ConfigPackTemplate.java
+LINE≈69
+CLAIM=ConfigPackTemplate contains private @Meta ChunkGeneratorProvider generatorProvider.
+STATUS=CONFIRMED
+
+F005:
+SOURCE=investigacao/ConfigPackTemplate.java
+LINE≈114
+CLAIM=ConfigPackTemplate exposes getGeneratorProvider().
+STATUS=CONFIRMED
+
+F006:
+SOURCE=investigacao/ChunkGeneratorProvider.java
+CLAIM=ChunkGeneratorProvider defines ChunkGenerator newInstance(ConfigPack).
+STATUS=CONFIRMED
+
+F007:
+SOURCE=com/dfsek/terra/bukkit/TerraBukkitPlugin.java
+LINE≈118
+CLAIM=TerraBukkitPlugin executes pack.getGeneratorProvider().newInstance(pack).
+STATUS=CONFIRMED
+
+F008:
+SOURCE=com/dfsek/terra/bukkit/generator/BukkitChunkGeneratorWrapper.java
+LINE≈46
+CLAIM=Wrapper delegates generation through ChunkGenerator.generateChunkData(...).
+STATUS=CONFIRMED
+
+F009:
+SOURCE=com/dfsek/terra/bukkit/generator/BukkitChunkGeneratorWrapper.java
+LINE≈76
+CLAIM=Wrapper sets delegate using pack.getGeneratorProvider().newInstance(pack).
+STATUS=CONFIRMED
+
+F010:
+SOURCE=com/dfsek/terra/bukkit/nms/v1_21_8/NMSChunkGeneratorDelegate.java
+LINE≈43
+CLAIM=1.21.8 NMS delegate obtains its Terra generator through pack.getGeneratorProvider().newInstance(pack).
+STATUS=CONFIRMED
+
+F011:
+SOURCE=investigacao/ChunkGenerator.java
+CLAIM=ChunkGenerator API defines generateChunkData(ProtoChunk, WorldProperties, BiomeProvider, int, int).
+STATUS=CONFIRMED
+
+F012:
+SOURCE=investigacao/GenerationStage.java
+CLAIM=GenerationStage is an independent generation-stage abstraction.
+STATUS=CONFIRMED
+
+F013:
+SOURCE=investigacao/GenerationStageProvider.java
+CLAIM=GenerationStageProvider defines GenerationStage newInstance(ConfigPack).
+STATUS=CONFIRMED
+
+F014:
+SOURCE=com/dfsek/terra/bukkit/generator/BukkitBlockPopulator.java
+CLAIM=pack.getStages().forEach(stage -> stage.populate(...)).
+STATUS=CONFIRMED
+
+F015:
+SOURCE=com/dfsek/terra/config/pack/ConfigPackImpl.java
+LINE≈81
+CLAIM=ConfigPackImpl creates a ConfigPackTemplate instance.
+STATUS=CONFIRMED
+
+F016:
+SEARCH=implements ChunkGeneratorProvider
+RESULT=No Java match in current decompiled source.
+STATUS=CONFIRMED_NEGATIVE
+
+F017:
+SEARCH=generatorProvider\s*=
+RESULT=No Java match in current decompiled source.
+STATUS=CONFIRMED_NEGATIVE
+
+F018:
+SEARCH=GeneratorProvider.*new
+RESULT=No direct concrete GeneratorProvider construction found in current Java search.
+STATUS=CONFIRMED_NEGATIVE
+
+F019:
+SOURCE=investigacao/ConfigPackTemplate.java
+CLAIM=generatorProvider is stored as @Meta rather than visibly instantiated by ordinary Java assignment.
+STATUS=CONFIRMED
+
+F020:
+SOURCE=search results
+CLAIM=The concrete ChunkGeneratorProvider is not yet identified.
+STATUS=CONFIRMED
+
+F021:
+SOURCE=search results
+CLAIM=The actual mechanism that populates ConfigPackTemplate.generatorProvider is not yet identified.
+STATUS=CONFIRMED
+
+F022:
+SOURCE=project history/investigation
+CLAIM=Original plugin target/version is Minecraft 1.21.8.
+STATUS=CONFIRMED
+
+F023:
+SOURCE=current project goal
+CLAIM=Modern target is Minecraft 26.2.
+STATUS=CONFIRMED
+
+INVESTIGATION_NEGATIVES:
+N001=No class found with "implements ChunkGeneratorProvider".
+N002=No ordinary Java assignment found matching "generatorProvider =".
+N003=No direct "new <ConcreteGeneratorProvider>" found by current searches.
+N004=Do not conclude that the provider does not exist; current evidence indicates it is likely supplied through configuration/deserialization/registration.
+
+HYPOTHESES:
+
+H001:
+CLAIM=generatorProvider is populated by the Terra configuration system rather than direct Java instantiation.
+EVIDENCE=@Meta field + absence of concrete assignment.
+CONFIDENCE=HIGH
+STATUS=OPEN
+
+H002:
+CLAIM=Tectonic is involved in transforming configuration into typed objects such as GeneratorProvider.
+EVIDENCE=Terra architecture uses @Meta and prior package references/known Terra configuration architecture.
+CONFIDENCE=HIGH_BUT_UNPROVEN
+STATUS=OPEN
+
+H003:
+CLAIM=The concrete GeneratorProvider can be located by tracing ConfigPackTemplate population and the Tectonic ConfigType/loader system.
+CONFIDENCE=HIGH
+STATUS=OPEN
+
+H004:
+CLAIM=GenerationStage is a post/base-population layer separate from ChunkGenerator.generateChunkData().
+EVIDENCE=BukkitBlockPopulator explicitly iterates stages and calls populate().
+CONFIDENCE=HIGH
+STATUS=CONFIRMED_AS_ARCHITECTURAL_HYPOTHESIS; continue tracing exact timing.
+
+H005:
+CLAIM=The original Terra architecture is sufficiently modular to preserve a large part of the Core while replacing Minecraft-version-specific adapters.
+CONFIDENCE=HIGH
+STATUS=DESIGN_DIRECTION
+
+CURRENT_PIPELINE:
+A=ConfigPack
+B=ConfigPackTemplate
+C=configuration/deserialization/registration [UNKNOWN]
+D=GeneratorProvider [UNKNOWN_CONCRETE]
+E=ChunkGenerator [UNKNOWN_CONCRETE]
+F=generateChunkData()
+G=GenerationStage[]
+H=BiomeProvider
+I=Noise
+J=features/structures/vegetation/etc.
+
+CURRENT_EXECUTION_PATH_CONFIRMED:
+TerraBukkitPlugin
+ -> pack
+ -> pack.getGeneratorProvider()
+ -> provider.newInstance(pack)
+ -> ChunkGenerator
+
+BukkitChunkGeneratorWrapper
+ -> pack.getGeneratorProvider()
+ -> provider.newInstance(pack)
+ -> delegate.generateChunkData(...)
+
+BukkitBlockPopulator
+ -> pack.getStages()
+ -> GenerationStage.populate(...)
+
+1.21.8_NMS:
+NMSChunkGeneratorDelegate[v1_21_8]
+ -> pack.getGeneratorProvider().newInstance(pack)
+
+INVESTIGATION_ORDER:
+1=ConfigPack
+2=ConfigPackTemplate
+3=ConfigPackTemplate population
+4=Tectonic/@Meta/ConfigType/loader
+5=GeneratorProvider concrete
+6=ChunkGenerator concrete
+7=generateChunkData()
+8=GenerationStage pipeline
+9=BiomeProvider concrete
+10=Noise
+11=default.zip structure/configuration
+12=structures
+13=features
+14=vegetation
+15=rivers
+16=oceans
+17=caves
+18=world registration/preset integration
+19=1.21.8 NMS adapter
+20=26.2 adapter design
+21=DataPack integration
+22=TerraPack v2 design
+23=new custom TerraFormation packs
+
+DO_NOT_JUMP:
+Não ir para Noise antes de identificar o ChunkGenerator concreto.
+Não assumir que o nome de uma classe revela sua função.
+Não substituir o Core antes de entender o pipeline.
+Não remover o sistema de configuração original antes de entender Tectonic.
+Não confundir Bukkit wrapper/NMS adapter com o algoritmo real de TerraFormação.
+
+CURRENT_TARGET:
+T003=Localizar mecanismo que preenche ConfigPackTemplate.generatorProvider.
+T004=Localizar Tectonic/@Meta/ConfigType/loader relacionado.
+T005=Localizar GeneratorProvider concreto.
+T006=Seguir newInstance(pack).
+T007=Localizar ChunkGenerator concreto.
+T008=Seguir generateChunkData().
+
+NEXT_COMMANDS:
+Get-ChildItem -Recurse -Filter *.java | Select-String "com.dfsek.tectonic"
+Get-ChildItem -Recurse -Filter *.java | Select-String "@Meta"
+Get-ChildItem -Recurse -Filter *.java | Select-String "TypeRegistry"
+Get-ChildItem -Recurse -Filter *.java | Select-String "Tectonic"
+Get-Content ".\com\dfsek\terra\config\pack\ConfigPackImpl.java" | Select-Object -Skip 60 -First 220
+Get-Content ".\com\dfsek\terra\config\pack\ConfigPackTemplate.java"
+
+DEFAULT_PACK:
+STATUS=NOT_YET_MAPPED
+TARGET=packs/default.zip
+ACTION=list_zip_tree_then_correlate_files_to_ConfigPackTemplate/@Meta
+
+GITHUB_WORKFLOW:
+LOCAL_CHANGE
+ -> git add .
+ -> git commit -m "..."
+ -> git push
+ -> assistant reads GitHub
+ -> investigation continues
+
+FILES_CURRENTLY_EXPECTED:
+investigacao/ConfigPack.java
+investigacao/ConfigPackImpl.java
+investigacao/ConfigPackTemplate.java
+investigacao/ChunkGenerator.java
+investigacao/ChunkGeneratorProvider.java
+investigacao/GenerationStage.java
+investigacao/GenerationStageProvider.java
+investigacao/TERRA2_CONTEXT.txt [THIS FILE]
+
+FUTURE_CONTEXT_UPDATE_RULE:
+Quando houver novo marco:
+1=Adicionar FACTS novos.
+2=Atualizar HYPOTHESES confirmadas/refutadas.
+3=Atualizar CHECKLIST/STATUS.
+4=Atualizar CURRENT_TARGET.
+5=Registrar DECISIONS.
+6=Registrar arquivos-fonte relevantes.
+7=Preservar histórico importante.
+8=Não reescrever fatos antigos sem registrar a mudança.
+
+DECISIONS:
+
+D001:
+DECISION=Investigar antes de modernizar.
+STATUS=ACTIVE
+
+D002:
+DECISION=Preservar Core modular do Terra quando tecnicamente viável.
+STATUS=ACTIVE
+
+D003:
+DECISION=Separar Terra Core de Minecraft Adapter.
+STATUS=ACTIVE
+
+D004:
+DECISION=Terra 2.0 deve suportar DataPacks e novos TerraPacks.
+STATUS=ACTIVE
+
+D005:
+DECISION=GitHub é o repositório persistente da investigação e código.
+STATUS=ACTIVE
+
+D006:
+DECISION=TERRA2_CONTEXT.txt é a memória operacional externa da investigação.
+STATUS=ACTIVE
+
+LONG_TERM_ARCHITECTURE_GOAL:
+TerraCore
+ -> Pack Engine
+ -> Config Engine
+ -> Generator Engine
+ -> Biome Engine
+ -> Noise/Terrain Engine
+ -> Stage/Feature Engine
+ -> DataPack bridge
+ -> Minecraft 26.2 Adapter
+
+DESIRED_RESULT:
+Um Terra moderno que:
+- gere terrenos personalizados;
+- permita novos TerraPacks;
+- permita configuração profunda;
+- possa reutilizar DataPacks;
+- possa combinar sistemas de geração;
+- minimize dependência de NMS;
+- seja atualizável para futuras versões do Minecraft;
+- mantenha arquitetura modular;
+- preserve o máximo possível do conhecimento/algoritmos do Terra original.
+
+END_STATE:
+INVESTIGATION_ACTIVE
+CURRENT_MILESTONE=FIND_CONCRETE_GENERATOR_PROVIDER
+NEXT_MILESTONE=TRACE_CHUNK_GENERATOR_AND_REAL_TERRAFORMATION_PIPELINE
+"""
+
+path = Path("/mnt/data/TERRA2_CONTEXT.txt")
+path.write_text(content, encoding="utf-8")
+print(f"Criado: {path}")
+print(f"Tamanho: {path.stat().st_size:,} bytes")
