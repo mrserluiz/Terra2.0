@@ -1,0 +1,72 @@
+﻿Compiled from "Sampler3D.java"
+public class com.dfsek.terra.addons.chunkgenerator.generation.math.samplers.Sampler3D {
+  private final com.dfsek.terra.addons.chunkgenerator.generation.math.interpolation.ChunkInterpolator interpolator;
+
+  private final com.dfsek.terra.addons.chunkgenerator.generation.math.interpolation.ElevationInterpolator elevationInterpolator;
+
+  public com.dfsek.terra.addons.chunkgenerator.generation.math.samplers.Sampler3D(int, int, long, int, int, com.dfsek.terra.api.world.biome.generation.BiomeProvider, int, com.dfsek.terra.api.properties.PropertyKey<com.dfsek.terra.addons.chunkgenerator.config.noise.BiomeNoiseProperties>, int);
+    Code:
+         0: aload_0
+         1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+         4: aload_0
+         5: new           #7                  // class com/dfsek/terra/addons/chunkgenerator/generation/math/interpolation/ChunkInterpolator
+         8: dup
+         9: lload_3
+        10: iload_1
+        11: iload_2
+        12: aload         7
+        14: iload         5
+        16: iload         6
+        18: aload         9
+        20: iload         10
+        22: invokespecial #9                  // Method com/dfsek/terra/addons/chunkgenerator/generation/math/interpolation/ChunkInterpolator."<init>":(JIILcom/dfsek/terra/api/world/biome/generation/BiomeProvider;IILcom/dfsek/terra/api/properties/PropertyKey;I)V
+        25: putfield      #12                 // Field interpolator:Lcom/dfsek/terra/addons/chunkgenerator/generation/math/interpolation/ChunkInterpolator;
+        28: aload_0
+        29: new           #18                 // class com/dfsek/terra/addons/chunkgenerator/generation/math/interpolation/ElevationInterpolator
+        32: dup
+        33: lload_3
+        34: iload_1
+        35: iload_2
+        36: aload         7
+        38: iload         8
+        40: aload         9
+        42: invokespecial #20                 // Method com/dfsek/terra/addons/chunkgenerator/generation/math/interpolation/ElevationInterpolator."<init>":(JIILcom/dfsek/terra/api/world/biome/generation/BiomeProvider;ILcom/dfsek/terra/api/properties/PropertyKey;)V
+        45: putfield      #23                 // Field elevationInterpolator:Lcom/dfsek/terra/addons/chunkgenerator/generation/math/interpolation/ElevationInterpolator;
+        48: return
+
+  public double sample(double, double, double);
+    Code:
+         0: aload_0
+         1: getfield      #12                 // Field interpolator:Lcom/dfsek/terra/addons/chunkgenerator/generation/math/interpolation/ChunkInterpolator;
+         4: dload_1
+         5: dload_3
+         6: dload         5
+         8: invokevirtual #27                 // Method com/dfsek/terra/addons/chunkgenerator/generation/math/interpolation/ChunkInterpolator.getNoise:(DDD)D
+        11: aload_0
+        12: getfield      #23                 // Field elevationInterpolator:Lcom/dfsek/terra/addons/chunkgenerator/generation/math/interpolation/ElevationInterpolator;
+        15: dload_1
+        16: invokestatic  #31                 // Method java/lang/Math.round:(D)J
+        19: l2i
+        20: dload         5
+        22: invokestatic  #31                 // Method java/lang/Math.round:(D)J
+        25: l2i
+        26: invokevirtual #37                 // Method com/dfsek/terra/addons/chunkgenerator/generation/math/interpolation/ElevationInterpolator.getElevation:(II)D
+        29: dadd
+        30: dreturn
+
+  public double sample(int, int, int);
+    Code:
+         0: aload_0
+         1: getfield      #12                 // Field interpolator:Lcom/dfsek/terra/addons/chunkgenerator/generation/math/interpolation/ChunkInterpolator;
+         4: iload_1
+         5: iload_2
+         6: iload_3
+         7: invokevirtual #41                 // Method com/dfsek/terra/addons/chunkgenerator/generation/math/interpolation/ChunkInterpolator.getNoise:(III)D
+        10: aload_0
+        11: getfield      #23                 // Field elevationInterpolator:Lcom/dfsek/terra/addons/chunkgenerator/generation/math/interpolation/ElevationInterpolator;
+        14: iload_1
+        15: iload_3
+        16: invokevirtual #37                 // Method com/dfsek/terra/addons/chunkgenerator/generation/math/interpolation/ElevationInterpolator.getElevation:(II)D
+        19: dadd
+        20: dreturn
+}
