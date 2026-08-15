@@ -1,0 +1,36 @@
+﻿
+com\dfsek\terra\config\pack\ConfigPackImpl.java:78:   public static final TypeKey<ConfigType<?, ?>> 
+CONFIG_TYPE_TYPE_KEY = new TypeKey<ConfigType<?, ?>>() {};
+com\dfsek\terra\config\pack\ConfigPackImpl.java:90:   private final OpenRegistry<ConfigType<?, ?>> configTypeRegistry;
+com\dfsek\terra\config\pack\ConfigPackImpl.java:91:   private final TreeMap<Integer, List<Pair<RegistryKey, 
+ConfigType<?, ?>>>> configTypes = new TreeMap<>();
+com\dfsek\terra\config\pack\ConfigPackImpl.java:133:      this.configTypeRegistry = this.createConfigRegistry();
+com\dfsek\terra\config\pack\ConfigPackImpl.java:160:      this.configTypes.values().forEach(list -> list.forEach(pair 
+-> this.configTypeRegistry.register(pair.getLeft(), pair.getRight())));
+com\dfsek\terra\config\pack\ConfigPackImpl.java:170:      this.configTypeRegistry
+com\dfsek\terra\config\pack\ConfigPackImpl.java:245:      registry.registerLoader(ConfigType.class, 
+this.configTypeRegistry).registerLoader(BufferedImage.class, new BufferedImageLoader(this.loader, this));
+com\dfsek\terra\config\pack\ConfigPackImpl.java:253:      this.configTypes.forEach((p, configs) -> 
+configs.forEach(pair -> {
+com\dfsek\terra\config\pack\ConfigPackImpl.java:260:      this.configTypes.computeIfAbsent(priority, p -> new 
+ArrayList<>()).add(Pair.of(key, type));
+com\dfsek\terra\config\pack\ConfigPackImpl.java:346:      return new OpenRegistryImpl<ConfigType<?, ?>>(new 
+LinkedHashMap(), CONFIG_TYPE_TYPE_KEY) {
+investigacao\ConfigPackImpl.java:78:   public static final TypeKey<ConfigType<?, ?>> CONFIG_TYPE_TYPE_KEY = new 
+TypeKey<ConfigType<?, ?>>() {};
+investigacao\ConfigPackImpl.java:90:   private final OpenRegistry<ConfigType<?, ?>> configTypeRegistry;
+investigacao\ConfigPackImpl.java:91:   private final TreeMap<Integer, List<Pair<RegistryKey, ConfigType<?, ?>>>> 
+configTypes = new TreeMap<>();
+investigacao\ConfigPackImpl.java:133:      this.configTypeRegistry = this.createConfigRegistry();
+investigacao\ConfigPackImpl.java:160:      this.configTypes.values().forEach(list -> list.forEach(pair -> 
+this.configTypeRegistry.register(pair.getLeft(), pair.getRight())));
+investigacao\ConfigPackImpl.java:170:      this.configTypeRegistry
+investigacao\ConfigPackImpl.java:245:      registry.registerLoader(ConfigType.class, 
+this.configTypeRegistry).registerLoader(BufferedImage.class, new BufferedImageLoader(this.loader, this));
+investigacao\ConfigPackImpl.java:253:      this.configTypes.forEach((p, configs) -> configs.forEach(pair -> {
+investigacao\ConfigPackImpl.java:260:      this.configTypes.computeIfAbsent(priority, p -> new 
+ArrayList<>()).add(Pair.of(key, type));
+investigacao\ConfigPackImpl.java:346:      return new OpenRegistryImpl<ConfigType<?, ?>>(new LinkedHashMap(), 
+CONFIG_TYPE_TYPE_KEY) {
+
+

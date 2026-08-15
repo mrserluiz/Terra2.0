@@ -1,0 +1,32 @@
+﻿
+com\dfsek\terra\api\event\events\config\ConfigurationLoadEvent.java:12:public class ConfigurationLoadEvent implements 
+PackEvent, FailThroughEvent {
+com\dfsek\terra\api\event\events\config\ConfigurationLoadEvent.java:19:   public ConfigurationLoadEvent(ConfigPack 
+pack, AbstractConfiguration configuration, Consumer<ConfigTemplate> loader, ConfigType<?, ?> type, Object loaded) {
+com\dfsek\terra\api\event\events\config\type\ConfigTypeLoadEvent.java:10:public abstract class ConfigTypeLoadEvent 
+implements PackEvent, FailThroughEvent {
+com\dfsek\terra\api\event\events\config\type\ConfigTypeLoadEvent.java:15:   public ConfigTypeLoadEvent(ConfigType<?, 
+?> type, CheckedRegistry<?> registry, ConfigPack pack) {
+com\dfsek\terra\api\event\events\config\type\ConfigTypePostLoadEvent.java:7:public class ConfigTypePostLoadEvent 
+extends ConfigTypeLoadEvent {
+com\dfsek\terra\api\event\events\config\type\ConfigTypePreLoadEvent.java:7:public class ConfigTypePreLoadEvent extends 
+ConfigTypeLoadEvent {
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSAddon.java:3:import 
+com.dfsek.terra.api.event.events.config.ConfigurationLoadEvent;
+com\dfsek\terra\bukkit\nms\v1_21_8\NMSAddon.java:18:      
+this.terraBukkitPlugin.getEventManager().getHandler(FunctionalEventHandler.class).register(this, 
+ConfigurationLoadEvent.class).then(event -> {
+com\dfsek\terra\config\pack\ConfigPackImpl.java:20:import 
+com.dfsek.terra.api.event.events.config.ConfigurationLoadEvent;
+com\dfsek\terra\config\pack\ConfigPackImpl.java:45:import com.dfsek.terra.config.prototype.ProtoConfig;
+com\dfsek\terra\config\pack\ConfigPackImpl.java:165:               ProtoConfig config = new ProtoConfig();
+com\dfsek\terra\config\pack\ConfigPackImpl.java:184:                              new ConfigurationLoadEvent(this, 
+configuration, template -> this.selfLoader.load(template, configuration), configType, loaded)
+com\dfsek\terra\config\prototype\ProtoConfig.java:7:public class ProtoConfig implements ConfigTemplate {
+investigacao\ConfigPackImpl.java:20:import com.dfsek.terra.api.event.events.config.ConfigurationLoadEvent;
+investigacao\ConfigPackImpl.java:45:import com.dfsek.terra.config.prototype.ProtoConfig;
+investigacao\ConfigPackImpl.java:165:               ProtoConfig config = new ProtoConfig();
+investigacao\ConfigPackImpl.java:184:                              new ConfigurationLoadEvent(this, configuration, 
+template -> this.selfLoader.load(template, configuration), configType, loaded)
+
+

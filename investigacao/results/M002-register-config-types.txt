@@ -1,0 +1,10 @@
+﻿
+com\dfsek\terra\api\config\ConfigPack.java:23:   ConfigPack registerConfigType(ConfigType<?, ?> var1, RegistryKey 
+var2, int var3);
+com\dfsek\terra\config\pack\ConfigPackImpl.java:251:   public ConfigPack registerConfigType(ConfigType<?, ?> type, 
+RegistryKey key, int priority) {
+investigacao\ConfigPack.java:23:   ConfigPack registerConfigType(ConfigType<?, ?> var1, RegistryKey var2, int var3);
+investigacao\ConfigPackImpl.java:251:   public ConfigPack registerConfigType(ConfigType<?, ?> type, RegistryKey key, 
+int priority) {
+
+
