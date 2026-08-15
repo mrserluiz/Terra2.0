@@ -421,3 +421,41 @@ END_STATE:
 INVESTIGATION_ACTIVE
 CURRENT_MILESTONE=FIND_CONCRETE_GENERATOR_PROVIDER
 NEXT_MILESTONE=TRACE_CHUNK_GENERATOR_AND_REAL_TERRAFORMATION_PIPELINE
+
+CHECKLIST:
+
+[✓] GitHub repository
+[✓] Decompiled Terra source
+[✓] ConfigPack
+[✓] ConfigPackImpl
+[✓] ConfigPackTemplate
+[✓] ChunkGenerator API
+[✓] ChunkGeneratorProvider API
+[✓] GenerationStage API
+[✓] GenerationStageProvider API
+[✓] Bukkit generation bridge
+[✓] NMS 1.21.8 bridge
+[✓] GeneratorProvider call path
+[ ] ConfigPackTemplate population
+[ ] Tectonic loader
+[ ] @Meta resolution
+[ ] ConfigType/registry
+[ ] GeneratorProvider concrete
+[ ] ChunkGenerator concrete
+[ ] generateChunkData pipeline
+[ ] GenerationStage concrete implementations
+[ ] BiomeProvider concrete
+[ ] Noise system
+[ ] default.zip mapping
+[ ] Terrain configuration
+[ ] Rivers
+[ ] Oceans
+[ ] Caves
+[ ] Structures
+[ ] Vegetation
+[ ] Features
+[ ] World registration
+[ ] NMS 26.2 adapter
+[ ] DataPack bridge
+[ ] TerraPack v2
+[ ] Custom TerraFormation packs
