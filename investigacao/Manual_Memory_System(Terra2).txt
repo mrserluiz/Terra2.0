@@ -1,6 +1,28 @@
 ================================
 UPDATES:
 =============================
+UPDATE > 15/08/26 - 16:59
+
+MEMORY_FILE_RENAME:
+OLD=TERRA2_CONTEXT.txt
+NEW=Manual_Memory_System(Terra2).txt
+
+STATUS=CONFIRMED
+
+RULE:
+Manual_Memory_System(Terra2).txt is now the official persistent manual memory file for the Terra2 project and technical interaction.
+
+MEMORY_REFERENCE_UPDATE:
+All future references to TERRA2_CONTEXT.txt as the active memory file should be interpreted as Manual_Memory_System(Terra2).txt.
+
+GITHUB_PATH:
+investigacao/Manual_Memory_System(Terra2).txt
+
+EVIDENCE:
+The file was successfully verified in the main branch of the GitHub repository.
+
+NEXT:
+Update internal protocol references from TERRA2_CONTEXT.txt to Manual_Memory_System(Terra2).txt where appropriate.
 UPDATE > 15/08/26 - 16:40
 
 MEMORY_PROTOCOL_UPDATE:
