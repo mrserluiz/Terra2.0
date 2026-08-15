@@ -2,6 +2,105 @@
 UPDATES:
 =============================
 
+UPDATE > 15/08/26 - M002D
+
+MILESTONE=M002D
+NAME=Concrete ChunkGeneratorProvider and instantiation path identified
+STATUS=CONFIRMED
+
+FACT:F041
+SOURCE=investigacao/results/M002D-generator-provider-registration.txt
+CLAIM=NoiseChunkGenerator3DAddon registers a ChunkGeneratorProvider in the ConfigPack ChunkGeneratorProvider registry during ConfigPackPreLoadEvent.
+STATUS=CONFIRMED
+
+FACT:F042
+SOURCE=investigacao/results/M002D-generator-provider-registration.txt
+CLAIM=The registered provider is created through an invokedynamic lambda corresponding to lambda$initialize$1.
+STATUS=CONFIRMED
+
+FACT:F043
+SOURCE=investigacao/results/M002D-generator-provider-registration.txt
+CLAIM=lambda$initialize$1 constructs the concrete NoiseChunkGenerator3D instance.
+STATUS=CONFIRMED
+
+FACT:F044
+SOURCE=investigacao/results/M002D-generator-provider-registration.txt
+CLAIM=NoiseChunkGenerator3D is instantiated with ConfigPack, Platform, elevationBlend, horizontalRes, verticalRes, biome PropertyKey, palette PropertyKey, SlantCalculationMethod and slant palette enablement.
+STATUS=CONFIRMED
+
+FACT:F045
+SOURCE=investigacao/results/M002D-provider-registration-search.txt
+CLAIM=The concrete NoiseChunkGenerator3D implementation exists exclusively in the Terra-chunk-generator-noise-3d addon among the scanned addon JARs.
+STATUS=CONFIRMED
+
+ARCHITECTURE_UPDATE:
+ConfigPack
+ -> ConfigPackPreLoadEvent
+ -> NoiseChunkGenerator3DAddon.initialize()
+ -> ChunkGeneratorProvider registry
+ -> registered Noise 3D provider
+ -> lambda$initialize$1(...)
+ -> new NoiseChunkGenerator3D(...)
+ -> generateChunkData()
+
+GENERATOR_PROVIDER:
+TYPE=ChunkGeneratorProvider
+REGISTRATION=ChunkGeneratorProvider registry
+IMPLEMENTATION=NoiseChunkGenerator3DAddon.lambda$initialize$1
+OUTPUT=NoiseChunkGenerator3D
+
+CONCRETE_GENERATOR:
+CLASS=com.dfsek.terra.addons.chunkgenerator.generation.NoiseChunkGenerator3D
+INTERFACE=com.dfsek.terra.api.world.chunk.generation.ChunkGenerator
+
+M002D_RESULT:
+The true executable terrain generator creation path has been identified.
+
+PREVIOUS_UNKNOWN:
+ChunkGeneratorProvider=UNKNOWN
+ChunkGenerator=UNKNOWN
+
+CURRENT_STATE:
+ChunkGeneratorProvider=CONFIRMED
+ChunkGenerator=CONFIRMED
+ProviderInstantiationPath=CONFIRMED
+generateChunkData=PARTIALLY_TRACED
+
+HYPOTHESIS:H010
+OLD=NoiseChunkGenerator3DAddon likely registers the concrete generator/configuration types into Terra's ConfigPack/registry during addon initialization.
+NEW=Confirmed. NoiseChunkGenerator3DAddon registers a concrete ChunkGeneratorProvider during ConfigPackPreLoadEvent and the provider constructs NoiseChunkGenerator3D.
+STATUS=CONFIRMED
+
+CURRENT_TARGET=M002E
+Trace NoiseChunkGenerator3D.generateChunkData() completely.
+
+NEXT_TARGET:
+1=Map generateChunkData() execution order.
+2=Identify SamplerProvider inputs and outputs.
+3=Identify biome lookup.
+4=Identify BiomeNoiseProperties.
+5=Identify BiomePaletteInfo.
+6=Identify Palette selection.
+7=Identify block placement loop.
+8=Identify density/noise sampling.
+9=Identify vertical/horizontal interpolation.
+10=Identify slant palette logic.
+11=Identify where caves/oceans/terrain shape are introduced.
+
+DO_NOT_INVESTIGATE_YET:
+Noise mathematical implementation should not be analyzed in isolation until its caller/input chain is mapped.
+
+REUSE_VALUE_FOR_TERRA2:
+The original Terra architecture provides a clean separation:
+Core API
+ -> addon registration
+ -> provider registry
+ -> generator implementation
+ -> pack configuration
+ -> generation pipeline.
+
+This architecture is a strong candidate for Terra 2.0 modernization rather than rewriting the entire generator system from scratch.
+
 UPDATE > 15/08/26 - M002C
 
 MILESTONE=M002C
