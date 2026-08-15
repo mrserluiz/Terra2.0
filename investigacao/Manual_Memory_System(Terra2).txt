@@ -1,6 +1,70 @@
 ================================
 UPDATES:
 =============================
+
+UPDATE > 15/08/26 - M002C
+
+MILESTONE=M002C
+NAME=Concrete Noise 3D Chunk Generator identified
+STATUS=CONFIRMED
+
+FACT:F038
+SOURCE=investigacao/results/M002-addon-jar-tree.txt
+CLAIM=Terra contains a dedicated addon JAR named Terra-chunk-generator-noise-3d-1.2.1-BETA+451683aff-all.jar.
+STATUS=CONFIRMED
+
+FACT:F039
+SOURCE=investigacao/results/M002-addon-generation-classes.txt
+CLAIM=The Noise 3D addon contains NoiseChunkGenerator3D.class under com.dfsek.terra.addons.chunkgenerator.generation.
+STATUS=CONFIRMED
+
+FACT:F040
+SOURCE=investigacao/results/M002-addon-generation-classes.txt
+CLAIM=The Noise 3D addon contains NoiseChunkGenerator3DAddon.class, NoiseChunkGeneratorPackConfigTemplate, BiomeNoiseConfigTemplate, SamplerProvider, ThreadLocalNoiseHolder and multiple generation/math/interpolation components.
+STATUS=CONFIRMED
+
+ARCHITECTURE_UPDATE:
+The concrete terrain generator is not located in Terra Core.
+It is supplied by the Terra-chunk-generator-noise-3d addon.
+
+CURRENT_PIPELINE:
+Terra Core
+ -> Addon System
+ -> Terra-chunk-generator-noise-3d
+ -> NoiseChunkGenerator3DAddon
+ -> NoiseChunkGenerator3D
+ -> generation/math/samplers
+ -> noise/biome configuration
+ -> palette
+ -> chunk generation
+
+HYPOTHESIS:H009
+OLD=Concrete ConfigType/Factory/GeneratorProvider may be supplied by addons.
+NEW=Concrete terrain-generation implementation is confirmed to exist inside the Noise 3D addon.
+STATUS=PARTIALLY_CONFIRMED
+
+HYPOTHESIS:H010
+CLAIM=NoiseChunkGenerator3DAddon likely registers the concrete generator/configuration types into Terra's ConfigPack/registry during addon initialization.
+STATUS=STRONG
+REQUIRES=M002D-javap-analysis
+
+CURRENT_TARGET=M002D
+Analyze NoiseChunkGenerator3DAddon registration and NoiseChunkGenerator3D execution.
+
+NEXT_TARGET:
+1=Identify registration mechanism.
+2=Identify concrete ConfigType/ConfigFactory.
+3=Identify GeneratorProvider.
+4=Trace newInstance(pack).
+5=Trace generateChunkData().
+6=Trace SamplerProvider.
+7=Trace Noise configuration.
+8=Trace Palette/Biome integration.
+
+RULE:
+Do not modify the addon JAR.
+Use javap/decompilation only for structural investigation.
+
 UPDATE > 15/08/26 - 16:59
 
 MEMORY_FILE_RENAME:
