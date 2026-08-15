@@ -421,7 +421,3 @@ END_STATE:
 INVESTIGATION_ACTIVE
 CURRENT_MILESTONE=FIND_CONCRETE_GENERATOR_PROVIDER
 NEXT_MILESTONE=TRACE_CHUNK_GENERATOR_AND_REAL_TERRAFORMATION_PIPELINE
-path = Path("/mnt/data/TERRA2_CONTEXT.txt")
-path.write_text(content, encoding="utf-8")
-print(f"Criado: {path}")
-print(f"Tamanho: {path.stat().st_size:,} bytes")
