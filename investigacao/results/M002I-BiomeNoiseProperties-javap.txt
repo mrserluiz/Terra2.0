@@ -1,0 +1,115 @@
+﻿Compiled from "BiomeNoiseProperties.java"
+public final class com.dfsek.terra.addons.chunkgenerator.config.noise.BiomeNoiseProperties extends java.lang.Record implements com.dfsek.terra.api.properties.Properties {
+  private final com.dfsek.terra.api.noise.NoiseSampler base;
+
+  private final com.dfsek.terra.api.noise.NoiseSampler elevation;
+
+  private final com.dfsek.terra.api.noise.NoiseSampler carving;
+
+  private final int blendDistance;
+
+  private final int blendStep;
+
+  private final double blendWeight;
+
+  private final double elevationWeight;
+
+  private final com.dfsek.terra.addons.chunkgenerator.config.noise.ThreadLocalNoiseHolder noiseHolder;
+
+  public com.dfsek.terra.addons.chunkgenerator.config.noise.BiomeNoiseProperties(com.dfsek.terra.api.noise.NoiseSampler, com.dfsek.terra.api.noise.NoiseSampler, com.dfsek.terra.api.noise.NoiseSampler, int, int, double, double, com.dfsek.terra.addons.chunkgenerator.config.noise.ThreadLocalNoiseHolder);
+    Code:
+         0: aload_0
+         1: invokespecial #1                  // Method java/lang/Record."<init>":()V
+         4: aload_0
+         5: aload_1
+         6: putfield      #7                  // Field base:Lcom/dfsek/terra/api/noise/NoiseSampler;
+         9: aload_0
+        10: aload_2
+        11: putfield      #13                 // Field elevation:Lcom/dfsek/terra/api/noise/NoiseSampler;
+        14: aload_0
+        15: aload_3
+        16: putfield      #16                 // Field carving:Lcom/dfsek/terra/api/noise/NoiseSampler;
+        19: aload_0
+        20: iload         4
+        22: putfield      #19                 // Field blendDistance:I
+        25: aload_0
+        26: iload         5
+        28: putfield      #23                 // Field blendStep:I
+        31: aload_0
+        32: dload         6
+        34: putfield      #26                 // Field blendWeight:D
+        37: aload_0
+        38: dload         8
+        40: putfield      #30                 // Field elevationWeight:D
+        43: aload_0
+        44: aload         10
+        46: putfield      #33                 // Field noiseHolder:Lcom/dfsek/terra/addons/chunkgenerator/config/noise/ThreadLocalNoiseHolder;
+        49: return
+
+  public final java.lang.String toString();
+    Code:
+         0: aload_0
+         1: invokedynamic #37,  0             // InvokeDynamic #0:toString:(Lcom/dfsek/terra/addons/chunkgenerator/config/noise/BiomeNoiseProperties;)Ljava/lang/String;
+         6: areturn
+
+  public final int hashCode();
+    Code:
+         0: aload_0
+         1: invokedynamic #41,  0             // InvokeDynamic #0:hashCode:(Lcom/dfsek/terra/addons/chunkgenerator/config/noise/BiomeNoiseProperties;)I
+         6: ireturn
+
+  public final boolean equals(java.lang.Object);
+    Code:
+         0: aload_0
+         1: aload_1
+         2: invokedynamic #45,  0             // InvokeDynamic #0:equals:(Lcom/dfsek/terra/addons/chunkgenerator/config/noise/BiomeNoiseProperties;Ljava/lang/Object;)Z
+         7: ireturn
+
+  public com.dfsek.terra.api.noise.NoiseSampler base();
+    Code:
+         0: aload_0
+         1: getfield      #7                  // Field base:Lcom/dfsek/terra/api/noise/NoiseSampler;
+         4: areturn
+
+  public com.dfsek.terra.api.noise.NoiseSampler elevation();
+    Code:
+         0: aload_0
+         1: getfield      #13                 // Field elevation:Lcom/dfsek/terra/api/noise/NoiseSampler;
+         4: areturn
+
+  public com.dfsek.terra.api.noise.NoiseSampler carving();
+    Code:
+         0: aload_0
+         1: getfield      #16                 // Field carving:Lcom/dfsek/terra/api/noise/NoiseSampler;
+         4: areturn
+
+  public int blendDistance();
+    Code:
+         0: aload_0
+         1: getfield      #19                 // Field blendDistance:I
+         4: ireturn
+
+  public int blendStep();
+    Code:
+         0: aload_0
+         1: getfield      #23                 // Field blendStep:I
+         4: ireturn
+
+  public double blendWeight();
+    Code:
+         0: aload_0
+         1: getfield      #26                 // Field blendWeight:D
+         4: dreturn
+
+  public double elevationWeight();
+    Code:
+         0: aload_0
+         1: getfield      #30                 // Field elevationWeight:D
+         4: dreturn
+
+  public com.dfsek.terra.addons.chunkgenerator.config.noise.ThreadLocalNoiseHolder noiseHolder();
+    Code:
+         0: aload_0
+         1: getfield      #33                 // Field noiseHolder:Lcom/dfsek/terra/addons/chunkgenerator/config/noise/ThreadLocalNoiseHolder;
+         4: areturn
+}

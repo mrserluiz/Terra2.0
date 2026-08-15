@@ -1,0 +1,23 @@
+﻿Compiled from "BiomeNoiseProperties.java"
+public final class com.dfsek.terra.addons.chunkgenerator.config.noise.BiomeNoiseProperties extends java.lang.Record implements com.dfsek.terra.api.properties.Properties {
+  private final com.dfsek.terra.api.noise.NoiseSampler base;
+  private final com.dfsek.terra.api.noise.NoiseSampler elevation;
+  private final com.dfsek.terra.api.noise.NoiseSampler carving;
+  private final int blendDistance;
+  private final int blendStep;
+  private final double blendWeight;
+  private final double elevationWeight;
+  private final com.dfsek.terra.addons.chunkgenerator.config.noise.ThreadLocalNoiseHolder noiseHolder;
+  public com.dfsek.terra.addons.chunkgenerator.config.noise.BiomeNoiseProperties(com.dfsek.terra.api.noise.NoiseSampler, com.dfsek.terra.api.noise.NoiseSampler, com.dfsek.terra.api.noise.NoiseSampler, int, int, double, double, com.dfsek.terra.addons.chunkgenerator.config.noise.ThreadLocalNoiseHolder);
+  public final java.lang.String toString();
+  public final int hashCode();
+  public final boolean equals(java.lang.Object);
+  public com.dfsek.terra.api.noise.NoiseSampler base();
+  public com.dfsek.terra.api.noise.NoiseSampler elevation();
+  public com.dfsek.terra.api.noise.NoiseSampler carving();
+  public int blendDistance();
+  public int blendStep();
+  public double blendWeight();
+  public double elevationWeight();
+  public com.dfsek.terra.addons.chunkgenerator.config.noise.ThreadLocalNoiseHolder noiseHolder();
+}
