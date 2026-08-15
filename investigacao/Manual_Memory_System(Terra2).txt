@@ -1,6 +1,93 @@
 ================================
 UPDATES:
 =============================
+UPDATE > 15/08/26 - M002F
+
+MILESTONE=M002F
+NAME=Palette selection and Slant material system identified
+STATUS=CONFIRMED
+
+FACT:F046
+SOURCE=investigacao/results/M002F-paletteAt.txt
+CLAIM=NoiseChunkGenerator3D selects terrain palettes through BiomePaletteInfo.
+STATUS=CONFIRMED
+
+FACT:F047
+SOURCE=investigacao/results/M002F-paletteAt.txt
+CLAIM=BiomePaletteInfo exposes PaletteHolder and SlantHolder for material selection.
+STATUS=CONFIRMED
+
+FACT:F048
+SOURCE=investigacao/results/M002F-paletteAt.txt
+CLAIM=When slant palettes are enabled, paletteAt() can select a slant palette according to terrain depth and calculated surface slant.
+STATUS=CONFIRMED
+
+FACT:F049
+SOURCE=investigacao/results/M002F-paletteAt.txt
+CLAIM=Palette.get(index,x,y,z,seed) returns a BlockState rather than merely selecting a static block.
+STATUS=CONFIRMED
+
+FACT:F050
+SOURCE=investigacao/results/M002F-paletteAt.txt
+CLAIM=The generator exposes getBlock(WorldProperties,x,y,z,BiomeProvider), allowing individual block-state evaluation without generating an entire chunk.
+STATUS=CONFIRMED
+
+ARCHITECTURE_UPDATE:
+Terrain sampler value
+ -> biome
+ -> BiomePaletteInfo
+ -> PaletteHolder / SlantHolder
+ -> Palette
+ -> Palette.get(...)
+ -> BlockState
+
+SLANT_SYSTEM:
+BiomePaletteInfo
+ -> SlantHolder
+ -> depth check
+ -> SlantCalculationMethod
+ -> surface slant
+ -> threshold
+ -> slant palette OR normal palette
+
+IMPORTANT:
+Palette is a procedural BlockState selector and may receive coordinates and seed.
+Therefore Terra material generation is not necessarily a static block lookup.
+
+API_CAPABILITY:
+getBlock(...) provides a direct coordinate-level terrain/block evaluation path.
+
+CURRENT_STATE:
+TerrainValue=CONFIRMED
+BiomeResolution=CONFIRMED
+PaletteResolution=CONFIRMED
+SlantPaletteSystem=CONFIRMED
+BlockStateSelection=CONFIRMED
+SamplerConstruction=UNKNOWN
+
+CURRENT_TARGET=M002G
+Investigate SamplerProvider and the construction of Sampler3D.
+
+NEXT_TARGET:
+1=Identify exact SamplerProvider class.
+2=Trace SamplerProvider.get().
+3=Trace SamplerProvider.getChunk().
+4=Identify Sampler3D implementation.
+5=Determine how sampler graphs are constructed.
+6=Identify configuration inputs.
+7=Only after this investigate underlying Noise implementations.
+
+DESIGN_VALUE_FOR_TERRA2:
+The original architecture suggests separating:
+Terrain sampling
+Biome resolution
+Material/palette resolution
+BlockState generation
+
+This separation should be preserved in Terra 2.0 and exposed through modern Pack/DataPack configuration.
+
+MEMORY_RULE:
+Do not move to Noise implementation before tracing SamplerProvider unless evidence shows Noise is directly constructed there.
 
 UPDATE > 15/08/26 - M002D
 
