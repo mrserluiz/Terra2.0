@@ -1196,7 +1196,28 @@ and
 ConfigPack -> GenerationStage[]
 are confirmed execution paths.
 
-NEXT=M002
+[ACTIVE INVESTIGATION]
+CURRENT = M002H
+STATUS = IN_PROGRESS
+
+[INVESTIGATION RULE]
+Não avançar para componentes matemáticos individuais antes de descobrir
+como o pipeline de configuração os instancia e conecta.
+
+[EVIDENCE RULE]
+FACT = confirmado por código/bytecode/evidência do repositório.
+INFERENCE = conclusão arquitetural ainda sujeita a confirmação.
+HYPOTHESIS = possibilidade ainda não comprovada.
+DECISION = decisão tomada para o projeto Terra 2.0.
+
+[CONTINUITY RULE]
+Antes de continuar uma investigação:
+1. Ler Manual_Memory_System(Terra2).txt no GitHub.
+2. Consultar os results relevantes do GitHub.
+3. Manter a nomenclatura M002/M002H/etc.
+4. Registrar descobertas arquiteturais importantes antes de mudar de marco.
+5. Sempre fornecer os comandos PowerShell necessários para gerar novos arquivos de evidência.
+6. Usuário atualiza a memória manual pelo GitHub quando solicitado.
 NAME=Identify configuration mechanism that populates generatorProvider
 STATUS=ACTIVE
 
