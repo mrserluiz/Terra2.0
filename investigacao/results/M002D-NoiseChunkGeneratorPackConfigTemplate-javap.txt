@@ -1,0 +1,67 @@
+﻿Compiled from "NoiseChunkGeneratorPackConfigTemplate.java"
+public class com.dfsek.terra.addons.chunkgenerator.config.NoiseChunkGeneratorPackConfigTemplate implements com.dfsek.tectonic.api.config.template.ConfigTemplate,com.dfsek.terra.api.properties.Properties {
+  private int elevationBlend;
+
+  private int horizontalRes;
+
+  private int verticalRes;
+
+  private com.dfsek.terra.addons.chunkgenerator.generation.math.SlantCalculationMethod slantCalculationMethod;
+
+  private boolean disableSlantPalettes;
+
+  public com.dfsek.terra.addons.chunkgenerator.config.NoiseChunkGeneratorPackConfigTemplate();
+    Code:
+         0: aload_0
+         1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+         4: aload_0
+         5: iconst_4
+         6: putfield      #7                  // Field elevationBlend:I
+         9: aload_0
+        10: iconst_4
+        11: putfield      #13                 // Field horizontalRes:I
+        14: aload_0
+        15: iconst_2
+        16: putfield      #16                 // Field verticalRes:I
+        19: aload_0
+        20: getstatic     #19                 // Field com/dfsek/terra/addons/chunkgenerator/generation/math/SlantCalculationMethod.Derivative:Lcom/dfsek/terra/addons/chunkgenerator/generation/math/SlantCalculationMethod;
+        23: putfield      #25                 // Field slantCalculationMethod:Lcom/dfsek/terra/addons/chunkgenerator/generation/math/SlantCalculationMethod;
+        26: aload_0
+        27: iconst_0
+        28: putfield      #28                 // Field disableSlantPalettes:Z
+        31: return
+
+  public int getElevationBlend();
+    Code:
+         0: aload_0
+         1: getfield      #7                  // Field elevationBlend:I
+         4: ireturn
+
+  public int getHorizontalRes();
+    Code:
+         0: aload_0
+         1: getfield      #13                 // Field horizontalRes:I
+         4: ireturn
+
+  public int getVerticalRes();
+    Code:
+         0: aload_0
+         1: getfield      #16                 // Field verticalRes:I
+         4: ireturn
+
+  public com.dfsek.terra.addons.chunkgenerator.generation.math.SlantCalculationMethod getSlantCalculationMethod();
+    Code:
+         0: aload_0
+         1: getfield      #25                 // Field slantCalculationMethod:Lcom/dfsek/terra/addons/chunkgenerator/generation/math/SlantCalculationMethod;
+         4: areturn
+
+  public boolean isSlantPalettesEnabled();
+    Code:
+         0: aload_0
+         1: getfield      #28                 // Field disableSlantPalettes:Z
+         4: ifne          11
+         7: iconst_1
+         8: goto          12
+        11: iconst_0
+        12: ireturn
+}

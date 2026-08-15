@@ -1,0 +1,179 @@
+﻿Compiled from "NoiseChunkGenerator3DAddon.java"
+public class com.dfsek.terra.addons.chunkgenerator.NoiseChunkGenerator3DAddon implements com.dfsek.terra.addons.manifest.api.AddonInitializer {
+  private com.dfsek.terra.api.Platform platform;
+
+  private com.dfsek.terra.api.addon.BaseAddon addon;
+
+  public com.dfsek.terra.addons.chunkgenerator.NoiseChunkGenerator3DAddon();
+    Code:
+         0: aload_0
+         1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+         4: return
+
+  public void initialize();
+    Code:
+         0: ldc           #7                  // class com/dfsek/terra/addons/chunkgenerator/palette/BiomePaletteInfo
+         2: invokestatic  #9                  // Method com/dfsek/terra/api/properties/Context.create:(Ljava/lang/Class;)Lcom/dfsek/terra/api/properties/PropertyKey;
+         5: astore_1
+         6: ldc           #15                 // class com/dfsek/terra/addons/chunkgenerator/config/noise/BiomeNoiseProperties
+         8: invokestatic  #9                  // Method com/dfsek/terra/api/properties/Context.create:(Ljava/lang/Class;)Lcom/dfsek/terra/api/properties/PropertyKey;
+        11: astore_2
+        12: aload_0
+        13: getfield      #17                 // Field platform:Lcom/dfsek/terra/api/Platform;
+        16: invokeinterface #23,  1           // InterfaceMethod com/dfsek/terra/api/Platform.getEventManager:()Lcom/dfsek/terra/api/event/EventManager;
+        21: ldc           #29                 // class com/dfsek/terra/api/event/functional/FunctionalEventHandler
+        23: invokeinterface #31,  2           // InterfaceMethod com/dfsek/terra/api/event/EventManager.getHandler:(Ljava/lang/Class;)Lcom/dfsek/terra/api/event/EventHandler;
+        28: checkcast     #29                 // class com/dfsek/terra/api/event/functional/FunctionalEventHandler
+        31: aload_0
+        32: getfield      #37                 // Field addon:Lcom/dfsek/terra/api/addon/BaseAddon;
+        35: ldc           #41                 // class com/dfsek/terra/api/event/events/config/pack/ConfigPackPreLoadEvent
+        37: invokeinterface #43,  3           // InterfaceMethod com/dfsek/terra/api/event/functional/FunctionalEventHandler.register:(Lcom/dfsek/terra/api/addon/BaseAddon;Ljava/lang/Class;)Lcom/dfsek/terra/api/event/functional/EventContext;
+        42: sipush        1000
+        45: invokeinterface #47,  2           // InterfaceMethod com/dfsek/terra/api/event/functional/EventContext.priority:(I)Lcom/dfsek/terra/api/event/functional/EventContext;
+        50: aload_0
+        51: aload_2
+        52: aload_1
+        53: invokedynamic #53,  0             // InvokeDynamic #0:accept:(Lcom/dfsek/terra/addons/chunkgenerator/NoiseChunkGenerator3DAddon;Lcom/dfsek/terra/api/properties/PropertyKey;Lcom/dfsek/terra/api/properties/PropertyKey;)Ljava/util/function/Consumer;
+        58: invokeinterface #57,  2           // InterfaceMethod com/dfsek/terra/api/event/functional/EventContext.then:(Ljava/util/function/Consumer;)Lcom/dfsek/terra/api/event/functional/EventContext;
+        63: invokeinterface #61,  1           // InterfaceMethod com/dfsek/terra/api/event/functional/EventContext.failThrough:()Lcom/dfsek/terra/api/event/functional/EventContext;
+        68: pop
+        69: aload_0
+        70: getfield      #17                 // Field platform:Lcom/dfsek/terra/api/Platform;
+        73: invokeinterface #23,  1           // InterfaceMethod com/dfsek/terra/api/Platform.getEventManager:()Lcom/dfsek/terra/api/event/EventManager;
+        78: ldc           #29                 // class com/dfsek/terra/api/event/functional/FunctionalEventHandler
+        80: invokeinterface #31,  2           // InterfaceMethod com/dfsek/terra/api/event/EventManager.getHandler:(Ljava/lang/Class;)Lcom/dfsek/terra/api/event/EventHandler;
+        85: checkcast     #29                 // class com/dfsek/terra/api/event/functional/FunctionalEventHandler
+        88: aload_0
+        89: getfield      #37                 // Field addon:Lcom/dfsek/terra/api/addon/BaseAddon;
+        92: ldc           #65                 // class com/dfsek/terra/api/event/events/config/ConfigurationLoadEvent
+        94: invokeinterface #43,  3           // InterfaceMethod com/dfsek/terra/api/event/functional/FunctionalEventHandler.register:(Lcom/dfsek/terra/api/addon/BaseAddon;Ljava/lang/Class;)Lcom/dfsek/terra/api/event/functional/EventContext;
+        99: aload_0
+       100: aload_1
+       101: aload_2
+       102: invokedynamic #67,  0             // InvokeDynamic #1:accept:(Lcom/dfsek/terra/addons/chunkgenerator/NoiseChunkGenerator3DAddon;Lcom/dfsek/terra/api/properties/PropertyKey;Lcom/dfsek/terra/api/properties/PropertyKey;)Ljava/util/function/Consumer;
+       107: invokeinterface #57,  2           // InterfaceMethod com/dfsek/terra/api/event/functional/EventContext.then:(Ljava/util/function/Consumer;)Lcom/dfsek/terra/api/event/functional/EventContext;
+       112: invokeinterface #61,  1           // InterfaceMethod com/dfsek/terra/api/event/functional/EventContext.failThrough:()Lcom/dfsek/terra/api/event/functional/EventContext;
+       117: pop
+       118: return
+
+  private void lambda$initialize$3(com.dfsek.terra.api.properties.PropertyKey, com.dfsek.terra.api.properties.PropertyKey, com.dfsek.terra.api.event.events.config.ConfigurationLoadEvent);
+    Code:
+         0: aload_3
+         1: ldc           #68                 // class com/dfsek/terra/api/world/biome/Biome
+         3: invokevirtual #70                 // Method com/dfsek/terra/api/event/events/config/ConfigurationLoadEvent.is:(Ljava/lang/Class;)Z
+         6: ifeq          109
+         9: aload_3
+        10: invokevirtual #74                 // Method com/dfsek/terra/api/event/events/config/ConfigurationLoadEvent.getPack:()Lcom/dfsek/terra/api/config/ConfigPack;
+        13: invokeinterface #78,  1           // InterfaceMethod com/dfsek/terra/api/config/ConfigPack.getContext:()Lcom/dfsek/terra/api/properties/Context;
+        18: ldc           #84                 // class com/dfsek/terra/addons/chunkgenerator/config/NoiseChunkGeneratorPackConfigTemplate
+        20: invokevirtual #86                 // Method com/dfsek/terra/api/properties/Context.get:(Ljava/lang/Class;)Lcom/dfsek/terra/api/properties/Properties;
+        23: checkcast     #84                 // class com/dfsek/terra/addons/chunkgenerator/config/NoiseChunkGeneratorPackConfigTemplate
+        26: astore        4
+        28: aload_3
+        29: ldc           #68                 // class com/dfsek/terra/api/world/biome/Biome
+        31: invokevirtual #90                 // Method com/dfsek/terra/api/event/events/config/ConfigurationLoadEvent.getLoadedObject:(Ljava/lang/Class;)Ljava/lang/Object;
+        34: checkcast     #68                 // class com/dfsek/terra/api/world/biome/Biome
+        37: invokeinterface #94,  1           // InterfaceMethod com/dfsek/terra/api/world/biome/Biome.getContext:()Lcom/dfsek/terra/api/properties/Context;
+        42: aload_1
+        43: aload_3
+        44: new           #95                 // class com/dfsek/terra/addons/chunkgenerator/config/palette/BiomePaletteTemplate
+        47: dup
+        48: aload_0
+        49: getfield      #17                 // Field platform:Lcom/dfsek/terra/api/Platform;
+        52: aload         4
+        54: invokevirtual #97                 // Method com/dfsek/terra/addons/chunkgenerator/config/NoiseChunkGeneratorPackConfigTemplate.getSlantCalculationMethod:()Lcom/dfsek/terra/addons/chunkgenerator/generation/math/SlantCalculationMethod;
+        57: invokespecial #101                // Method com/dfsek/terra/addons/chunkgenerator/config/palette/BiomePaletteTemplate."<init>":(Lcom/dfsek/terra/api/Platform;Lcom/dfsek/terra/addons/chunkgenerator/generation/math/SlantCalculationMethod;)V
+        60: invokevirtual #104                // Method com/dfsek/terra/api/event/events/config/ConfigurationLoadEvent.load:(Lcom/dfsek/tectonic/api/config/template/ConfigTemplate;)Lcom/dfsek/tectonic/api/config/template/ConfigTemplate;
+        63: checkcast     #95                 // class com/dfsek/terra/addons/chunkgenerator/config/palette/BiomePaletteTemplate
+        66: invokevirtual #108                // Method com/dfsek/terra/addons/chunkgenerator/config/palette/BiomePaletteTemplate.get:()Lcom/dfsek/terra/addons/chunkgenerator/palette/BiomePaletteInfo;
+        69: invokevirtual #111                // Method com/dfsek/terra/api/properties/Context.put:(Lcom/dfsek/terra/api/properties/PropertyKey;Lcom/dfsek/terra/api/properties/Properties;)Lcom/dfsek/terra/api/properties/Context;
+        72: pop
+        73: aload_3
+        74: ldc           #68                 // class com/dfsek/terra/api/world/biome/Biome
+        76: invokevirtual #90                 // Method com/dfsek/terra/api/event/events/config/ConfigurationLoadEvent.getLoadedObject:(Ljava/lang/Class;)Ljava/lang/Object;
+        79: checkcast     #68                 // class com/dfsek/terra/api/world/biome/Biome
+        82: invokeinterface #94,  1           // InterfaceMethod com/dfsek/terra/api/world/biome/Biome.getContext:()Lcom/dfsek/terra/api/properties/Context;
+        87: aload_2
+        88: aload_3
+        89: new           #115                // class com/dfsek/terra/addons/chunkgenerator/config/noise/BiomeNoiseConfigTemplate
+        92: dup
+        93: invokespecial #117                // Method com/dfsek/terra/addons/chunkgenerator/config/noise/BiomeNoiseConfigTemplate."<init>":()V
+        96: invokevirtual #104                // Method com/dfsek/terra/api/event/events/config/ConfigurationLoadEvent.load:(Lcom/dfsek/tectonic/api/config/template/ConfigTemplate;)Lcom/dfsek/tectonic/api/config/template/ConfigTemplate;
+        99: checkcast     #115                // class com/dfsek/terra/addons/chunkgenerator/config/noise/BiomeNoiseConfigTemplate
+       102: invokevirtual #118                // Method com/dfsek/terra/addons/chunkgenerator/config/noise/BiomeNoiseConfigTemplate.get:()Lcom/dfsek/terra/addons/chunkgenerator/config/noise/BiomeNoiseProperties;
+       105: invokevirtual #111                // Method com/dfsek/terra/api/properties/Context.put:(Lcom/dfsek/terra/api/properties/PropertyKey;Lcom/dfsek/terra/api/properties/Properties;)Lcom/dfsek/terra/api/properties/Context;
+       108: pop
+       109: return
+
+  private void lambda$initialize$2(com.dfsek.terra.api.properties.PropertyKey, com.dfsek.terra.api.properties.PropertyKey, com.dfsek.terra.api.event.events.config.pack.ConfigPackPreLoadEvent);
+    Code:
+         0: aload_3
+         1: invokevirtual #121                // Method com/dfsek/terra/api/event/events/config/pack/ConfigPackPreLoadEvent.getPack:()Lcom/dfsek/terra/api/config/ConfigPack;
+         4: ldc           #122                // class com/dfsek/terra/addons/chunkgenerator/generation/math/SlantCalculationMethod
+         6: invokedynamic #124,  0            // InvokeDynamic #2:load:()Lcom/dfsek/tectonic/api/loader/type/TypeLoader;
+        11: invokeinterface #127,  3          // InterfaceMethod com/dfsek/terra/api/config/ConfigPack.applyLoader:(Ljava/lang/Class;Lcom/dfsek/tectonic/api/loader/type/TypeLoader;)Lcom/dfsek/terra/api/tectonic/ConfigLoadingDelegate;
+        16: pop
+        17: aload_3
+        18: new           #84                 // class com/dfsek/terra/addons/chunkgenerator/config/NoiseChunkGeneratorPackConfigTemplate
+        21: dup
+        22: invokespecial #131                // Method com/dfsek/terra/addons/chunkgenerator/config/NoiseChunkGeneratorPackConfigTemplate."<init>":()V
+        25: invokevirtual #132                // Method com/dfsek/terra/api/event/events/config/pack/ConfigPackPreLoadEvent.loadTemplate:(Lcom/dfsek/tectonic/api/config/template/ConfigTemplate;)Lcom/dfsek/tectonic/api/config/template/ConfigTemplate;
+        28: checkcast     #84                 // class com/dfsek/terra/addons/chunkgenerator/config/NoiseChunkGeneratorPackConfigTemplate
+        31: astore        4
+        33: aload_3
+        34: invokevirtual #121                // Method com/dfsek/terra/api/event/events/config/pack/ConfigPackPreLoadEvent.getPack:()Lcom/dfsek/terra/api/config/ConfigPack;
+        37: invokeinterface #78,  1           // InterfaceMethod com/dfsek/terra/api/config/ConfigPack.getContext:()Lcom/dfsek/terra/api/properties/Context;
+        42: aload         4
+        44: invokevirtual #135                // Method com/dfsek/terra/api/properties/Context.put:(Lcom/dfsek/terra/api/properties/Properties;)Lcom/dfsek/terra/api/properties/Context;
+        47: pop
+        48: aload_3
+        49: invokevirtual #121                // Method com/dfsek/terra/api/event/events/config/pack/ConfigPackPreLoadEvent.getPack:()Lcom/dfsek/terra/api/config/ConfigPack;
+        52: ldc           #138                // class com/dfsek/terra/api/world/chunk/generation/util/provider/ChunkGeneratorProvider
+        54: invokeinterface #140,  2          // InterfaceMethod com/dfsek/terra/api/config/ConfigPack.getOrCreateRegistry:(Ljava/lang/Class;)Lcom/dfsek/terra/api/registry/CheckedRegistry;
+        59: aload_0
+        60: getfield      #37                 // Field addon:Lcom/dfsek/terra/api/addon/BaseAddon;
+        63: ldc           #144                // String NOISE_3D
+        65: invokeinterface #146,  2          // InterfaceMethod com/dfsek/terra/api/addon/BaseAddon.key:(Ljava/lang/String;)Lcom/dfsek/terra/api/registry/key/RegistryKey;
+        70: aload_0
+        71: aload         4
+        73: aload_1
+        74: aload_2
+        75: invokedynamic #152,  0            // InvokeDynamic #3:newInstance:(Lcom/dfsek/terra/addons/chunkgenerator/NoiseChunkGenerator3DAddon;Lcom/dfsek/terra/addons/chunkgenerator/config/NoiseChunkGeneratorPackConfigTemplate;Lcom/dfsek/terra/api/properties/PropertyKey;Lcom/dfsek/terra/api/properties/PropertyKey;)Lcom/dfsek/terra/api/world/chunk/generation/util/provider/ChunkGeneratorProvider;
+        80: invokeinterface #156,  3          // InterfaceMethod com/dfsek/terra/api/registry/CheckedRegistry.register:(Lcom/dfsek/terra/api/registry/key/RegistryKey;Ljava/lang/Object;)V
+        85: aload_3
+        86: invokevirtual #121                // Method com/dfsek/terra/api/event/events/config/pack/ConfigPackPreLoadEvent.getPack:()Lcom/dfsek/terra/api/config/ConfigPack;
+        89: ldc           #161                // class com/dfsek/terra/addons/chunkgenerator/palette/slant/SlantHolder$Layer
+        91: invokedynamic #163,  0            // InvokeDynamic #4:get:()Ljava/util/function/Supplier;
+        96: invokeinterface #166,  3          // InterfaceMethod com/dfsek/terra/api/config/ConfigPack.applyLoader:(Ljava/lang/Class;Ljava/util/function/Supplier;)Lcom/dfsek/terra/api/tectonic/ConfigLoadingDelegate;
+       101: pop
+       102: return
+
+  private com.dfsek.terra.api.world.chunk.generation.ChunkGenerator lambda$initialize$1(com.dfsek.terra.addons.chunkgenerator.config.NoiseChunkGeneratorPackConfigTemplate, com.dfsek.terra.api.properties.PropertyKey, com.dfsek.terra.api.properties.PropertyKey, com.dfsek.terra.api.config.ConfigPack);
+    Code:
+         0: new           #169                // class com/dfsek/terra/addons/chunkgenerator/generation/NoiseChunkGenerator3D
+         3: dup
+         4: aload         4
+         6: aload_0
+         7: getfield      #17                 // Field platform:Lcom/dfsek/terra/api/Platform;
+        10: aload_1
+        11: invokevirtual #171                // Method com/dfsek/terra/addons/chunkgenerator/config/NoiseChunkGeneratorPackConfigTemplate.getElevationBlend:()I
+        14: aload_1
+        15: invokevirtual #175                // Method com/dfsek/terra/addons/chunkgenerator/config/NoiseChunkGeneratorPackConfigTemplate.getHorizontalRes:()I
+        18: aload_1
+        19: invokevirtual #178                // Method com/dfsek/terra/addons/chunkgenerator/config/NoiseChunkGeneratorPackConfigTemplate.getVerticalRes:()I
+        22: aload_2
+        23: aload_3
+        24: aload_1
+        25: invokevirtual #97                 // Method com/dfsek/terra/addons/chunkgenerator/config/NoiseChunkGeneratorPackConfigTemplate.getSlantCalculationMethod:()Lcom/dfsek/terra/addons/chunkgenerator/generation/math/SlantCalculationMethod;
+        28: aload_1
+        29: invokevirtual #181                // Method com/dfsek/terra/addons/chunkgenerator/config/NoiseChunkGeneratorPackConfigTemplate.isSlantPalettesEnabled:()Z
+        32: invokespecial #185                // Method com/dfsek/terra/addons/chunkgenerator/generation/NoiseChunkGenerator3D."<init>":(Lcom/dfsek/terra/api/config/ConfigPack;Lcom/dfsek/terra/api/Platform;IIILcom/dfsek/terra/api/properties/PropertyKey;Lcom/dfsek/terra/api/properties/PropertyKey;Lcom/dfsek/terra/addons/chunkgenerator/generation/math/SlantCalculationMethod;Z)V
+        35: areturn
+
+  private static com.dfsek.terra.addons.chunkgenerator.generation.math.SlantCalculationMethod lambda$initialize$0(java.lang.reflect.AnnotatedType, java.lang.Object, com.dfsek.tectonic.api.loader.ConfigLoader, com.dfsek.tectonic.api.depth.DepthTracker) throws com.dfsek.tectonic.api.exception.LoadException;
+    Code:
+         0: aload_1
+         1: checkcast     #188                // class java/lang/String
+         4: invokestatic  #190                // Method com/dfsek/terra/addons/chunkgenerator/generation/math/SlantCalculationMethod.valueOf:(Ljava/lang/String;)Lcom/dfsek/terra/addons/chunkgenerator/generation/math/SlantCalculationMethod;
+         7: areturn
+}
