@@ -35,7 +35,6 @@
 
 ===== Terra-config-noise-function-1.2.0-BETA+451683aff-all.jar =====
 
-com/dfsek/terra/addons/noise/config/templates/DerivativeNoiseSamplerTemplate.class
 com/dfsek/terra/addons/noise/config/DimensionApplicableNoiseSampler.class
 com/dfsek/terra/addons/noise/normalizer/CubicSplineNoiseSampler.class
 com/dfsek/terra/addons/noise/samplers/noise/random/GaussianNoiseSampler.class
@@ -58,10 +57,6 @@ com/dfsek/terra/addons/noise/samplers/noise/GaborNoiseSampler.class
 ===== Terra-language-yaml-1.0.0-BETA+451683aff-all.jar =====
 
 ===== Terra-library-image-1.1.0-BETA+451683aff-all.jar =====
-com/dfsek/terra/addons/image/config/noisesampler/
-com/dfsek/terra/addons/image/config/noisesampler/DistanceTransformNoiseSamplerTemplate.class
-com/dfsek/terra/addons/image/config/noisesampler/ChannelNoiseSamplerTemplate.class
-com/dfsek/terra/addons/image/noisesampler/
 com/dfsek/terra/addons/image/noisesampler/ChannelNoiseSampler.class
 
 ===== Terra-locator-slant-noise-3d-1.0.0-BETA+451683aff-all.jar =====
