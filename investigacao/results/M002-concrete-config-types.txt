@@ -1,0 +1,52 @@
+﻿
+com\dfsek\terra\api\config\ConfigPack.java:23:   ConfigPack registerConfigType(ConfigType<?, ?> var1, RegistryKey 
+var2, int var3);
+com\dfsek\terra\api\config\ConfigType.java:6:public interface ConfigType<T extends AbstractableTemplate, R> {
+com\dfsek\terra\api\event\events\config\ConfigurationLoadEvent.java:16:   private final ConfigType<?, ?> type;
+com\dfsek\terra\api\event\events\config\ConfigurationLoadEvent.java:19:   public ConfigurationLoadEvent(ConfigPack 
+pack, AbstractConfiguration configuration, Consumer<ConfigTemplate> loader, ConfigType<?, ?> type, Object loaded) {
+com\dfsek\terra\api\event\events\config\ConfigurationLoadEvent.java:45:   public ConfigType<?, ?> getType() {
+com\dfsek\terra\api\event\events\config\type\ConfigTypeLoadEvent.java:11:   private final ConfigType<?, ?> type;
+com\dfsek\terra\api\event\events\config\type\ConfigTypeLoadEvent.java:15:   public ConfigTypeLoadEvent(ConfigType<?, 
+?> type, CheckedRegistry<?> registry, ConfigPack pack) {
+com\dfsek\terra\api\event\events\config\type\ConfigTypePostLoadEvent.java:7:public class ConfigTypePostLoadEvent 
+extends ConfigTypeLoadEvent {
+com\dfsek\terra\api\event\events\config\type\ConfigTypePostLoadEvent.java:8:   public 
+ConfigTypePostLoadEvent(ConfigType<?, ?> type, CheckedRegistry<?> registry, ConfigPack pack) {
+com\dfsek\terra\api\event\events\config\type\ConfigTypePreLoadEvent.java:7:public class ConfigTypePreLoadEvent extends 
+ConfigTypeLoadEvent {
+com\dfsek\terra\api\event\events\config\type\ConfigTypePreLoadEvent.java:8:   public 
+ConfigTypePreLoadEvent(ConfigType<?, ?> type, CheckedRegistry<?> registry, ConfigPack pack) {
+com\dfsek\terra\config\pack\ConfigPackImpl.java:78:   public static final TypeKey<ConfigType<?, ?>> 
+CONFIG_TYPE_TYPE_KEY = new TypeKey<ConfigType<?, ?>>() {};
+com\dfsek\terra\config\pack\ConfigPackImpl.java:90:   private final OpenRegistry<ConfigType<?, ?>> configTypeRegistry;
+com\dfsek\terra\config\pack\ConfigPackImpl.java:91:   private final TreeMap<Integer, List<Pair<RegistryKey, 
+ConfigType<?, ?>>>> configTypes = new TreeMap<>();
+com\dfsek\terra\config\pack\ConfigPackImpl.java:161:      ListMultimap<ConfigType<?, ?>, Configuration> multimap = 
+configurations.values()
+com\dfsek\terra\config\pack\ConfigPackImpl.java:251:   public ConfigPack registerConfigType(ConfigType<?, ?> type, 
+RegistryKey key, int priority) {
+com\dfsek\terra\config\pack\ConfigPackImpl.java:345:   private OpenRegistry<ConfigType<?, ?>> createConfigRegistry() {
+com\dfsek\terra\config\pack\ConfigPackImpl.java:346:      return new OpenRegistryImpl<ConfigType<?, ?>>(new 
+LinkedHashMap(), CONFIG_TYPE_TYPE_KEY) {
+com\dfsek\terra\config\pack\ConfigPackImpl.java:347:         public boolean register(@NotNull RegistryKey key, 
+@NotNull ConfigType<?, ?> value) {
+com\dfsek\terra\config\prototype\ProtoConfig.java:11:   private ConfigType<?, ?> type;
+com\dfsek\terra\config\prototype\ProtoConfig.java:17:   public ConfigType<?, ?> getType() {
+investigacao\ConfigPack.java:23:   ConfigPack registerConfigType(ConfigType<?, ?> var1, RegistryKey var2, int var3);
+investigacao\ConfigPackImpl.java:78:   public static final TypeKey<ConfigType<?, ?>> CONFIG_TYPE_TYPE_KEY = new 
+TypeKey<ConfigType<?, ?>>() {};
+investigacao\ConfigPackImpl.java:90:   private final OpenRegistry<ConfigType<?, ?>> configTypeRegistry;
+investigacao\ConfigPackImpl.java:91:   private final TreeMap<Integer, List<Pair<RegistryKey, ConfigType<?, ?>>>> 
+configTypes = new TreeMap<>();
+investigacao\ConfigPackImpl.java:161:      ListMultimap<ConfigType<?, ?>, Configuration> multimap = 
+configurations.values()
+investigacao\ConfigPackImpl.java:251:   public ConfigPack registerConfigType(ConfigType<?, ?> type, RegistryKey key, 
+int priority) {
+investigacao\ConfigPackImpl.java:345:   private OpenRegistry<ConfigType<?, ?>> createConfigRegistry() {
+investigacao\ConfigPackImpl.java:346:      return new OpenRegistryImpl<ConfigType<?, ?>>(new LinkedHashMap(), 
+CONFIG_TYPE_TYPE_KEY) {
+investigacao\ConfigPackImpl.java:347:         public boolean register(@NotNull RegistryKey key, @NotNull ConfigType<?, 
+?> value) {
+
+

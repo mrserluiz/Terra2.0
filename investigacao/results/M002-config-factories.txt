@@ -1,0 +1,5 @@
+﻿
+com\dfsek\terra\api\config\ConfigFactory.java:7:public interface ConfigFactory<C extends ConfigTemplate, O> {
+com\dfsek\terra\api\config\ConfigType.java:9:   ConfigFactory<T, R> getFactory();
+
+

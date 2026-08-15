@@ -1,0 +1,125 @@
+﻿      platform.getEventManager().callEvent(new ConfigPackPreLoadEvent(this, template -> this.selfLoader.load(template, packManifest)));
+      this.selfLoader.load(this.template, packManifest);
+      String namespace;
+      String id;
+      if (this.template.getID().contains(":")) {
+         namespace = this.template.getID().substring(0, this.template.getID().indexOf(":"));
+         id = this.template.getID().substring(this.template.getID().indexOf(":") + 1);
+      } else {
+         id = this.template.getID();
+         namespace = this.template.getID();
+      }
+
+      this.key = RegistryKey.of(namespace, id);
+      logger.info("Loading config pack \"{}:{}\"", id, namespace);
+      this.configTypes.values().forEach(list -> list.forEach(pair -> this.configTypeRegistry.register(pair.getLeft(), pair.getRight())));
+      ListMultimap<ConfigType<?, ?>, Configuration> multimap = configurations.values()
+         .parallelStream()
+         .collect(() -> Multimaps.newListMultimap(new ConcurrentHashMap<>(), ArrayList::new), (configs, configuration) -> {
+            if (configuration.contains("type")) {
+               ProtoConfig config = new ProtoConfig();
+               this.selfLoader.load(config, configuration);
+               configs.put(config.getType(), configuration);
+            }
+         }, Multimap::putAll);
+      this.configTypeRegistry
+         .forEach(
+            configType -> {
+               CheckedRegistry registry = this.getCheckedRegistry(configType.getTypeKey());
+               this.abstractConfigLoader
+                  .loadConfigs(multimap.get(configType))
+                  .stream()
+                  .parallel()
+                  .map(
+                     configuration -> {
+                        logger.debug("Loading abstract config {}", configuration.getID());
+                        Object loaded = configType.getFactory().build(this.selfLoader.load(configType.getTemplate(this, platform), configuration), platform);
+                        platform.getEventManager()
+                           .callEvent(
+                              new ConfigurationLoadEvent(this, configuration, template -> this.selfLoader.load(template, configuration), configType, loaded)
+                           );
+                        return Pair.of(configuration.getID(), loaded);
+                     }
+                  )
+                  .toList()
+                  .forEach(pair -> registry.register(this.key(pair.getLeft()), pair.getRight()));
+               platform.getEventManager().callEvent(new ConfigTypePostLoadEvent(configType, registry, this));
+            }
+         );
+      platform.getEventManager().callEvent(new ConfigPackPostLoadEvent(this, template -> this.selfLoader.load(template, packManifest)));
+      logger.info(
+         "Loaded config pack \"{}:{}\" v{} by {} in {}ms.",
+         new Object[]{namespace, id, this.getVersion().getFormatted(), this.template.getAuthor(), (System.nanoTime() - start) / 1000000.0}
+      );
+      ConfigPackPostTemplate packPostTemplate = new ConfigPackPostTemplate();
+      this.selfLoader.load(packPostTemplate, packManifest);
+      this.seededBiomeProvider = this.template.getBiomeCache()
+         ? packPostTemplate.getProviderBuilder().caching(platform)
+         : packPostTemplate.getProviderBuilder();
+      this.checkDeadEntries();
+   }
+
+   private Map<String, Configuration> discoverConfigurations() {
+      Map<String, Configuration> configurations = new HashMap<>();
+      this.platform.getEventManager().callEvent(new ConfigurationDiscoveryEvent(this, this.loader, (s, c) -> configurations.put(s.replace("\\", "/"), c)));
+      return configurations;
+   }
+
+   private void registerMeta(Map<String, Configuration> configurations) {
+      MetaStringPreprocessor stringPreprocessor = new MetaStringPreprocessor(configurations);
+      this.selfLoader.registerPreprocessor(Meta.class, stringPreprocessor);
+      this.abstractConfigLoader.registerPreprocessor(Meta.class, stringPreprocessor);
+      MetaListLikePreprocessor listPreprocessor = new MetaListLikePreprocessor(configurations);
+      this.selfLoader.registerPreprocessor(Meta.class, listPreprocessor);
+      this.abstractConfigLoader.registerPreprocessor(Meta.class, listPreprocessor);
+      MetaMapPreprocessor mapPreprocessor = new MetaMapPreprocessor(configurations);
+      this.selfLoader.registerPreprocessor(Meta.class, mapPreprocessor);
+      this.abstractConfigLoader.registerPreprocessor(Meta.class, mapPreprocessor);
+      MetaValuePreprocessor valuePreprocessor = new MetaValuePreprocessor(configurations);
+      this.selfLoader.registerPreprocessor(Meta.class, valuePreprocessor);
+      this.abstractConfigLoader.registerPreprocessor(Meta.class, valuePreprocessor);
+      MetaNumberPreprocessor numberPreprocessor = new MetaNumberPreprocessor(configurations, this.parseOptions);
+      this.selfLoader.registerPreprocessor(Meta.class, numberPreprocessor);
+      this.abstractConfigLoader.registerPreprocessor(Meta.class, numberPreprocessor);
+   }
+
+   public <T> ConfigPackImpl applyLoader(Type type, TypeLoader<T> loader) {
+      this.abstractConfigLoader.registerLoader(type, loader);
+      this.selfLoader.registerLoader(type, loader);
+      return this;
+   }
+
+   public <T> ConfigPackImpl applyLoader(Type type, Supplier<ObjectTemplate<T>> loader) {
+      this.abstractConfigLoader.registerLoader(type, loader);
+      this.selfLoader.registerLoader(type, loader);
+      return this;
+   }
+
+   @Override
+   public void register(TypeRegistry registry) {
+      registry.registerLoader(ConfigType.class, this.configTypeRegistry).registerLoader(BufferedImage.class, new BufferedImageLoader(this.loader, this));
+      this.registryMap.forEach(registry::registerLoader);
+      this.shortcuts.forEach(registry::registerLoader);
+   }
+
+   @Override
+   public ConfigPack registerConfigType(ConfigType<?, ?> type, RegistryKey key, int priority) {
+      Set<RegistryKey> contained = new HashSet<>();
+      this.configTypes.forEach((p, configs) -> configs.forEach(pair -> {
+         if (contained.contains(pair.getLeft())) {
+            throw new IllegalArgumentException("Duplicate config key: " + key);
+         }
+
+         contained.add(key);
+      }));
+      this.configTypes.computeIfAbsent(priority, p -> new ArrayList<>()).add(Pair.of(key, type));
+      return this;
+   }
+
+   @Override
+   public Map<BaseAddon, VersionRange> addons() {
+      return this.addons;
+   }
+
+   @Override
+   public BiomeProvider getBiomeProvider() {
