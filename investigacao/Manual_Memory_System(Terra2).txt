@@ -1,6 +1,106 @@
 ================================
 UPDATES:
 =============================
+UPDATE > 15/08/26 - M002G
+
+[M002G][FACT]
+Investigação do addon Terra-chunk-generator-noise-3d-1.2.1-BETA+451683aff-all.jar confirmou:
+
+1. SamplerProvider:
+- Classe:
+  com.dfsek.terra.addons.chunkgenerator.generation.math.samplers.SamplerProvider
+- NÃO é o motor matemático de Noise.
+- Atua como factory/cache de Sampler3D.
+- getChunk(cx, cz, WorldProperties, BiomeProvider) cria/obtém Sampler3D associado ao contexto do mundo/chunk.
+- Utiliza cache Caffeine configurado por PluginConfig.getSamplerCache().
+- O contexto de geração inclui seed, altura mínima/máxima e coordenadas do chunk.
+
+2. Sampler3D:
+- Classe:
+  com.dfsek.terra.addons.chunkgenerator.generation.math.samplers.Sampler3D
+- Contém:
+  ChunkInterpolator
+  ElevationInterpolator
+- sample(x,y,z) combina:
+  ChunkInterpolator.getNoise(x,y,z)
+  +
+  ElevationInterpolator.getElevation(x,z)
+- Portanto Sampler3D funciona como composição final dos valores usados pelo gerador.
+
+3. Descoberta de arquitetura modular:
+O addon Terra-chunk-generator-noise-3d não contém sozinho todos os Noise utilizados pelo Terra.
+Foi identificado o addon:
+  Terra-config-noise-function-1.2.0
+
+Esse addon contém diversas funções/samplers de Noise, incluindo:
+- Simplex
+- OpenSimplex2
+- Perlin
+- Value
+- Cellular
+- Gabor
+- Brownian Motion
+- Ridged Fractal
+- PingPong
+- Domain Warp
+- Arithmetic samplers:
+  Addition
+  Subtraction
+  Multiplication
+  Division
+  Min
+  Max
+- Cache
+- Translate
+- PseudoErosion
+- Distance
+- Image
+- Kernel
+- LinearHeightmap
+- entre outros.
+
+4. [ARCHITECTURE][INFERENCE]
+A arquitetura atualmente indica separação entre:
+Terra Core/API
+  ↓
+Generator
+  ↓
+SamplerProvider
+  ↓
+Sampler3D
+  ↓
+ChunkInterpolator / ElevationInterpolator
+  ↓
+Noise Function / Sampler Graph
+
+O mecanismo exato que conecta ChunkInterpolator às Noise Functions ainda NÃO está confirmado.
+
+5. [DECISION]
+Não investigar individualmente todas as Noise Functions neste momento.
+Primeiro descobrir como ChunkInterpolator recebe/constrói o Noise configurado.
+Depois investigar o sistema de Noise Graph/configuração.
+
+6. [NEXT]
+M002H:
+Investigar:
+ChunkInterpolator
+ElevationInterpolator
+BiomeNoiseProperties
+NoiseProperties
+NoiseFunction
+e descobrir como a configuração do Pack é transformada em Samplers/Noise executáveis.
+
+[MEMORY RULE]
+Resultados M002G estão registrados nos arquivos:
+investigacao/results/M002G-sampler-classes.txt
+investigacao/results/M002G-SamplerProvider-javap.txt
+investigacao/results/M002G-Sampler3D-javap.txt
+investigacao/results/M002G-sampler-implementations.txt
+investigacao/results/M002G-sampler-provider-refs.txt
+investigacao/results/M002G-sampler-noise-map.txt
+
+Sempre consultar os arquivos de results no GitHub quando uma conclusão anterior precisar ser confirmada.
+
 UPDATE > 15/08/26 - M002F
 
 MILESTONE=M002F
