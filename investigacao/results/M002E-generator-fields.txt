@@ -1,0 +1,21 @@
+﻿Compiled from "NoiseChunkGenerator3D.java"
+public class com.dfsek.terra.addons.chunkgenerator.generation.NoiseChunkGenerator3D implements com.dfsek.terra.api.world.chunk.generation.ChunkGenerator {
+  private final com.dfsek.terra.api.Platform platform;
+  private final com.dfsek.terra.addons.chunkgenerator.generation.math.samplers.SamplerProvider samplerCache;
+  private final com.dfsek.terra.api.block.state.BlockState air;
+  private final int carverHorizontalResolution;
+  private final int carverVerticalResolution;
+  private final com.dfsek.terra.api.properties.PropertyKey<com.dfsek.terra.addons.chunkgenerator.palette.BiomePaletteInfo> paletteInfoPropertyKey;
+  private final com.dfsek.terra.api.properties.PropertyKey<com.dfsek.terra.addons.chunkgenerator.config.noise.BiomeNoiseProperties> noisePropertiesKey;
+  private final com.dfsek.terra.addons.chunkgenerator.generation.math.SlantCalculationMethod slantCalculationMethod;
+  private final boolean useSlantPalettes;
+  public com.dfsek.terra.addons.chunkgenerator.generation.NoiseChunkGenerator3D(com.dfsek.terra.api.config.ConfigPack, com.dfsek.terra.api.Platform, int, int, int, com.dfsek.terra.api.properties.PropertyKey<com.dfsek.terra.addons.chunkgenerator.config.noise.BiomeNoiseProperties>, com.dfsek.terra.api.properties.PropertyKey<com.dfsek.terra.addons.chunkgenerator.palette.BiomePaletteInfo>, com.dfsek.terra.addons.chunkgenerator.generation.math.SlantCalculationMethod, boolean);
+  private com.dfsek.terra.api.world.chunk.generation.util.Palette paletteAt(int, int, int, com.dfsek.terra.addons.chunkgenerator.generation.math.samplers.Sampler3D, com.dfsek.terra.addons.chunkgenerator.palette.BiomePaletteInfo, int);
+  public void generateChunkData(com.dfsek.terra.api.world.chunk.generation.ProtoChunk, com.dfsek.terra.api.world.info.WorldProperties, com.dfsek.terra.api.world.biome.generation.BiomeProvider, int, int);
+  public com.dfsek.terra.api.block.state.BlockState getBlock(com.dfsek.terra.api.world.info.WorldProperties, int, int, int, com.dfsek.terra.api.world.biome.generation.BiomeProvider);
+  public com.dfsek.terra.api.world.chunk.generation.util.Palette getPalette(int, int, int, com.dfsek.terra.api.world.info.WorldProperties, com.dfsek.terra.api.world.biome.generation.BiomeProvider);
+  public double getSlant(int, int, int, com.dfsek.terra.api.world.info.WorldProperties, com.dfsek.terra.api.world.biome.generation.BiomeProvider);
+  public com.dfsek.terra.addons.chunkgenerator.generation.math.samplers.SamplerProvider samplerProvider();
+  private static int lambda$new$1(com.dfsek.terra.addons.chunkgenerator.config.noise.BiomeNoiseProperties);
+  private static com.dfsek.terra.addons.chunkgenerator.config.noise.BiomeNoiseProperties lambda$new$0(com.dfsek.terra.api.properties.PropertyKey, com.dfsek.terra.api.world.biome.Biome);
+}
