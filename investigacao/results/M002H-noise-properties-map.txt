@@ -1,21 +1,30 @@
 ﻿
 ===== Terra-biome-provider-extrusion-1.0.0-BETA+451683aff-all.jar =====
 
+com/dfsek/terra/addons/biome/extrusion/config/extrusions/SamplerExtrusionTemplate.class
+
 ===== Terra-biome-provider-image-1.0.1-BETA+451683aff-all.jar =====
 
 ===== Terra-biome-provider-image-v2-1.0.1-BETA+451683aff-all.jar =====
 
 ===== Terra-biome-provider-pipeline-1.0.2-BETA+451683aff-all.jar =====
+com/dfsek/terra/addons/biome/pipeline/config/SamplerSourceTemplate.class
+com/dfsek/terra/addons/biome/pipeline/source/SamplerSource.class
 
 ===== Terra-biome-provider-pipeline-v2-1.0.1-BETA+451683aff-all.jar =====
+com/dfsek/terra/addons/biome/pipeline/v2/config/source/SamplerSourceTemplate.class
+com/dfsek/terra/addons/biome/pipeline/v2/source/SamplerSource.class
 
 ===== Terra-biome-provider-single-1.0.0-BETA+451683aff-all.jar =====
 
 ===== Terra-biome-query-api-1.0.0-BETA+451683aff-all.jar =====
 
 ===== Terra-chunk-generator-noise-3d-1.2.1-BETA+451683aff-all.jar =====
-
 com/dfsek/terra/addons/chunkgenerator/config/noise/BiomeNoiseProperties.class
+com/dfsek/terra/addons/chunkgenerator/generation/math/samplers/
+com/dfsek/terra/addons/chunkgenerator/generation/math/samplers/SamplerProvider$WorldContext.class
+com/dfsek/terra/addons/chunkgenerator/generation/math/samplers/SamplerProvider.class
+com/dfsek/terra/addons/chunkgenerator/generation/math/samplers/Sampler3D.class
 
 ===== Terra-command-addons-1.0.0-BETA+451683aff-all.jar =====
 
@@ -28,17 +37,83 @@ com/dfsek/terra/addons/chunkgenerator/config/noise/BiomeNoiseProperties.class
 ===== Terra-config-biome-1.0.0-BETA+451683aff-all.jar =====
 
 ===== Terra-config-distributors-1.0.1-BETA+451683aff-all.jar =====
+com/dfsek/terra/addons/feature/distributor/distributors/SamplerDistributor.class
+com/dfsek/terra/addons/feature/distributor/config/SamplerDistributorTemplate.class
 
 ===== Terra-config-feature-1.0.0-BETA+451683aff-all.jar =====
 
 ===== Terra-config-flora-1.0.1-BETA+451683aff-all.jar =====
 
 ===== Terra-config-locators-1.1.1-BETA+451683aff-all.jar =====
+com/dfsek/terra/addons/feature/locator/locators/SamplerLocator.class
+com/dfsek/terra/addons/feature/locator/locators/Sampler3DLocator.class
+com/dfsek/terra/addons/feature/locator/config/Sampler3DLocatorTemplate.class
+com/dfsek/terra/addons/feature/locator/config/SamplerLocatorTemplate.class
 
 ===== Terra-config-noise-function-1.2.0-BETA+451683aff-all.jar =====
+com/dfsek/terra/addons/noise/config/templates/TranslateSamplerTemplate.class
+com/dfsek/terra/addons/noise/config/templates/DerivativeNoiseSamplerTemplate.class
+com/dfsek/terra/addons/noise/config/templates/CacheSamplerTemplate.class
+com/dfsek/terra/addons/noise/config/templates/SamplerTemplate.class
+com/dfsek/terra/addons/noise/config/templates/ImageSamplerTemplate.class
+com/dfsek/terra/addons/noise/config/templates/LinearHeightmapSamplerTemplate.class
+com/dfsek/terra/addons/noise/config/templates/noise/DistanceSamplerTemplate.class
+com/dfsek/terra/addons/noise/config/DimensionApplicableNoiseSampler.class
+com/dfsek/terra/addons/noise/normalizer/CubicSplineNoiseSampler.class
+com/dfsek/terra/addons/noise/samplers/
+com/dfsek/terra/addons/noise/samplers/ImageSampler$Channel$2.class
+com/dfsek/terra/addons/noise/samplers/LinearHeightmapSampler.class
+com/dfsek/terra/addons/noise/samplers/KernelSampler.class
+com/dfsek/terra/addons/noise/samplers/ImageSampler$Channel$5.class
+com/dfsek/terra/addons/noise/samplers/CacheSampler.class
+com/dfsek/terra/addons/noise/samplers/ImageSampler$Channel.class
+com/dfsek/terra/addons/noise/samplers/ImageSampler$Channel$3.class
+com/dfsek/terra/addons/noise/samplers/DomainWarpedSampler.class
+com/dfsek/terra/addons/noise/samplers/arithmetic/
+com/dfsek/terra/addons/noise/samplers/arithmetic/AdditionSampler.class
+com/dfsek/terra/addons/noise/samplers/arithmetic/MaxSampler.class
+com/dfsek/terra/addons/noise/samplers/arithmetic/MultiplicationSampler.class
+com/dfsek/terra/addons/noise/samplers/arithmetic/BinaryArithmeticSampler.class
+com/dfsek/terra/addons/noise/samplers/arithmetic/MinSampler.class
+com/dfsek/terra/addons/noise/samplers/arithmetic/SubtractionSampler.class
+com/dfsek/terra/addons/noise/samplers/arithmetic/DivisionSampler.class
+com/dfsek/terra/addons/noise/samplers/TranslateSampler.class
+com/dfsek/terra/addons/noise/samplers/ImageSampler$Channel$4.class
+com/dfsek/terra/addons/noise/samplers/noise/
+com/dfsek/terra/addons/noise/samplers/noise/random/
+com/dfsek/terra/addons/noise/samplers/noise/random/GaussianNoiseSampler.class
+com/dfsek/terra/addons/noise/samplers/noise/random/PositiveWhiteNoiseSampler.class
+com/dfsek/terra/addons/noise/samplers/noise/random/WhiteNoiseSampler.class
+com/dfsek/terra/addons/noise/samplers/noise/CellularSampler$ReturnType.class
+com/dfsek/terra/addons/noise/samplers/noise/GaborNoiseSampler.class
+com/dfsek/terra/addons/noise/samplers/noise/simplex/
+com/dfsek/terra/addons/noise/samplers/noise/simplex/SimplexSampler.class
+com/dfsek/terra/addons/noise/samplers/noise/simplex/SimplexSampler$Double3.class
+com/dfsek/terra/addons/noise/samplers/noise/simplex/SimplexStyleSampler.class
+com/dfsek/terra/addons/noise/samplers/noise/simplex/OpenSimplex2Sampler.class
+com/dfsek/terra/addons/noise/samplers/noise/simplex/PerlinSampler.class
+com/dfsek/terra/addons/noise/samplers/noise/simplex/SimplexSampler$Double2.class
+com/dfsek/terra/addons/noise/samplers/noise/simplex/OpenSimplex2SSampler.class
 com/dfsek/terra/addons/noise/samplers/noise/NoiseFunction.class
 com/dfsek/terra/addons/noise/samplers/noise/DerivativeNoiseFunction.class
+com/dfsek/terra/addons/noise/samplers/noise/fractal/
+com/dfsek/terra/addons/noise/samplers/noise/fractal/PingPongSampler.class
+com/dfsek/terra/addons/noise/samplers/noise/fractal/RidgedFractalSampler.class
 com/dfsek/terra/addons/noise/samplers/noise/fractal/FractalNoiseFunction.class
+com/dfsek/terra/addons/noise/samplers/noise/fractal/BrownianMotionSampler.class
+com/dfsek/terra/addons/noise/samplers/noise/CellularSampler.class
+com/dfsek/terra/addons/noise/samplers/noise/ConstantSampler.class
+com/dfsek/terra/addons/noise/samplers/noise/value/
+com/dfsek/terra/addons/noise/samplers/noise/value/ValueCubicSampler.class
+com/dfsek/terra/addons/noise/samplers/noise/value/ValueSampler.class
+com/dfsek/terra/addons/noise/samplers/noise/value/ValueStyleNoise.class
+com/dfsek/terra/addons/noise/samplers/noise/PseudoErosionSampler.class
+com/dfsek/terra/addons/noise/samplers/noise/DistanceSampler$DistanceFunction.class
+com/dfsek/terra/addons/noise/samplers/noise/ExpressionFunction.class
+com/dfsek/terra/addons/noise/samplers/noise/CellularSampler$DistanceFunction.class
+com/dfsek/terra/addons/noise/samplers/noise/DistanceSampler.class
+com/dfsek/terra/addons/noise/samplers/ImageSampler$Channel$1.class
+com/dfsek/terra/addons/noise/samplers/ImageSampler.class
 com/dfsek/terra/addons/noise/paralithic/noise/SaltedNoiseFunction3.class
 com/dfsek/terra/addons/noise/paralithic/noise/NoiseFunction2.class
 com/dfsek/terra/addons/noise/paralithic/noise/NoiseFunction3.class
@@ -59,6 +134,35 @@ com/dfsek/terra/addons/noise/paralithic/noise/SaltedNoiseFunction2.class
 ===== Terra-language-yaml-1.0.0-BETA+451683aff-all.jar =====
 
 ===== Terra-library-image-1.1.0-BETA+451683aff-all.jar =====
+com/dfsek/terra/addons/image/config/noisesampler/
+com/dfsek/terra/addons/image/config/noisesampler/DistanceTransformNoiseSamplerTemplate.class
+com/dfsek/terra/addons/image/config/noisesampler/ChannelNoiseSamplerTemplate.class
+com/dfsek/terra/addons/image/config/colorsampler/
+com/dfsek/terra/addons/image/config/colorsampler/image/
+com/dfsek/terra/addons/image/config/colorsampler/image/ImageColorSamplerTemplate.class
+com/dfsek/terra/addons/image/config/colorsampler/image/SingleImageColorSamplerTemplate.class
+com/dfsek/terra/addons/image/config/colorsampler/image/TileImageColorSamplerTemplate.class
+com/dfsek/terra/addons/image/config/colorsampler/ConstantColorSamplerTemplate.class
+com/dfsek/terra/addons/image/config/colorsampler/mutate/
+com/dfsek/terra/addons/image/config/colorsampler/mutate/MutateColorSamplerTemplate.class
+com/dfsek/terra/addons/image/config/colorsampler/mutate/TranslateColorSamplerTemplate.class
+com/dfsek/terra/addons/image/config/colorsampler/mutate/RotateColorSamplerTemplate.class
+com/dfsek/terra/addons/image/noisesampler/
+com/dfsek/terra/addons/image/noisesampler/ChannelNoiseSampler.class
+com/dfsek/terra/addons/image/colorsampler/
+com/dfsek/terra/addons/image/colorsampler/image/
+com/dfsek/terra/addons/image/colorsampler/image/SingleImageColorSampler.class
+com/dfsek/terra/addons/image/colorsampler/image/transform/
+com/dfsek/terra/addons/image/colorsampler/image/transform/Alignment$1.class
+com/dfsek/terra/addons/image/colorsampler/image/transform/Alignment.class
+com/dfsek/terra/addons/image/colorsampler/image/transform/Alignment$2.class
+com/dfsek/terra/addons/image/colorsampler/image/transform/ImageTransformation.class
+com/dfsek/terra/addons/image/colorsampler/image/TileImageColorSampler.class
+com/dfsek/terra/addons/image/colorsampler/mutate/
+com/dfsek/terra/addons/image/colorsampler/mutate/TranslateColorSampler.class
+com/dfsek/terra/addons/image/colorsampler/mutate/RotateColorSampler$RotationMethod.class
+com/dfsek/terra/addons/image/colorsampler/mutate/RotateColorSampler.class
+com/dfsek/terra/addons/image/colorsampler/ColorSampler.class
 
 ===== Terra-locator-slant-noise-3d-1.0.0-BETA+451683aff-all.jar =====
 
@@ -77,6 +181,11 @@ com/dfsek/terra/addons/noise/paralithic/noise/SaltedNoiseFunction2.class
 ===== Terra-terrascript-function-check-noise-3d-1.0.1-BETA+451683aff-all.jar =====
 
 ===== Terra-terrascript-function-sampler-1.0.0-BETA+451683aff-all.jar =====
+com/dfsek/terra/addons/terrascript/sampler/
+com/dfsek/terra/addons/terrascript/sampler/TerraScriptSamplerFunctionAddon.class
+com/dfsek/terra/addons/terrascript/sampler/SamplerFunction.class
+com/dfsek/terra/addons/terrascript/sampler/ConstantSamplerFunction.class
+com/dfsek/terra/addons/terrascript/sampler/SamplerFunctionBuilder.class
 
 ===== Terra-api-addon-loader-0.1.0-BETA+451683aff-all.jar =====
 
