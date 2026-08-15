@@ -1,0 +1,281 @@
+﻿Compiled from "ElevationInterpolator.java"
+public class com.dfsek.terra.addons.chunkgenerator.generation.math.interpolation.ElevationInterpolator {
+  private final double[][] values;
+
+  public com.dfsek.terra.addons.chunkgenerator.generation.math.interpolation.ElevationInterpolator(long, int, int, com.dfsek.terra.api.world.biome.generation.BiomeProvider, int, com.dfsek.terra.api.properties.PropertyKey<com.dfsek.terra.addons.chunkgenerator.config.noise.BiomeNoiseProperties>);
+    Code:
+         0: aload_0
+         1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+         4: aload_0
+         5: bipush        18
+         7: bipush        18
+         9: multianewarray #7,  2             // class "[[D"
+        13: putfield      #9                  // Field values:[[D
+        16: iload_3
+        17: iconst_4
+        18: ishl
+        19: istore        8
+        21: iload         4
+        23: iconst_4
+        24: ishl
+        25: istore        9
+        27: bipush        18
+        29: iconst_2
+        30: iload         6
+        32: imul
+        33: iadd
+        34: bipush        18
+        36: iconst_2
+        37: iload         6
+        39: imul
+        40: iadd
+        41: multianewarray #14,  2            // class "[[Lcom/dfsek/terra/addons/chunkgenerator/config/noise/BiomeNoiseProperties;"
+        45: astore        10
+        47: iconst_m1
+        48: iload         6
+        50: isub
+        51: istore        11
+        53: iload         11
+        55: bipush        16
+        57: iload         6
+        59: iadd
+        60: if_icmpgt     166
+        63: iconst_m1
+        64: iload         6
+        66: isub
+        67: istore        12
+        69: iload         12
+        71: bipush        16
+        73: iload         6
+        75: iadd
+        76: if_icmpgt     160
+        79: iload         8
+        81: iload         11
+        83: iadd
+        84: istore        13
+        86: iload         9
+        88: iload         12
+        90: iadd
+        91: istore        14
+        93: aload         10
+        95: iload         11
+        97: iconst_1
+        98: iadd
+        99: iload         6
+       101: iadd
+       102: aaload
+       103: iload         12
+       105: iconst_1
+       106: iadd
+       107: iload         6
+       109: iadd
+       110: aload         5
+       112: iload         13
+       114: iload         14
+       116: lload_1
+       117: invokeinterface #16,  5           // InterfaceMethod com/dfsek/terra/api/world/biome/generation/BiomeProvider.getBaseBiome:(IIJ)Ljava/util/Optional;
+       122: aload         5
+       124: iload         13
+       126: iload         14
+       128: lload_1
+       129: invokedynamic #22,  0             // InvokeDynamic #0:get:(Lcom/dfsek/terra/api/world/biome/generation/BiomeProvider;IIJ)Ljava/util/function/Supplier;
+       134: invokevirtual #26                 // Method java/util/Optional.orElseGet:(Ljava/util/function/Supplier;)Ljava/lang/Object;
+       137: checkcast     #32                 // class com/dfsek/terra/api/world/biome/Biome
+       140: invokeinterface #34,  1           // InterfaceMethod com/dfsek/terra/api/world/biome/Biome.getContext:()Lcom/dfsek/terra/api/properties/Context;
+       145: aload         7
+       147: invokevirtual #38                 // Method com/dfsek/terra/api/properties/Context.get:(Lcom/dfsek/terra/api/properties/PropertyKey;)Lcom/dfsek/terra/api/properties/Properties;
+       150: checkcast     #43                 // class com/dfsek/terra/addons/chunkgenerator/config/noise/BiomeNoiseProperties
+       153: aastore
+       154: iinc          12, 1
+       157: goto          69
+       160: iinc          11, 1
+       163: goto          53
+       166: iconst_m1
+       167: istore        11
+       169: iload         11
+       171: bipush        16
+       173: if_icmpgt     464
+       176: iconst_m1
+       177: istore        12
+       179: iload         12
+       181: bipush        16
+       183: if_icmpgt     458
+       186: dconst_0
+       187: dstore        13
+       189: dconst_0
+       190: dstore        15
+       192: aload         10
+       194: iload         11
+       196: iconst_1
+       197: iadd
+       198: iload         6
+       200: iadd
+       201: aaload
+       202: iload         12
+       204: iconst_1
+       205: iadd
+       206: iload         6
+       208: iadd
+       209: aaload
+       210: astore        17
+       212: iconst_1
+       213: istore        18
+       215: iload         6
+       217: ineg
+       218: istore        19
+       220: iload         19
+       222: iload         6
+       224: if_icmpgt     286
+       227: iload         6
+       229: ineg
+       230: istore        20
+       232: iload         20
+       234: iload         6
+       236: if_icmpgt     280
+       239: aload         10
+       241: iload         11
+       243: iconst_1
+       244: iadd
+       245: iload         6
+       247: iadd
+       248: iload         19
+       250: iadd
+       251: aaload
+       252: iload         12
+       254: iconst_1
+       255: iadd
+       256: iload         6
+       258: iadd
+       259: iload         20
+       261: iadd
+       262: aaload
+       263: aload         17
+       265: if_acmpeq     274
+       268: iconst_0
+       269: istore        18
+       271: goto          280
+       274: iinc          20, 1
+       277: goto          232
+       280: iinc          19, 1
+       283: goto          220
+       286: iload         18
+       288: ifeq          329
+       291: aload_0
+       292: getfield      #9                  // Field values:[[D
+       295: iload         11
+       297: iconst_1
+       298: iadd
+       299: aaload
+       300: iload         12
+       302: iconst_1
+       303: iadd
+       304: aload         17
+       306: invokevirtual #45                 // Method com/dfsek/terra/addons/chunkgenerator/config/noise/BiomeNoiseProperties.elevation:()Lcom/dfsek/terra/api/noise/NoiseSampler;
+       309: lload_1
+       310: iload         8
+       312: iload         11
+       314: iadd
+       315: iload         9
+       317: iload         12
+       319: iadd
+       320: invokeinterface #49,  5           // InterfaceMethod com/dfsek/terra/api/noise/NoiseSampler.noise:(JII)D
+       325: dastore
+       326: goto          452
+       329: iload         6
+       331: ineg
+       332: istore        19
+       334: iload         19
+       336: iload         6
+       338: if_icmpgt     433
+       341: iload         6
+       343: ineg
+       344: istore        20
+       346: iload         20
+       348: iload         6
+       350: if_icmpgt     427
+       353: aload         10
+       355: iload         11
+       357: iconst_1
+       358: iadd
+       359: iload         6
+       361: iadd
+       362: iload         19
+       364: iadd
+       365: aaload
+       366: iload         12
+       368: iconst_1
+       369: iadd
+       370: iload         6
+       372: iadd
+       373: iload         20
+       375: iadd
+       376: aaload
+       377: astore        21
+       379: dload         13
+       381: aload         21
+       383: invokevirtual #45                 // Method com/dfsek/terra/addons/chunkgenerator/config/noise/BiomeNoiseProperties.elevation:()Lcom/dfsek/terra/api/noise/NoiseSampler;
+       386: lload_1
+       387: iload         8
+       389: iload         11
+       391: iadd
+       392: iload         9
+       394: iload         12
+       396: iadd
+       397: invokeinterface #49,  5           // InterfaceMethod com/dfsek/terra/api/noise/NoiseSampler.noise:(JII)D
+       402: aload         21
+       404: invokevirtual #55                 // Method com/dfsek/terra/addons/chunkgenerator/config/noise/BiomeNoiseProperties.elevationWeight:()D
+       407: dmul
+       408: dadd
+       409: dstore        13
+       411: dload         15
+       413: aload         21
+       415: invokevirtual #55                 // Method com/dfsek/terra/addons/chunkgenerator/config/noise/BiomeNoiseProperties.elevationWeight:()D
+       418: dadd
+       419: dstore        15
+       421: iinc          20, 1
+       424: goto          346
+       427: iinc          19, 1
+       430: goto          334
+       433: aload_0
+       434: getfield      #9                  // Field values:[[D
+       437: iload         11
+       439: iconst_1
+       440: iadd
+       441: aaload
+       442: iload         12
+       444: iconst_1
+       445: iadd
+       446: dload         13
+       448: dload         15
+       450: ddiv
+       451: dastore
+       452: iinc          12, 1
+       455: goto          179
+       458: iinc          11, 1
+       461: goto          169
+       464: return
+
+  public double getElevation(int, int);
+    Code:
+         0: aload_0
+         1: getfield      #9                  // Field values:[[D
+         4: iload_1
+         5: iconst_1
+         6: iadd
+         7: aaload
+         8: iload_2
+         9: iconst_1
+        10: iadd
+        11: daload
+        12: dreturn
+
+  private static com.dfsek.terra.api.world.biome.Biome lambda$new$0(com.dfsek.terra.api.world.biome.generation.BiomeProvider, int, int, long);
+    Code:
+         0: aload_0
+         1: iload_1
+         2: iconst_0
+         3: iload_2
+         4: lload_3
+         5: invokeinterface #59,  6           // InterfaceMethod com/dfsek/terra/api/world/biome/generation/BiomeProvider.getBiome:(IIIJ)Lcom/dfsek/terra/api/world/biome/Biome;
+        10: areturn
+}

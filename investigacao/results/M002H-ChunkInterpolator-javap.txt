@@ -1,0 +1,481 @@
+﻿Compiled from "ChunkInterpolator.java"
+public class com.dfsek.terra.addons.chunkgenerator.generation.math.interpolation.ChunkInterpolator {
+  private final com.dfsek.terra.addons.chunkgenerator.generation.math.interpolation.Interpolator3[][][] interpGrid;
+
+  private final int min;
+
+  private final int max;
+
+  public com.dfsek.terra.addons.chunkgenerator.generation.math.interpolation.ChunkInterpolator(long, int, int, com.dfsek.terra.api.world.biome.generation.BiomeProvider, int, int, com.dfsek.terra.api.properties.PropertyKey<com.dfsek.terra.addons.chunkgenerator.config.noise.BiomeNoiseProperties>, int);
+    Code:
+         0: aload_0
+         1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+         4: aload_0
+         5: iload         6
+         7: putfield      #7                  // Field min:I
+        10: aload_0
+        11: iload         7
+        13: putfield      #13                 // Field max:I
+        16: iload_3
+        17: iconst_4
+        18: ishl
+        19: istore        10
+        21: iload         4
+        23: iconst_4
+        24: ishl
+        25: istore        11
+        27: aload_0
+        28: getfield      #13                 // Field max:I
+        31: aload_0
+        32: getfield      #7                  // Field min:I
+        35: isub
+        36: iconst_1
+        37: iadd
+        38: istore        12
+        40: iload         12
+        42: iconst_2
+        43: ishr
+        44: istore        13
+        46: aload_0
+        47: iconst_4
+        48: iload         13
+        50: iconst_4
+        51: multianewarray #16,  3            // class "[[[Lcom/dfsek/terra/addons/chunkgenerator/generation/math/interpolation/Interpolator3;"
+        55: putfield      #18                 // Field interpGrid:[[[Lcom/dfsek/terra/addons/chunkgenerator/generation/math/interpolation/Interpolator3;
+        58: iconst_5
+        59: iconst_5
+        60: iload         13
+        62: iconst_1
+        63: iadd
+        64: multianewarray #21,  3            // class "[[[D"
+        68: astore        14
+        70: bipush        17
+        72: iconst_2
+        73: iload         9
+        75: imul
+        76: iadd
+        77: istore        15
+        79: iload         15
+        81: iload         15
+        83: imul
+        84: anewarray     #23                 // class com/dfsek/terra/api/util/Column
+        87: astore        16
+        89: iconst_0
+        90: istore        17
+        92: iload         17
+        94: iconst_5
+        95: if_icmpge     499
+        98: iload         17
+       100: iconst_2
+       101: ishl
+       102: istore        18
+       104: iload         10
+       106: iload         18
+       108: iadd
+       109: istore        19
+       111: iconst_0
+       112: istore        20
+       114: iload         20
+       116: iconst_5
+       117: if_icmpge     493
+       120: iload         20
+       122: iconst_2
+       123: ishl
+       124: istore        21
+       126: iload         11
+       128: iload         21
+       130: iadd
+       131: istore        22
+       133: iload         18
+       135: iload         9
+       137: iadd
+       138: iload         15
+       140: iload         21
+       142: iload         9
+       144: iadd
+       145: imul
+       146: iadd
+       147: istore        23
+       149: aload         16
+       151: iload         23
+       153: aaload
+       154: astore        24
+       156: aload         24
+       158: ifnonnull     186
+       161: aload         5
+       163: iload         19
+       165: iload         22
+       167: lload_1
+       168: iload         6
+       170: iload         7
+       172: invokeinterface #25,  7           // InterfaceMethod com/dfsek/terra/api/world/biome/generation/BiomeProvider.getColumn:(IIJII)Lcom/dfsek/terra/api/util/Column;
+       177: astore        24
+       179: aload         16
+       181: iload         23
+       183: aload         24
+       185: aastore
+       186: iconst_0
+       187: istore        25
+       189: iload         25
+       191: iload         13
+       193: if_icmpge     487
+       196: iload         25
+       198: iconst_2
+       199: ishl
+       200: iload         6
+       202: iadd
+       203: istore        26
+       205: aload         24
+       207: iload         26
+       209: invokeinterface #31,  2           // InterfaceMethod com/dfsek/terra/api/util/Column.get:(I)Ljava/lang/Object;
+       214: checkcast     #35                 // class com/dfsek/terra/api/world/biome/Biome
+       217: invokeinterface #37,  1           // InterfaceMethod com/dfsek/terra/api/world/biome/Biome.getContext:()Lcom/dfsek/terra/api/properties/Context;
+       222: aload         8
+       224: invokevirtual #41                 // Method com/dfsek/terra/api/properties/Context.get:(Lcom/dfsek/terra/api/properties/PropertyKey;)Lcom/dfsek/terra/api/properties/Properties;
+       227: checkcast     #46                 // class com/dfsek/terra/addons/chunkgenerator/config/noise/BiomeNoiseProperties
+       230: astore        27
+       232: aload         27
+       234: invokevirtual #48                 // Method com/dfsek/terra/addons/chunkgenerator/config/noise/BiomeNoiseProperties.blendStep:()I
+       237: istore        28
+       239: aload         27
+       241: invokevirtual #52                 // Method com/dfsek/terra/addons/chunkgenerator/config/noise/BiomeNoiseProperties.blendDistance:()I
+       244: istore        29
+       246: dconst_0
+       247: dstore        30
+       249: dconst_0
+       250: dstore        32
+       252: iload         29
+       254: ineg
+       255: istore        34
+       257: iload         34
+       259: iload         29
+       261: if_icmpgt     439
+       264: iload         29
+       266: ineg
+       267: istore        35
+       269: iload         35
+       271: iload         29
+       273: if_icmpgt     433
+       276: iload         34
+       278: iload         28
+       280: imul
+       281: istore        36
+       283: iload         35
+       285: iload         28
+       287: imul
+       288: istore        37
+       290: iload         18
+       292: iload         9
+       294: iadd
+       295: iload         36
+       297: iadd
+       298: iload         15
+       300: iload         21
+       302: iload         9
+       304: iadd
+       305: iload         37
+       307: iadd
+       308: imul
+       309: iadd
+       310: istore        38
+       312: aload         16
+       314: iload         38
+       316: aaload
+       317: astore        39
+       319: aload         39
+       321: ifnonnull     355
+       324: aload         5
+       326: iload         19
+       328: iload         36
+       330: iadd
+       331: iload         22
+       333: iload         37
+       335: iadd
+       336: lload_1
+       337: iload         6
+       339: iload         7
+       341: invokeinterface #25,  7           // InterfaceMethod com/dfsek/terra/api/world/biome/generation/BiomeProvider.getColumn:(IIJII)Lcom/dfsek/terra/api/util/Column;
+       346: astore        39
+       348: aload         16
+       350: iload         38
+       352: aload         39
+       354: aastore
+       355: aload         39
+       357: iload         26
+       359: invokeinterface #31,  2           // InterfaceMethod com/dfsek/terra/api/util/Column.get:(I)Ljava/lang/Object;
+       364: checkcast     #35                 // class com/dfsek/terra/api/world/biome/Biome
+       367: invokeinterface #37,  1           // InterfaceMethod com/dfsek/terra/api/world/biome/Biome.getContext:()Lcom/dfsek/terra/api/properties/Context;
+       372: aload         8
+       374: invokevirtual #41                 // Method com/dfsek/terra/api/properties/Context.get:(Lcom/dfsek/terra/api/properties/PropertyKey;)Lcom/dfsek/terra/api/properties/Properties;
+       377: checkcast     #46                 // class com/dfsek/terra/addons/chunkgenerator/config/noise/BiomeNoiseProperties
+       380: astore        40
+       382: aload         40
+       384: invokevirtual #55                 // Method com/dfsek/terra/addons/chunkgenerator/config/noise/BiomeNoiseProperties.noiseHolder:()Lcom/dfsek/terra/addons/chunkgenerator/config/noise/ThreadLocalNoiseHolder;
+       387: aload         40
+       389: invokevirtual #59                 // Method com/dfsek/terra/addons/chunkgenerator/config/noise/BiomeNoiseProperties.base:()Lcom/dfsek/terra/api/noise/NoiseSampler;
+       392: iload         19
+       394: iload         26
+       396: iload         22
+       398: lload_1
+       399: invokevirtual #63                 // Method com/dfsek/terra/addons/chunkgenerator/config/noise/ThreadLocalNoiseHolder.getNoise:(Lcom/dfsek/terra/api/noise/NoiseSampler;IIIJ)D
+       402: dstore        41
+       404: dload         30
+       406: dload         41
+       408: aload         40
+       410: invokevirtual #69                 // Method com/dfsek/terra/addons/chunkgenerator/config/noise/BiomeNoiseProperties.blendWeight:()D
+       413: dmul
+       414: dadd
+       415: dstore        30
+       417: dload         32
+       419: aload         40
+       421: invokevirtual #69                 // Method com/dfsek/terra/addons/chunkgenerator/config/noise/BiomeNoiseProperties.blendWeight:()D
+       424: dadd
+       425: dstore        32
+       427: iinc          35, 1
+       430: goto          269
+       433: iinc          34, 1
+       436: goto          257
+       439: dload         30
+       441: dload         32
+       443: ddiv
+       444: dstore        34
+       446: aload         14
+       448: iload         17
+       450: aaload
+       451: iload         20
+       453: aaload
+       454: iload         25
+       456: dload         34
+       458: dastore
+       459: iload         25
+       461: iload         13
+       463: iconst_1
+       464: isub
+       465: if_icmpne     481
+       468: aload         14
+       470: iload         17
+       472: aaload
+       473: iload         20
+       475: aaload
+       476: iload         13
+       478: dload         34
+       480: dastore
+       481: iinc          25, 1
+       484: goto          189
+       487: iinc          20, 1
+       490: goto          114
+       493: iinc          17, 1
+       496: goto          92
+       499: iconst_0
+       500: istore        17
+       502: iload         17
+       504: iconst_4
+       505: if_icmpge     677
+       508: iconst_0
+       509: istore        18
+       511: iload         18
+       513: iconst_4
+       514: if_icmpge     671
+       517: iconst_0
+       518: istore        19
+       520: iload         19
+       522: iload         13
+       524: if_icmpge     665
+       527: aload_0
+       528: getfield      #18                 // Field interpGrid:[[[Lcom/dfsek/terra/addons/chunkgenerator/generation/math/interpolation/Interpolator3;
+       531: iload         17
+       533: aaload
+       534: iload         19
+       536: aaload
+       537: iload         18
+       539: new           #73                 // class com/dfsek/terra/addons/chunkgenerator/generation/math/interpolation/Interpolator3
+       542: dup
+       543: aload         14
+       545: iload         17
+       547: aaload
+       548: iload         18
+       550: aaload
+       551: iload         19
+       553: daload
+       554: aload         14
+       556: iload         17
+       558: iconst_1
+       559: iadd
+       560: aaload
+       561: iload         18
+       563: aaload
+       564: iload         19
+       566: daload
+       567: aload         14
+       569: iload         17
+       571: aaload
+       572: iload         18
+       574: aaload
+       575: iload         19
+       577: iconst_1
+       578: iadd
+       579: daload
+       580: aload         14
+       582: iload         17
+       584: iconst_1
+       585: iadd
+       586: aaload
+       587: iload         18
+       589: aaload
+       590: iload         19
+       592: iconst_1
+       593: iadd
+       594: daload
+       595: aload         14
+       597: iload         17
+       599: aaload
+       600: iload         18
+       602: iconst_1
+       603: iadd
+       604: aaload
+       605: iload         19
+       607: daload
+       608: aload         14
+       610: iload         17
+       612: iconst_1
+       613: iadd
+       614: aaload
+       615: iload         18
+       617: iconst_1
+       618: iadd
+       619: aaload
+       620: iload         19
+       622: daload
+       623: aload         14
+       625: iload         17
+       627: aaload
+       628: iload         18
+       630: iconst_1
+       631: iadd
+       632: aaload
+       633: iload         19
+       635: iconst_1
+       636: iadd
+       637: daload
+       638: aload         14
+       640: iload         17
+       642: iconst_1
+       643: iadd
+       644: aaload
+       645: iload         18
+       647: iconst_1
+       648: iadd
+       649: aaload
+       650: iload         19
+       652: iconst_1
+       653: iadd
+       654: daload
+       655: invokespecial #75                 // Method com/dfsek/terra/addons/chunkgenerator/generation/math/interpolation/Interpolator3."<init>":(DDDDDDDD)V
+       658: aastore
+       659: iinc          19, 1
+       662: goto          520
+       665: iinc          18, 1
+       668: goto          511
+       671: iinc          17, 1
+       674: goto          502
+       677: return
+
+  private static int reRange(int, int);
+    Code:
+         0: iload_0
+         1: iload_1
+         2: invokestatic  #78                 // Method java/lang/Math.min:(II)I
+         5: iconst_0
+         6: invokestatic  #83                 // Method java/lang/Math.max:(II)I
+         9: ireturn
+
+  public double getNoise(double, double, double);
+    Code:
+         0: aload_0
+         1: getfield      #18                 // Field interpGrid:[[[Lcom/dfsek/terra/addons/chunkgenerator/generation/math/interpolation/Interpolator3;
+         4: dload_1
+         5: d2i
+         6: iconst_4
+         7: idiv
+         8: iconst_3
+         9: invokestatic  #85                 // Method reRange:(II)I
+        12: aaload
+        13: dload_3
+        14: d2i
+        15: aload_0
+        16: getfield      #13                 // Field max:I
+        19: invokestatic  #78                 // Method java/lang/Math.min:(II)I
+        22: aload_0
+        23: getfield      #7                  // Field min:I
+        26: invokestatic  #83                 // Method java/lang/Math.max:(II)I
+        29: aload_0
+        30: getfield      #7                  // Field min:I
+        33: isub
+        34: iconst_4
+        35: idiv
+        36: aaload
+        37: dload         5
+        39: d2i
+        40: iconst_4
+        41: idiv
+        42: iconst_3
+        43: invokestatic  #85                 // Method reRange:(II)I
+        46: aaload
+        47: dload_1
+        48: ldc2_w        #88                 // double 4.0d
+        51: drem
+        52: ldc2_w        #88                 // double 4.0d
+        55: ddiv
+        56: dload_3
+        57: ldc2_w        #88                 // double 4.0d
+        60: drem
+        61: ldc2_w        #88                 // double 4.0d
+        64: ddiv
+        65: dload         5
+        67: ldc2_w        #88                 // double 4.0d
+        70: drem
+        71: ldc2_w        #88                 // double 4.0d
+        74: ddiv
+        75: invokevirtual #90                 // Method com/dfsek/terra/addons/chunkgenerator/generation/math/interpolation/Interpolator3.trilerp:(DDD)D
+        78: dreturn
+
+  public double getNoise(int, int, int);
+    Code:
+         0: aload_0
+         1: getfield      #18                 // Field interpGrid:[[[Lcom/dfsek/terra/addons/chunkgenerator/generation/math/interpolation/Interpolator3;
+         4: iload_1
+         5: iconst_4
+         6: idiv
+         7: aaload
+         8: iload_2
+         9: aload_0
+        10: getfield      #7                  // Field min:I
+        13: isub
+        14: iconst_4
+        15: idiv
+        16: aaload
+        17: iload_3
+        18: iconst_4
+        19: idiv
+        20: aaload
+        21: iload_1
+        22: iconst_3
+        23: iand
+        24: i2d
+        25: ldc2_w        #88                 // double 4.0d
+        28: ddiv
+        29: iload_2
+        30: iconst_3
+        31: iand
+        32: i2d
+        33: ldc2_w        #88                 // double 4.0d
+        36: ddiv
+        37: iload_3
+        38: iconst_3
+        39: iand
+        40: i2d
+        41: ldc2_w        #88                 // double 4.0d
+        44: ddiv
+        45: invokevirtual #90                 // Method com/dfsek/terra/addons/chunkgenerator/generation/math/interpolation/Interpolator3.trilerp:(DDD)D
+        48: dreturn
+}
