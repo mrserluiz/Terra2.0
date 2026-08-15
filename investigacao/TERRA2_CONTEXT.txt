@@ -8,6 +8,82 @@ TARGET_MC=26.2
 LANG=Java
 PRIMARY_SOURCE=GitHub_repository_plus_local_decompiled_source
 
+EVIDENCE_WORKFLOW:
+
+PURPOSE:
+Permitir que resultados de comandos executados localmente sejam persistidos no GitHub
+e analisados posteriormente sem depender do histórico da conversa.
+
+RULE:
+Quando uma investigação exigir execução local:
+1=Assistant fornece comando PowerShell.
+2=Comando deve salvar saída em investigacao/...
+3=User executa localmente.
+4=User faz git add/commit/push pelo GitHub/PowerShell.
+5=Assistant lê o arquivo diretamente do repositório.
+6=Assistant analisa resultado.
+7=Se necessário, Assistant fornece próximo comando.
+8=Não solicitar que User copie grandes outputs para o chat quando um arquivo pode ser usado.
+
+RESULT_NAMING:
+Preferir nomes descritivos:
+investigacao/results/<tema>.txt
+investigacao/dumps/<tema>.txt
+
+EXAMPLE:
+Get-ChildItem -Recurse -Filter *.java |
+    Select-String "Tectonic" |
+    Out-File ".\investigacao\results\tectonic-search.txt" -Encoding UTF8
+
+GITHUB_SYNC:
+git add investigacao/
+git commit -m "Investigation: <description>"
+git push
+
+CONTEXT_UPDATE:
+TERRA2_CONTEXT.txt deve registrar quais evidence files existem e para que servem.
+
+MEMORY_ROLE:
+TERRA2_CONTEXT.txt não é apenas investigação.
+É a memória operacional persistente do projeto e da interação técnica:
+- objetivo;
+- decisões;
+- preferências de workflow;
+- protocolo de investigação;
+- estado atual;
+- fatos;
+- hipóteses;
+- resultados;
+- próximos passos;
+- regras para continuidade.
+
+ASSISTANT_BEHAVIOR:
+Sempre lembrar:
+- usar GitHub como fonte persistente;
+- consultar TERRA2_CONTEXT antes de retomar trabalho complexo;
+- consultar evidence files quando referenciados;
+- fornecer comando de coleta quando faltar evidência local;
+- avisar quando TERRA2_CONTEXT precisar ser atualizado;
+- fornecer exatamente o bloco que deve ser adicionado/alterado;
+- não exigir upload manual de grandes outputs no chat.
+
+EVIDENCE_INDEX:
+
+E001
+FILE=investigacao/results/generator-provider-search.txt
+PURPOSE=Busca por implementações de ChunkGeneratorProvider
+STATUS=ANALYZED
+
+E002
+FILE=investigacao/results/tectonic-search.txt
+PURPOSE=Localizar sistema Tectonic
+STATUS=PENDING
+
+E003
+FILE=investigacao/default-pack-tree.txt
+PURPOSE=Árvore do default.zip
+STATUS=PENDING
+
 MISSION:
 1=Ressuscitar o plugin Terra de TerraFormação abandonado pelo desenvolvedor.
 2=Entender completamente seu funcionamento antes de reescrever.
