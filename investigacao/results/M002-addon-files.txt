@@ -1,0 +1,23 @@
+﻿
+FullName                                                                                                               
+--------                                                                                                               
+E:\Downloads 0.2\Plugins Server\Revese\TerraPlugin\addons\Terra-command-addons-1.0.0-BETA+451683aff-all.jar            
+E:\Downloads 0.2\Plugins Server\Revese\TerraPlugin\addons\bootstrap\Terra-api-addon-loader-0.1.0-BETA+451683aff-all.jar
+E:\Downloads 0.2\Plugins Server\Revese\TerraPlugin\addons\bootstrap\Terra-manifest-addon-loader-1.0.0-BETA+451683aff...
+E:\Downloads 0.2\Plugins Server\Revese\TerraPlugin\com\dfsek\terra\addon\BootstrapAddonLoader.java                     
+E:\Downloads 0.2\Plugins Server\Revese\TerraPlugin\com\dfsek\terra\addon\EphemeralAddon.java                           
+E:\Downloads 0.2\Plugins Server\Revese\TerraPlugin\com\dfsek\terra\addon\InternalAddon.java                            
+E:\Downloads 0.2\Plugins Server\Revese\TerraPlugin\com\dfsek\terra\addon\exception\AddonLoadException.java             
+E:\Downloads 0.2\Plugins Server\Revese\TerraPlugin\com\dfsek\terra\api\addon\BaseAddon.java                            
+E:\Downloads 0.2\Plugins Server\Revese\TerraPlugin\com\dfsek\terra\api\addon\bootstrap\BootstrapAddonClassLoader.java  
+E:\Downloads 0.2\Plugins Server\Revese\TerraPlugin\com\dfsek\terra\api\addon\bootstrap\BootstrapBaseAddon.java         
+E:\Downloads 0.2\Plugins Server\Revese\TerraPlugin\com\dfsek\terra\bukkit\BukkitAddon.java                             
+E:\Downloads 0.2\Plugins Server\Revese\TerraPlugin\com\dfsek\terra\bukkit\nms\v1_21_8\NMSAddon.java                    
+E:\Downloads 0.2\Plugins Server\Revese\TerraPlugin\com\dfsek\terra\config\pack\ConfigPackAddonsTemplate.java           
+E:\Downloads 0.2\Plugins Server\Revese\TerraPlugin\com\dfsek\terra\lib\asm\ModuleVisitor.java                          
+E:\Downloads 0.2\Plugins Server\Revese\TerraPlugin\com\dfsek\terra\lib\asm\ModuleWriter.java                           
+E:\Downloads 0.2\Plugins Server\Revese\TerraPlugin\investigacao\results\M002-addon-config-registration.txt             
+E:\Downloads 0.2\Plugins Server\Revese\TerraPlugin\investigacao\results\M002-addon-directories.txt                     
+E:\Downloads 0.2\Plugins Server\Revese\TerraPlugin\investigacao\results\M002-addon-files.txt                           
+
+

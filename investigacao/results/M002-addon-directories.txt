@@ -1,0 +1,8 @@
+﻿
+FullName                                                                    
+--------                                                                    
+E:\Downloads 0.2\Plugins Server\Revese\TerraPlugin\addons                   
+E:\Downloads 0.2\Plugins Server\Revese\TerraPlugin\com\dfsek\terra\addon    
+E:\Downloads 0.2\Plugins Server\Revese\TerraPlugin\com\dfsek\terra\api\addon
+
+
