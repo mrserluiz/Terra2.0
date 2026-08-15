@@ -1,6 +1,117 @@
 ================================
 UPDATES:
 =============================
+UPDATE > 15/08/26 - M002H
+
+[M002H][FACT]
+ChunkInterpolator e ElevationInterpolator foram analisados através dos resultados
+javap armazenados no GitHub.
+
+1. ChunkInterpolator:
+- Trabalha com PropertyKey<BiomeNoiseProperties>.
+- Obtém BiomeNoiseProperties através do Context do Biome.
+- Não recebe diretamente um Noise concreto.
+- Obtém BiomeNoiseProperties.base().
+- base() fornece um com.dfsek.terra.api.noise.NoiseSampler.
+- O NoiseSampler é avaliado através de ThreadLocalNoiseHolder.
+- O ChunkInterpolator portanto trabalha contra a abstração NoiseSampler.
+
+Fluxo confirmado:
+BiomeProvider
+  -> Biome
+  -> Context
+  -> PropertyKey<BiomeNoiseProperties>
+  -> BiomeNoiseProperties.base()
+  -> NoiseSampler
+  -> ThreadLocalNoiseHolder
+  -> valor de Noise
+
+2. ElevationInterpolator:
+- Também utiliza PropertyKey<BiomeNoiseProperties>.
+- Obtém BiomeNoiseProperties.elevation().
+- elevation() fornece NoiseSampler.
+- Avalia o sampler usando seed + coordenadas X/Z.
+- Possui tratamento de blending entre biomas.
+
+Fluxo confirmado:
+Biome
+  -> Context
+  -> BiomeNoiseProperties
+  -> elevation()
+  -> NoiseSampler
+  -> ElevationInterpolator
+  -> valor de elevação
+
+3. Blending:
+- ChunkInterpolator utiliza propriedades associadas ao blending entre biomas,
+  incluindo blendWeight, blendDistance e blendStep.
+- ElevationInterpolator utiliza elevationWeight para ponderação.
+- O Terra consegue portanto combinar Noise de diferentes biomas nas regiões
+  de transição.
+
+4. [ARCHITECTURE][FACT]
+O ChunkInterpolator NÃO instancia nem conhece Noise concretos como Simplex,
+Perlin ou Cellular.
+Ele depende da interface:
+com.dfsek.terra.api.noise.NoiseSampler
+
+Isso demonstra desacoplamento entre:
+Generator
+e
+Noise implementation.
+
+5. [ARCHITECTURE][INFERENCE]
+A arquitetura observada atualmente pode ser representada como:
+
+Pack
+  -> Biome configuration
+  -> Biome Context
+  -> BiomeNoiseProperties
+  -> NoiseSampler
+  -> ChunkInterpolator
+  -> Sampler3D
+  -> generateChunkData()
+
+E paralelamente:
+
+BiomeNoiseProperties
+  -> elevation()
+  -> NoiseSampler
+  -> ElevationInterpolator
+  -> Sampler3D
+
+A parte "Pack -> BiomeNoiseProperties -> NoiseSampler" ainda não está
+completamente comprovada. Precisamos localizar quem instancia/constrói
+BiomeNoiseProperties e quem injeta os NoiseSampler.
+
+6. [DECISION]
+Não investigar individualmente Simplex, Perlin, Cellular etc. neste momento.
+Primeiro descobrir o mecanismo que transforma configuração em NoiseSampler.
+
+7. [NEXT]
+M002I:
+Investigar:
+- BiomeNoiseProperties.class
+- referências a BiomeNoiseProperties
+- construtores/fábricas de BiomeNoiseProperties
+- registro de PropertyKey relacionado a Noise
+- criação/injeção de NoiseSampler
+- relação entre configuração de Pack/Biome e NoiseSampler.
+
+8. [EVIDENCE]
+Resultados M002H:
+investigacao/results/M002H-ChunkInterpolator-javap.txt
+investigacao/results/M002H-ElevationInterpolator-javap.txt
+investigacao/results/M002H-noise-properties-map.txt
+
+9. [CONTINUITY]
+Antes de iniciar M002I, consultar:
+Manual_Memory_System(Terra2).txt
+e os resultados M002H no GitHub.
+
+Não considerar como FACT qualquer ligação entre Pack e NoiseSampler
+até localizar o código responsável pela criação/injeção de BiomeNoiseProperties.
+
 UPDATE > 15/08/26 - M002G
 
 [M002G][FACT]
