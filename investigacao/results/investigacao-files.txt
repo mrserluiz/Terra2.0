@@ -1,0 +1,15 @@
+﻿
+FullName                                                                                      
+--------                                                                                      
+E:\Downloads 0.2\Plugins Server\Revese\TerraPlugin\investigacao\ChunkGenerator.java           
+E:\Downloads 0.2\Plugins Server\Revese\TerraPlugin\investigacao\ChunkGeneratorProvider.java   
+E:\Downloads 0.2\Plugins Server\Revese\TerraPlugin\investigacao\ConfigPack.java               
+E:\Downloads 0.2\Plugins Server\Revese\TerraPlugin\investigacao\ConfigPackImpl.java           
+E:\Downloads 0.2\Plugins Server\Revese\TerraPlugin\investigacao\ConfigPackTemplate.java       
+E:\Downloads 0.2\Plugins Server\Revese\TerraPlugin\investigacao\default-pack-tree.txt         
+E:\Downloads 0.2\Plugins Server\Revese\TerraPlugin\investigacao\GenerationStage.java          
+E:\Downloads 0.2\Plugins Server\Revese\TerraPlugin\investigacao\GenerationStageProvider.java  
+E:\Downloads 0.2\Plugins Server\Revese\TerraPlugin\investigacao\TERRA2_CONTEXT.txt            
+E:\Downloads 0.2\Plugins Server\Revese\TerraPlugin\investigacao\results\investigacao-files.txt
+
+
