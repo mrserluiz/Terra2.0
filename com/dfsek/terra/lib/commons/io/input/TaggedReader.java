@@ -1,0 +1,28 @@
+package com.dfsek.terra.lib.commons.io.input;
+
+import com.dfsek.terra.lib.commons.io.TaggedIOException;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Serializable;
+import java.util.UUID;
+
+public class TaggedReader extends ProxyReader {
+   private final Serializable tag = UUID.randomUUID();
+
+   public TaggedReader(Reader proxy) {
+      super(proxy);
+   }
+
+   @Override
+   protected void handleIOException(IOException e) throws IOException {
+      throw new TaggedIOException(e, this.tag);
+   }
+
+   public boolean isCauseOf(Throwable exception) {
+      return TaggedIOException.isTaggedWith(exception, this.tag);
+   }
+
+   public void throwIfCauseOf(Throwable throwable) throws IOException {
+      TaggedIOException.throwCauseIfTaggedWith(throwable, this.tag);
+   }
+}

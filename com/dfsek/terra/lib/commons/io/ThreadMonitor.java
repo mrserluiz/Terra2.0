@@ -1,0 +1,43 @@
+package com.dfsek.terra.lib.commons.io;
+
+import java.time.Duration;
+
+final class ThreadMonitor implements Runnable {
+   private final Thread thread;
+   private final Duration timeout;
+
+   static Thread start(Duration timeout) {
+      return start(Thread.currentThread(), timeout);
+   }
+
+   static Thread start(Thread thread, Duration timeout) {
+      if (!timeout.isZero() && !timeout.isNegative()) {
+         Thread monitor = new Thread(new ThreadMonitor(thread, timeout), ThreadMonitor.class.getSimpleName());
+         monitor.setDaemon(true);
+         monitor.start();
+         return monitor;
+      } else {
+         return null;
+      }
+   }
+
+   static void stop(Thread thread) {
+      if (thread != null) {
+         thread.interrupt();
+      }
+   }
+
+   private ThreadMonitor(Thread thread, Duration timeout) {
+      this.thread = thread;
+      this.timeout = timeout;
+   }
+
+   @Override
+   public void run() {
+      try {
+         ThreadUtils.sleep(this.timeout);
+         this.thread.interrupt();
+      } catch (InterruptedException var2) {
+      }
+   }
+}

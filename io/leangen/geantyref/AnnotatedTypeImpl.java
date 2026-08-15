@@ -1,0 +1,87 @@
+package io.leangen.geantyref;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedType;
+import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+class AnnotatedTypeImpl implements AnnotatedType {
+   protected Type type;
+   protected Map<Class<? extends Annotation>, Annotation> annotations;
+
+   AnnotatedTypeImpl(Type type) {
+      this(type, new Annotation[0]);
+   }
+
+   AnnotatedTypeImpl(Type type, Annotation[] annotations) {
+      this.type = Objects.requireNonNull(type);
+      this.annotations = this.toMap(annotations);
+   }
+
+   @Override
+   public Type getType() {
+      return this.type;
+   }
+
+   @Override
+   public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
+      return (T)this.annotations.get(annotationClass);
+   }
+
+   @Override
+   public Annotation[] getAnnotations() {
+      return this.annotations.values().toArray(new Annotation[0]);
+   }
+
+   @Override
+   public Annotation[] getDeclaredAnnotations() {
+      return this.getAnnotations();
+   }
+
+   @Override
+   public boolean equals(Object other) {
+      if (this == other) {
+         return true;
+      }
+
+      if (!(other instanceof AnnotatedType)) {
+         return false;
+      }
+
+      AnnotatedType that = (AnnotatedType)other;
+      return this.getType().equals(that.getType()) && Arrays.equals(this.getAnnotations(), that.getAnnotations());
+   }
+
+   @Override
+   public int hashCode() {
+      return 127 * this.getType().hashCode() ^ Arrays.hashCode(this.getAnnotations());
+   }
+
+   @Override
+   public String toString() {
+      return this.annotationsString() + GenericTypeReflector.getTypeName(this.type);
+   }
+
+   String annotationsString() {
+      return this.annotations.isEmpty() ? "" : this.annotations.values().stream().map(Annotation::toString).collect(Collectors.joining(", ")) + " ";
+   }
+
+   String typesString(AnnotatedType[] types) {
+      return Arrays.stream(types).map(Object::toString).collect(Collectors.joining(", "));
+   }
+
+   protected Map<Class<? extends Annotation>, Annotation> toMap(Annotation[] annotations) {
+      Map<Class<? extends Annotation>, Annotation> map = new LinkedHashMap<>();
+
+      for (Annotation annotation : annotations) {
+         map.put(annotation.annotationType(), annotation);
+      }
+
+      return Collections.unmodifiableMap(map);
+   }
+}

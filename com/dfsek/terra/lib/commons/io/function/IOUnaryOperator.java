@@ -1,0 +1,14 @@
+package com.dfsek.terra.lib.commons.io.function;
+
+import java.util.function.UnaryOperator;
+
+@FunctionalInterface
+public interface IOUnaryOperator<T> extends IOFunction<T, T> {
+   static <T> IOUnaryOperator<T> identity() {
+      return t -> t;
+   }
+
+   default UnaryOperator<T> asUnaryOperator() {
+      return t -> Uncheck.apply(this, (T)t);
+   }
+}

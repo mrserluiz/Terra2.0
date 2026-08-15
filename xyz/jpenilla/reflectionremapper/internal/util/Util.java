@@ -1,0 +1,174 @@
+package xyz.jpenilla.reflectionremapper.internal.util;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
+import java.lang.invoke.MethodHandles.Lookup;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.function.UnaryOperator;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.framework.qual.DefaultQualifier;
+import xyz.jpenilla.reflectionremapper.proxy.annotation.Proxies;
+
+@DefaultQualifier(NonNull.class)
+public final class Util {
+   private static final @Nullable Method PRIVATE_LOOKUP_IN = findMethod(MethodHandles.class, "privateLookupIn", Class.class, Lookup.class);
+   private static final @Nullable Method DESCRIPTOR_STRING = findMethod(Class.class, "descriptorString");
+
+   private Util() {
+   }
+
+   public static boolean mojangMapped() {
+      return classExists("net.minecraft.server.level.ServerPlayer");
+   }
+
+   public static boolean classExists(final String className) {
+      try {
+         Class.forName(className);
+         return true;
+      } catch (ClassNotFoundException ex) {
+         return false;
+      }
+   }
+
+   public static <E extends Throwable> E sneakyThrow(final Throwable ex) throws E {
+      throw ex;
+   }
+
+   public static <T> T sneakyThrows(final Util.ThrowingSupplier<T> supplier) {
+      try {
+         return supplier.get();
+      } catch (Throwable ex) {
+         throw (RuntimeException)sneakyThrow(ex);
+      }
+   }
+
+   public static boolean isSynthetic(final int modifiers) {
+      return (modifiers & 4096) != 0;
+   }
+
+   public static Class<?> findProxiedClass(final Class<?> proxyInterface, final UnaryOperator<String> classMapper) {
+      if (!proxyInterface.isInterface()) {
+         throw new IllegalArgumentException(proxyInterface.getTypeName() + " is not an interface annotated with @Proxies.");
+      }
+
+      Proxies proxies = proxyInterface.getDeclaredAnnotation(Proxies.class);
+      if (proxies == null) {
+         throw new IllegalArgumentException("interface " + proxyInterface.getTypeName() + " is not annotated with @Proxies.");
+      }
+
+      if (proxies.value() == Object.class && proxies.className().isEmpty()) {
+         throw new IllegalArgumentException("@Proxies annotation must either have value() or className() set. Interface: " + proxyInterface.getTypeName());
+      }
+
+      if (proxies.value() != Object.class) {
+         return proxies.value();
+      }
+
+      try {
+         return Class.forName(classMapper.apply(proxies.className()));
+      } catch (ClassNotFoundException ex) {
+         throw new IllegalArgumentException("Could not find class for @Proxied className() " + proxies.className() + ".");
+      }
+   }
+
+   private static @Nullable Method findMethod(final Class<?> holder, final String name, final Class<?>... paramTypes) {
+      try {
+         return holder.getDeclaredMethod(name, paramTypes);
+      } catch (ReflectiveOperationException ex) {
+         return null;
+      }
+   }
+
+   public static MethodHandle handleForDefaultMethod(final Class<?> interfaceClass, final Method method) throws Throwable {
+      if (PRIVATE_LOOKUP_IN == null) {
+         Constructor<Lookup> constructor = Lookup.class.getDeclaredConstructor(Class.class);
+         constructor.setAccessible(true);
+         return constructor.newInstance(interfaceClass).in(interfaceClass).unreflectSpecial(method, interfaceClass);
+      } else {
+         return ((Lookup)PRIVATE_LOOKUP_IN.invoke(null, interfaceClass, MethodHandles.lookup()))
+            .findSpecial(interfaceClass, method.getName(), MethodType.methodType(method.getReturnType(), method.getParameterTypes()), interfaceClass);
+      }
+   }
+
+   public static List<Class<?>> topDownInterfaceHierarchy(final Class<?> cls) {
+      if (!cls.isInterface()) {
+         throw new IllegalStateException("Expected an interface, got " + cls);
+      }
+
+      Set<Class<?>> set = new LinkedHashSet<>();
+      set.add(cls);
+      interfaces(cls, set);
+      List<Class<?>> list = new ArrayList<>(set);
+      Collections.reverse(list);
+      return Collections.unmodifiableList(list);
+   }
+
+   private static void interfaces(final Class<?> cls, final Collection<Class<?>> list) {
+      for (Class<?> iface : cls.getInterfaces()) {
+         list.add(iface);
+         interfaces(iface, list);
+      }
+   }
+
+   public static String descriptorString(final Class<?> clazz) {
+      if (DESCRIPTOR_STRING != null) {
+         try {
+            return (String)DESCRIPTOR_STRING.invoke(clazz);
+         } catch (ReflectiveOperationException ex) {
+            throw new RuntimeException("Failed to call Class#descriptorString", ex);
+         }
+      } else if (clazz == long.class) {
+         return "J";
+      } else if (clazz == int.class) {
+         return "I";
+      } else if (clazz == char.class) {
+         return "C";
+      } else if (clazz == short.class) {
+         return "S";
+      } else if (clazz == byte.class) {
+         return "B";
+      } else if (clazz == double.class) {
+         return "D";
+      } else if (clazz == float.class) {
+         return "F";
+      } else if (clazz == boolean.class) {
+         return "Z";
+      } else if (clazz == void.class) {
+         return "V";
+      } else {
+         return clazz.isArray() ? "[" + descriptorString(clazz.getComponentType()) : 'L' + clazz.getName().replace('.', '/') + ';';
+      }
+   }
+
+   public static String firstLine(final InputStream mappings) {
+      try {
+         mappings.mark(1024);
+         BufferedReader reader = new BufferedReader(new InputStreamReader(mappings, StandardCharsets.UTF_8));
+         String line = reader.readLine();
+         mappings.reset();
+         return line;
+      } catch (IOException e) {
+         throw new UncheckedIOException("Failed to read first line of input stream", e);
+      }
+   }
+
+   @FunctionalInterface
+   public interface ThrowingSupplier<T> {
+      T get() throws Throwable;
+   }
+}

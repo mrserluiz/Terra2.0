@@ -1,0 +1,13 @@
+package com.dfsek.terra.lib.commons.io.function;
+
+import java.io.IOException;
+import java.util.function.LongSupplier;
+
+@FunctionalInterface
+public interface IOLongSupplier {
+   default LongSupplier asSupplier() {
+      return () -> Uncheck.getAsLong(this);
+   }
+
+   long getAsLong() throws IOException;
+}

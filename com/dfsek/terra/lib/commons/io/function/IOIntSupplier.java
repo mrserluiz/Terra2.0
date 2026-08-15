@@ -1,0 +1,13 @@
+package com.dfsek.terra.lib.commons.io.function;
+
+import java.io.IOException;
+import java.util.function.IntSupplier;
+
+@FunctionalInterface
+public interface IOIntSupplier {
+   default IntSupplier asIntSupplier() {
+      return () -> Uncheck.getAsInt(this);
+   }
+
+   int getAsInt() throws IOException;
+}

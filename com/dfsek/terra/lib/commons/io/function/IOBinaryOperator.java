@@ -1,0 +1,18 @@
+package com.dfsek.terra.lib.commons.io.function;
+
+import java.util.function.BinaryOperator;
+
+@FunctionalInterface
+public interface IOBinaryOperator<T> extends IOBiFunction<T, T, T> {
+   static <T> IOBinaryOperator<T> maxBy(IOComparator<? super T> comparator) {
+      return (a, b) -> comparator.compare((T)a, (T)b) >= 0 ? a : b;
+   }
+
+   static <T> IOBinaryOperator<T> minBy(IOComparator<? super T> comparator) {
+      return (a, b) -> comparator.compare((T)a, (T)b) <= 0 ? a : b;
+   }
+
+   default BinaryOperator<T> asBinaryOperator() {
+      return (t, u) -> Uncheck.apply(this, (T)t, (T)u);
+   }
+}
