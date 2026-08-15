@@ -549,3 +549,73 @@ are confirmed execution paths.
 NEXT=M002
 NAME=Identify configuration mechanism that populates generatorProvider
 STATUS=ACTIVE
+
+UPDATES:
+MILESTONE:M002
+NAME=Configuration pipeline identified
+STATUS=PARTIALLY_COMPLETED
+
+FACT:F024
+SOURCE=com/dfsek/terra/config/pack/ConfigPackImpl.java
+CLAIM=ConfigPackImpl creates ConfigPackTemplate and loads it through selfLoader.load(template, packManifest).
+STATUS=CONFIRMED
+
+FACT:F025
+SOURCE=com/dfsek/terra/config/pack/ConfigPackImpl.java
+CLAIM=Before loading ConfigPackTemplate, Terra discovers configurations and registers Meta preprocessors through registerMeta().
+STATUS=CONFIRMED
+
+FACT:F026
+SOURCE=com/dfsek/terra/config/pack/ConfigPackTemplate.java
+CLAIM=generator is mapped by @Value("generator") to a @Meta ChunkGeneratorProvider field.
+STATUS=CONFIRMED
+
+FACT:F027
+SOURCE=com/dfsek/terra/config/preprocessor/MetaValuePreprocessor.java
+CLAIM=@Meta string values beginning with $ can resolve another discovered configuration using file:key syntax.
+STATUS=CONFIRMED
+
+FACT:F028
+SOURCE=com/dfsek/terra/api/config/ConfigType.java
+CLAIM=ConfigType provides getTemplate(), getFactory(), and getTypeKey().
+STATUS=CONFIRMED
+
+FACT:F029
+SOURCE=com/dfsek/terra/api/config/ConfigFactory.java
+CLAIM=ConfigFactory.build(template, platform) constructs the runtime object represented by a configuration type.
+STATUS=CONFIRMED
+
+FACT:F030
+SOURCE=com/dfsek/terra/config/pack/ConfigPackImpl.java
+CLAIM=Discovered configurations containing "type" are grouped by ConfigType and materialized through ConfigType.getFactory().build(...).
+STATUS=CONFIRMED
+
+ARCH_UPDATE:
+ConfigPackImpl
+ -> discoverConfigurations()
+ -> registerMeta()
+ -> selfLoader.load(ConfigPackTemplate, packManifest)
+ -> @Meta generator
+ -> configuration resolution
+ -> ConfigType/ConfigFactory system
+ -> runtime object
+
+M002_RESULT:
+The concrete ChunkGeneratorProvider is likely supplied through Terra's configuration/type system rather than directly instantiated by ConfigPackTemplate Java code.
+
+M002_STATUS:
+CONFIGURATION_PIPELINE=CONFIRMED
+CONCRETE_GENERATOR_PROVIDER=UNKNOWN
+CHUNK_GENERATOR=UNKNOWN
+
+NEXT_TARGET:
+Identify ConfigType/ConfigFactory registration responsible for ChunkGeneratorProvider.
+
+NEXT_SEARCH:
+Search for:
+- ConfigType implementations related to ChunkGeneratorProvider
+- ConfigFactory implementations returning ChunkGeneratorProvider
+- registerConfigType(...)
+- TypeKey<ChunkGeneratorProvider>
+- generator configuration files containing "type"
+- addon registration of generator-related ConfigTypes
