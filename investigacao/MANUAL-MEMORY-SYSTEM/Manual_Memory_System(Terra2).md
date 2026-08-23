@@ -1,5 +1,9 @@
 ================================
-UPDATES:
+UPDATES SITE:
+Exemplo:
+UPDATE > 00/00/00 - 00:00 - M003J
+[conteúdo]
+<END UPDATE>
 =============================
 
 UPDATE > 23/08/26 - 13:34 - M002J
