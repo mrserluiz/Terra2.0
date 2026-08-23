@@ -1,6 +1,1300 @@
 ================================
 UPDATES:
 =============================
+
+UPDATE > 23/08/26 - 13:34 - M002J
+
+# TERRA 2.0 — CONSOLIDAÇÃO DA INVESTIGAÇÃO
+
+STATUS=INVESTIGATION_ACTIVE
+PHASE=REVERSE_ENGINEERING_ORIGINAL_TERRA
+CURRENT_TARGET=M002I/M002J
+PROJECT=TERRA2
+SOURCE_OF_TRUTH=GitHub
+
+REPOSITORY:
+https://github.com/mrserluiz/Terra2.0
+
+==================================================
+MEMORY SYSTEM MIGRATION
+==================================================
+
+[MEMORY][FACT]
+
+Arquivo antigo:
+
+investigacao/MANUAL-MEMORY-SYSTEM/Manual_Memory_System(Terra2).txt
+
+Novo arquivo oficial:
+
+investigacao/MANUAL-MEMORY-SYSTEM/Manual_Memory_System(Terra2).md
+
+STATUS=RENAMED/MIGRATED
+
+A partir deste UPDATE:
+
+Manual_Memory_System(Terra2).md
+
+passa a ser a memória operacional persistente oficial da investigação Terra 2.0.
+
+Referências históricas a:
+
+Manual_Memory_System(Terra2).txt
+TERRA2_CONTEXT.txt
+
+devem ser interpretadas como versões anteriores da mesma memória.
+
+NÃO apagar histórico anterior.
+
+O novo .md deve preservar todos os UPDATEs antigos.
+
+==================================================
+OBJETIVO DO PROJETO
+==================================================
+
+[PROJECT][CONFIRMED]
+
+O projeto Terra2.0 tem como objetivo inicialmente RESSUSCITAR e MODERNIZAR
+o antigo plugin Terra de geração procedural de mundos.
+
+O Terra original investigado possuía suporte à geração do Minecraft
+1.21.8 da nomenclatura anterior.
+
+O ambiente moderno pretendido é Minecraft/Paper 26.x, inicialmente 26.2.
+
+OBJETIVOS:
+
+1. entender completamente como o Terra original funcionava;
+2. identificar seu verdadeiro núcleo de geração;
+3. descobrir o pipeline de geração do mundo;
+4. descobrir arquitetura de ConfigPacks/Addons;
+5. descobrir ChunkGenerator;
+6. descobrir BiomeProvider;
+7. descobrir sistema de Noise;
+8. descobrir Palettes;
+9. descobrir estruturas;
+10. descobrir Features/Flora/vegetação;
+11. descobrir cavernas, oceanos, rios e relevo;
+12. descobrir como Terra entra no pipeline de geração Minecraft/Paper;
+13. modernizar a plataforma para Minecraft/Paper atual;
+14. preservar as partes boas da arquitetura original;
+15. substituir componentes antigos incompatíveis quando necessário;
+16. expandir o sistema de Packs;
+17. permitir Packs próprios de TerraFormação;
+18. investigar integração futura com DataPacks;
+19. permitir mundos extremamente personalizáveis;
+20. transformar Terra2 em algo novo, modular e extensível.
+
+DECISION:
+
+NÃO reconstruir o Terra inteiro do zero antes de compreender sua arquitetura.
+
+A investigação mostrou que uma grande parte da arquitetura original
+provavelmente pode ser reaproveitada conceitualmente.
+
+==================================================
+ARQUITETURA GERAL DESCOBERTA
+==================================================
+
+[ARCHITECTURE][CONFIRMED]
+
+O Terra NÃO é um gerador monolítico.
+
+Arquitetura observada:
+
+Terra Core/API
+    ↓
+ConfigPack
+    ↓
+Addon System
+    ↓
+registries/providers
+    ↓
+Generator Addon
+    ↓
+ChunkGenerator
+    ↓
+Biome / Noise / Palette
+    ↓
+Generation Stages
+    ↓
+World
+
+Existe forte separação entre:
+
+CORE/API
+PLATFORM
+CONFIG PACK
+ADDONS
+GENERATOR
+BIOME PROVIDER
+NOISE
+PALETTE
+GENERATION STAGES
+
+Essa arquitetura modular é considerada altamente reutilizável para Terra2.
+
+==================================================
+CONFIGPACK
+==================================================
+
+[FACT]
+
+ConfigPack expõe elementos fundamentais do sistema.
+
+Entre eles:
+
+getGeneratorProvider()
+getBiomeProvider()
+getStages()
+
+Fluxo inicialmente confirmado:
+
+ConfigPack
+    ↓
+getGeneratorProvider()
+    ↓
+ChunkGeneratorProvider
+    ↓
+newInstance(pack)
+    ↓
+ChunkGenerator
+
+ConfigPackTemplate mantém configuração como:
+
+generatorProvider
+stages
+e outros componentes carregados por configuração.
+
+ConfigPackImpl encapsula ConfigPackTemplate e disponibiliza esses componentes
+para o restante da plataforma.
+
+==================================================
+ADDON SYSTEM
+==================================================
+
+[FACT]
+
+A investigação confirmou que várias implementações concretas NÃO estão no Core.
+
+Elas são fornecidas através de Addons JAR.
+
+Isso explicou por que buscas iniciais por:
+
+implements ChunkGeneratorProvider
+
+dentro do Core não encontraram a implementação esperada.
+
+O sistema é extensível por Addons.
+
+Addons identificados incluem, entre muitos outros:
+
+Terra-chunk-generator-noise-3d
+Terra-config-noise-function
+Terra-config-biome
+Terra-config-palette
+Terra-config-feature
+Terra-config-flora
+Terra-config-ore
+Terra-config-structure
+Terra-generation-stage-feature
+Terra-generation-stage-structure
+Biome Providers
+Structure Loaders
+TerraScript
+etc.
+
+ARCHITECTURAL_VALUE:
+
+Core define contratos.
+Addons fornecem implementações.
+
+Esse princípio deve ser preservado no Terra2.
+
+==================================================
+CHUNK GENERATOR CONCRETO
+==================================================
+
+[M002C/M002D][CONFIRMED]
+
+Addon:
+
+Terra-chunk-generator-noise-3d-1.2.1-BETA+451683aff-all.jar
+
+Classe Addon:
+
+com.dfsek.terra.addons.chunkgenerator.NoiseChunkGenerator3DAddon
+
+Generator:
+
+com.dfsek.terra.addons.chunkgenerator.generation.NoiseChunkGenerator3D
+
+NoiseChunkGenerator3D implementa:
+
+com.dfsek.terra.api.world.chunk.generation.ChunkGenerator
+
+Foi localizado o caminho concreto de criação do Generator.
+
+PIPELINE:
+
+ConfigPack
+    ↓
+ConfigPackPreLoadEvent
+    ↓
+NoiseChunkGenerator3DAddon.initialize()
+    ↓
+ConfigPack ChunkGeneratorProvider registry
+    ↓
+registro do provider NOISE_3D
+    ↓
+lambda$initialize$1(...)
+    ↓
+new NoiseChunkGenerator3D(...)
+    ↓
+ChunkGenerator executável
+
+CONCLUSION:
+
+O verdadeiro ChunkGenerator NÃO estava oculto no Core.
+
+Ele é fornecido pelo addon Noise 3D.
+
+==================================================
+NOISECHUNKGENERATOR3D
+==================================================
+
+[CONFIRMED]
+
+NoiseChunkGenerator3D recebe componentes/configuração incluindo:
+
+ConfigPack
+Platform
+elevationBlend
+horizontal resolution
+vertical resolution
+Biome PropertyKey
+Palette PropertyKey
+SlantCalculationMethod
+controle de Slant Palettes
+
+Ele possui:
+
+generateChunkData(...)
+getBlock(...)
+getPalette(...)
+getSlant(...)
+samplerProvider()
+
+Isso confirma que existe também uma capacidade de avaliar individualmente
+o bloco esperado em determinada coordenada sem necessariamente gerar
+o Chunk inteiro através da mesma interface pública.
+
+POTENTIAL_TERRA2_USE:
+
+preview
+debug
+terrain inspector
+visualization
+generation testing
+
+==================================================
+GENERATECHUNKDATA PIPELINE
+==================================================
+
+[M002E][CONFIRMED]
+
+O generateChunkData() foi rastreado.
+
+Fluxo conceitual confirmado:
+
+Chunk
+    ↓
+SamplerProvider.getChunk(...)
+    ↓
+Sampler3D
+    ↓
+LazilyEvaluatedInterpolator
+    ↓
+BiomeProvider.getColumn(...)
+    ↓
+Biome
+    ↓
+BiomePaletteInfo
+    ↓
+Noise/Sampler evaluation
+    ↓
+Palette
+    ↓
+BlockState
+    ↓
+ProtoChunk.setBlock(...)
+
+O Noise NÃO escolhe diretamente o bloco final.
+
+Existe separação entre:
+
+TERRAIN SHAPE
+MATERIAL SELECTION
+BIOME
+PALETTE
+BLOCKSTATE
+
+Essa separação é arquiteturalmente importante.
+
+==================================================
+OCEAN / SEA LEVEL
+==================================================
+
+[FACT]
+
+O pipeline identificado utiliza:
+
+BiomePaletteInfo.seaLevel()
+BiomePaletteInfo.ocean()
+
+Quando o valor de terreno indica região vazia/negativa e a coordenada Y
+está dentro do Sea Level, o sistema pode utilizar a Ocean Palette.
+
+Portanto Ocean no estágio analisado envolve:
+
+terrain density/value
+    +
+seaLevel
+    +
+ocean palette
+
+Não considerar ainda que todo o sistema oceânico foi completamente analisado.
+
+STATUS=PARTIAL
+
+==================================================
+PALETTE SYSTEM
+==================================================
+
+[M002F][CONFIRMED]
+
+NoiseChunkGenerator3D usa BiomePaletteInfo para seleção de materiais.
+
+BiomePaletteInfo fornece:
+
+PaletteHolder
+SlantHolder
+
+Pipeline:
+
+Terrain Value
+    ↓
+Biome
+    ↓
+BiomePaletteInfo
+    ↓
+PaletteHolder / SlantHolder
+    ↓
+Palette
+    ↓
+Palette.get(index,x,y,z,seed)
+    ↓
+BlockState
+
+IMPORTANTE:
+
+Palette NÃO é simplesmente uma lista estática de blocos.
+
+Palette.get(...) pode utilizar:
+
+index/depth
+x
+y
+z
+seed
+
+para produzir BlockState.
+
+Logo o material do terreno também pode ser procedural.
+
+==================================================
+SLANT PALETTE
+==================================================
+
+[CONFIRMED]
+
+O Terra possui seleção especial de Palette baseada na inclinação
+do relevo.
+
+Fluxo:
+
+BiomePaletteInfo
+    ↓
+SlantHolder
+    ↓
+depth
+    ↓
+SlantCalculationMethod
+    ↓
+terrain slant
+    ↓
+threshold
+    ↓
+Slant Palette OU Palette normal
+
+POTENTIAL_USE:
+
+cliffs
+rock faces
+mountain slopes
+snow transitions
+erosion-looking terrain
+special cliff materials
+
+Esse conceito é considerado importante para Terra2.
+
+==================================================
+SAMPLER PROVIDER
+==================================================
+
+[M002G][CONFIRMED]
+
+Classe:
+
+com.dfsek.terra.addons.chunkgenerator.generation.math.samplers.SamplerProvider
+
+SamplerProvider NÃO é o Noise engine.
+
+Função:
+
+factory/cache de Sampler3D.
+
+Utiliza Caffeine Cache.
+
+Tamanho do cache depende de:
+
+PluginConfig.getSamplerCache()
+
+get(x,z,...)
+converte coordenadas para Chunk.
+
+getChunk(cx,cz,WorldProperties,BiomeProvider)
+usa um WorldContext contendo:
+
+chunk X
+chunk Z
+seed
+minHeight
+maxHeight
+
+e cria/cacheia:
+
+Sampler3D
+
+==================================================
+SAMPLER3D
+==================================================
+
+[M002G][CONFIRMED]
+
+Classe:
+
+com.dfsek.terra.addons.chunkgenerator.generation.math.samplers.Sampler3D
+
+Possui:
+
+ChunkInterpolator
+ElevationInterpolator
+
+sample(x,y,z):
+
+ChunkInterpolator.getNoise(x,y,z)
++
+ElevationInterpolator.getElevation(x,z)
+
+Portanto:
+
+Sampler3D = composição da densidade/forma 3D + elevação 2D.
+
+==================================================
+CHUNK INTERPOLATOR
+==================================================
+
+[M002H][CONFIRMED]
+
+ChunkInterpolator recebe:
+
+PropertyKey<BiomeNoiseProperties>
+
+Ele consulta:
+
+BiomeProvider
+    ↓
+Biome
+    ↓
+Biome.getContext()
+    ↓
+Context.get(PropertyKey<BiomeNoiseProperties>)
+    ↓
+BiomeNoiseProperties
+
+Depois utiliza:
+
+BiomeNoiseProperties.base()
+
+que retorna:
+
+com.dfsek.terra.api.noise.NoiseSampler
+
+Noise é avaliado através de:
+
+ThreadLocalNoiseHolder.getNoise(...)
+
+IMPORTANTE:
+
+ChunkInterpolator NÃO conhece diretamente:
+
+Simplex
+Perlin
+Cellular
+etc.
+
+Ele trabalha contra a abstração:
+
+NoiseSampler
+
+Isso confirma desacoplamento entre:
+
+TERRAIN GENERATOR
+e
+NOISE IMPLEMENTATION
+
+==================================================
+BIOME NOISE BLENDING
+==================================================
+
+[M002H][CONFIRMED]
+
+ChunkInterpolator usa propriedades:
+
+blendDistance
+blendStep
+blendWeight
+
+para combinar valores provenientes de regiões/biomas diferentes.
+
+Logo o Terra possui blending de Noise durante transições entre biomas.
+
+Isso reduz transições abruptas entre terrenos produzidos
+por configurações de Noise diferentes.
+
+==================================================
+ELEVATION INTERPOLATOR
+==================================================
+
+[M002H][CONFIRMED]
+
+ElevationInterpolator também utiliza:
+
+BiomeNoiseProperties
+
+Porém obtém:
+
+BiomeNoiseProperties.elevation()
+
+que retorna:
+
+NoiseSampler
+
+Fluxo:
+
+Biome
+    ↓
+BiomeNoiseProperties
+    ↓
+elevation()
+    ↓
+NoiseSampler.noise(seed,x,z)
+    ↓
+ElevationInterpolator
+    ↓
+double elevation
+
+Existe blending usando:
+
+elevationWeight
+
+Quando regiões utilizam propriedades diferentes, o Terra pode realizar
+média ponderada entre valores de elevação.
+
+==================================================
+BIOMENOISEPROPERTIES
+==================================================
+
+[M002I][CONFIRMED]
+
+Classe:
+
+com.dfsek.terra.addons.chunkgenerator.config.noise.BiomeNoiseProperties
+
+É:
+
+final record
+implements Properties
+
+Campos:
+
+NoiseSampler base
+NoiseSampler elevation
+NoiseSampler carving
+
+int blendDistance
+int blendStep
+
+double blendWeight
+double elevationWeight
+
+ThreadLocalNoiseHolder noiseHolder
+
+Construtor:
+
+BiomeNoiseProperties(
+    NoiseSampler base,
+    NoiseSampler elevation,
+    NoiseSampler carving,
+    int blendDistance,
+    int blendStep,
+    double blendWeight,
+    double elevationWeight,
+    ThreadLocalNoiseHolder noiseHolder
+)
+
+CONCLUSION:
+
+BiomeNoiseProperties NÃO cria Noise.
+
+Recebe NoiseSampler já construídos/resolvidos.
+
+Ele funciona como container de propriedades de geração associadas ao Biome.
+
+==================================================
+TRÊS CAMADAS DE NOISE IDENTIFICADAS
+==================================================
+
+[CONFIRMED]
+
+Cada BiomeNoiseProperties possui:
+
+BASE
+ELEVATION
+CARVING
+
+BASE:
+participa da forma/densidade principal do terreno 3D.
+
+ELEVATION:
+participa da elevação 2D.
+
+CARVING:
+terceiro Noise relacionado ao processo de carving.
+
+IMPORTANTE:
+
+O funcionamento completo de CARVING ainda NÃO foi rastreado.
+
+Não afirmar ainda que toda a arquitetura de cavernas está compreendida.
+
+STATUS=CARVING_PRESENT_BUT_NOT_FULLY_TRACED
+
+==================================================
+NOISE FUNCTION ADDON
+==================================================
+
+[CONFIRMED]
+
+Addon:
+
+Terra-config-noise-function-1.2.0-BETA+451683aff-all.jar
+
+Possui grande sistema modular de Noise.
+
+Foram identificados samplers/funções como:
+
+Simplex
+OpenSimplex2
+OpenSimplex2S
+Perlin
+Value
+ValueCubic
+Cellular
+Gabor
+White Noise
+Gaussian
+Positive White Noise
+Constant
+
+Fractals:
+Brownian Motion
+Ridged Fractal
+Ping Pong
+
+Composição:
+Addition
+Subtraction
+Multiplication
+Division
+Min
+Max
+
+Transformações:
+Domain Warp
+Translate
+Cache
+Kernel
+Distance
+PseudoErosion
+Image
+LinearHeightmap
+
+Normalizers:
+Scale
+Clamp
+Linear
+Normal
+LinearMap
+Posterization
+Probability
+Expression
+CubicSpline
+
+Também existem sistemas de expression/function evaluation.
+
+==================================================
+NOISE CONFIGURATION TEMPLATES
+==================================================
+
+[M002I][CONFIRMED_EXISTENCE]
+
+No addon Noise foram identificados templates como:
+
+NoiseConfigPackTemplate
+
+FunctionTemplate
+
+SamplerTemplate
+
+NoiseTemplate
+
+SimpleNoiseTemplate
+ConstantNoiseTemplate
+CellularNoiseTemplate
+GaborNoiseTemplate
+
+FractalTemplate
+RidgedFractalTemplate
+PingPongTemplate
+BrownianMotionTemplate
+
+DomainWarpTemplate
+DerivativeNoiseTemplate
+PseudoErosionTemplate
+DistanceSamplerTemplate
+ExpressionFunctionTemplate
+
+BinaryArithmeticTemplate
+TranslateSamplerTemplate
+CacheSamplerTemplate
+DerivativeNoiseSamplerTemplate
+
+NormalizerTemplate
+e vários normalizer templates.
+
+ARCHITECTURAL_INFERENCE:
+
+O Terra aparentemente possui um sistema declarativo capaz de
+transformar configuração em grafos/composições de Noise.
+
+Entretanto:
+
+CONFIG
+    ↓
+TEMPLATE
+    ↓
+NoiseSampler
+
+AINDA precisa ser confirmado através da análise do bytecode dos templates.
+
+==================================================
+BIOME NOISE CONFIG TEMPLATE
+==================================================
+
+[M002I][CONFIRMED_EXISTENCE]
+
+Foi localizada:
+
+com.dfsek.terra.addons.chunkgenerator.config.noise.BiomeNoiseConfigTemplate
+
+Ela é atualmente o candidato mais forte para a ligação:
+
+Biome config
+    ↓
+base/elevation/carving config
+    ↓
+NoiseSampler
+    ↓
+BiomeNoiseProperties
+
+MAS:
+
+A ligação ainda NÃO deve ser tratada como FACT
+até a análise direta do bytecode confirmar a construção.
+
+==================================================
+PIPELINE CONFIRMADO ATÉ AGORA
+==================================================
+
+[FACT]
+
+ConfigPack
+    ↓
+ChunkGeneratorProvider Registry
+    ↓
+NoiseChunkGenerator3DAddon
+    ↓
+NoiseChunkGenerator3D
+    ↓
+generateChunkData()
+    ↓
+SamplerProvider
+    ↓
+Sampler3D
+    ↓
+ChunkInterpolator + ElevationInterpolator
+    ↓
+BiomeProvider
+    ↓
+Biome Context
+    ↓
+BiomeNoiseProperties
+    ↓
+NoiseSampler
+    ↓
+terrain values
+    ↓
+BiomePaletteInfo
+    ↓
+Palette / Slant Palette
+    ↓
+BlockState
+    ↓
+ProtoChunk
+
+==================================================
+PIPELINE AINDA NÃO TOTALMENTE CONFIRMADO
+==================================================
+
+[HYPOTHESIS/ACTIVE_INVESTIGATION]
+
+Pack YAML/config
+    ↓
+NoiseConfigPackTemplate
+    ↓
+FunctionTemplate / SamplerTemplate / NoiseTemplate
+    ↓
+Noise Graph
+    ↓
+NoiseSampler
+    ↓
+BiomeNoiseConfigTemplate
+    ↓
+BiomeNoiseProperties
+    ↓
+Generator
+
+Essa é atualmente a hipótese arquitetural central.
+
+NÃO promover para FACT antes de completar M002I.
+
+==================================================
+SISTEMAS AINDA NÃO INVESTIGADOS COMPLETAMENTE
+==================================================
+
+[PENDING]
+
+BiomeProvider concreto e arquitetura completa dos providers.
+
+Carving/cavernas completo.
+
+Rios.
+
+Oceanos além da lógica seaLevel/ocean palette já observada.
+
+Structures.
+
+GenerationStage.
+
+Features.
+
+Flora.
+
+Árvores/vegetação.
+
+Ores.
+
+Locators.
+
+Distributors.
+
+TerraScript.
+
+Pack completo/default pack.
+
+Registro e resolução completa de Noise Graph.
+
+Entrada do Terra no pipeline moderno Minecraft/Paper.
+
+NMS específico 1.21.8 e substituição necessária para 26.x.
+
+Integração Multiverse moderna.
+
+DataPacks.
+
+WorldPreset / registro moderno de mundos.
+
+Compatibilidade com Paper 26.x.
+
+==================================================
+PRINCÍPIOS PARA TERRA2
+==================================================
+
+[DECISION]
+
+Preservar, sempre que tecnicamente viável:
+
+1. Core/API separado das implementações.
+2. Addon System.
+3. ConfigPack.
+4. Registries/providers.
+5. ChunkGenerator desacoplado de Noise concreto.
+6. NoiseSampler como abstração.
+7. Biome Properties.
+8. Palette procedural.
+9. Slant Palette.
+10. Generation Stages.
+11. Configuração declarativa.
+12. Noise Graph modular.
+
+EXPANDIR PARA:
+
+Terra2 Core
+    ↓
+modern Platform Adapter
+    ↓
+Pack/DataPack Layer
+    ↓
+Biome System
+    ↓
+Noise Graph
+    ↓
+Generator
+    ↓
+Features/Structures
+    ↓
+World
+
+==================================================
+OBJETIVO DE DATAPACKS
+==================================================
+
+[PROJECT_DIRECTION]
+
+DataPacks NÃO devem simplesmente substituir automaticamente
+o sistema interno antes que sua arquitetura seja compreendida.
+
+Direção pretendida:
+
+usar DataPacks e/ou formato próprio moderno como camada adicional
+para permitir:
+
+custom worlds
+custom biomes
+custom terrain
+custom noises
+custom palettes
+custom structures
+custom vegetation
+custom caves
+custom oceans/rivers
+
+A implementação exata será decidida somente depois de mapear
+todo o pipeline original.
+
+==================================================
+ESTADO DOS MARCOS
+==================================================
+
+M002C = COMPLETE
+Addon responsável pelo Generator identificado.
+
+M002D = COMPLETE
+ChunkGeneratorProvider e instanciação concreta identificados.
+
+M002E = COMPLETE
+generateChunkData() rastreado.
+
+M002F = COMPLETE
+Palette / Slant / BlockState identificados.
+
+M002G = COMPLETE
+SamplerProvider / Sampler3D identificados.
+
+M002H = COMPLETE
+ChunkInterpolator / ElevationInterpolator /
+BiomeNoiseProperties connection identificada.
+
+M002I = IN_PROGRESS
+Noise configuration / NoiseSampler origin.
+
+==================================================
+EVIDÊNCIAS PRINCIPAIS
+==================================================
+
+EVIDENCE_ROOT:
+investigacao/results/
+
+Consultar especialmente:
+
+M002D-generator-provider-registration.txt
+M002D-provider-registration-search.txt
+
+M002E-generateChunkData.txt
+M002E-generator-fields.txt
+
+M002F-paletteAt.txt
+M002F-generator-accessors.txt
+
+M002G-SamplerProvider-javap.txt
+M002G-Sampler3D-javap.txt
+M002G-sampler-implementations.txt
+M002G-sampler-noise-map.txt
+
+M002H-ChunkInterpolator-javap.txt
+M002H-ElevationInterpolator-javap.txt
+M002H-noise-properties-map.txt
+
+M002I-BiomeNoiseProperties-javap.txt
+M002I-BiomeNoiseProperties-signature.txt
+M002I-NoiseSampler-map.txt
+M002I-chunk-generator-config-map.txt
+M002I-noise-function-config-map.txt
+
+Também foram gerados para análise:
+
+M002I-BiomeNoiseConfigTemplate-javap.txt
+M002I-BiomeNoiseConfigTemplate-signature.txt
+
+M002I-NoiseConfigPackTemplate-javap.txt
+M002I-NoiseConfigPackTemplate-signature.txt
+
+M002I-FunctionTemplate-javap.txt
+M002I-FunctionTemplate-signature.txt
+
+==================================================
+PONTO EXATO PARA RETOMAR A INVESTIGAÇÃO
+==================================================
+
+[CURRENT_TARGET]
+
+NÃO repetir M002C-M002H.
+
+NÃO voltar a procurar genericamente por Noise.
+
+NÃO começar ainda a estudar cada algoritmo Simplex/Perlin/etc.
+
+RETOMAR EM:
+
+M002I
+
+PRIMEIRO:
+
+analisar diretamente os seis arquivos já gerados:
+
+1.
+investigacao/results/M002I-BiomeNoiseConfigTemplate-javap.txt
+
+2.
+investigacao/results/M002I-BiomeNoiseConfigTemplate-signature.txt
+
+3.
+investigacao/results/M002I-NoiseConfigPackTemplate-javap.txt
+
+4.
+investigacao/results/M002I-NoiseConfigPackTemplate-signature.txt
+
+5.
+investigacao/results/M002I-FunctionTemplate-javap.txt
+
+6.
+investigacao/results/M002I-FunctionTemplate-signature.txt
+
+OBJETIVO:
+
+confirmar ou refutar:
+
+BiomeNoiseConfigTemplate
+    ↓
+NoiseSampler
+    ↓
+new BiomeNoiseProperties(...)
+
+e:
+
+NoiseConfigPackTemplate
+    ↓
+FunctionTemplate
+    ↓
+Noise configuration
+    ↓
+NoiseSampler
+
+==================================================
+PERGUNTA CENTRAL ATUAL
+==================================================
+
+Como uma configuração escrita no Pack deixa de ser dados declarativos
+e se transforma em um NoiseSampler executável?
+
+Precisamos localizar:
+
+CONFIG
+    ↓
+LOADER/TEMPLATE
+    ↓
+FACTORY/REGISTRY
+    ↓
+NoiseSampler
+    ↓
+BiomeNoiseProperties
+
+Quando essa ponte estiver confirmada:
+
+M002I = COMPLETE
+
+==================================================
+PRÓXIMO MARCO RECOMENDADO
+==================================================
+
+M002J
+
+Somente depois de concluir M002I.
+
+M002J deverá reconstruir:
+
+PACK CONFIG
+    ↓
+NOISE GRAPH
+    ↓
+NoiseSampler
+
+e identificar como diferentes templates podem ser combinados para formar
+um grafo de Noise configurável.
+
+Depois:
+
+M002K = reconstrução do Pack real/default pack.
+
+M002L = BiomeProvider completo.
+
+M002M = GenerationStages / Features / Flora / Structures.
+
+M002N = Carving / caves / rivers / ocean systems.
+
+M003 = análise de compatibilidade Minecraft/Paper 26.x
+e desenho da arquitetura moderna Terra2.
+
+==================================================
+REGRA DE CONTINUIDADE
+==================================================
+
+Ao iniciar uma nova conversa/instância:
+
+1. Ler:
+investigacao/MANUAL-MEMORY-SYSTEM/SYSTEM.md
+
+2. Ler:
+investigacao/MANUAL-MEMORY-SYSTEM/Manual_Memory_System(Terra2).md
+
+3. Considerar GitHub como SOURCE_OF_TRUTH.
+
+4. Consultar investigacao/results/ quando um FACT técnico precisar ser validado.
+
+5. Não repetir investigação concluída.
+
+6. Separar:
+FACT
+INFERENCE
+HYPOTHESIS
+DECISION
+
+7. Não transformar hipótese em fato.
+
+8. Sempre indicar próximo passo recomendado.
+
+9. Quando precisar de inspeção local de JAR/class:
+fornecer ao usuário o comando PowerShell exato.
+
+10. Usuário gera results localmente e envia ao GitHub.
+
+11. ChatGPT lê os results diretamente do GitHub e continua.
+
+12. Quando ocorrer marco importante:
+gerar UPDATE COPY AND PASTE para esta memória.
+
+==================================================
+CURRENT STATE
+==================================================
+
+PROJECT=TERRA2
+ORIGINAL_PLUGIN=TERRA
+REVERSE_ENGINEERING=ACTIVE
+
+GENERATOR=KNOWN
+GENERATOR_PROVIDER=KNOWN
+ADDON_REGISTRATION=KNOWN
+GENERATE_CHUNK_PIPELINE=KNOWN
+PALETTE_SYSTEM=KNOWN
+SLANT_SYSTEM=KNOWN
+SAMPLER_PROVIDER=KNOWN
+SAMPLER3D=KNOWN
+CHUNK_INTERPOLATOR=KNOWN
+ELEVATION_INTERPOLATOR=KNOWN
+BIOME_NOISE_PROPERTIES=KNOWN
+BASE_NOISE_SLOT=KNOWN
+ELEVATION_NOISE_SLOT=KNOWN
+CARVING_NOISE_SLOT=KNOWN
+
+NOISE_CONFIGURATION=PARTIAL
+NOISE_SAMPLER_FACTORY=UNKNOWN
+PACK_TO_NOISE_BRIDGE=UNKNOWN
+CARVING_PIPELINE=PARTIAL
+BIOME_PROVIDER_FULL_PIPELINE=PENDING
+GENERATION_STAGES=PENDING
+FEATURES=PENDING
+STRUCTURES=PENDING
+FLORA=PENDING
+RIVERS=PENDING
+CAVES=PENDING
+MODERN_26X_ADAPTER=PENDING
+DATAPACK_INTEGRATION=DESIGN_TARGET
+
+CURRENT_INVESTIGATION=M002I
+
+NEXT_ACTION=
+ANALYZE_ALREADY_GENERATED_M002I_TEMPLATE_JAVAP_FILES
+
+DO_NOT_GENERATE_NEW_EVIDENCE_UNTIL_CURRENT_M002I_TEMPLATE_RESULTS_ARE_ANALYZED
+
+==================================================
+END CONSOLIDATED UPDATE
+==================================================
+
+<END UPDATE>
+
 UPDATE > 15/08/26 - M002I
 
 M002I
