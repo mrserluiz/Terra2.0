@@ -78,7 +78,7 @@ class WorldSafetyGuardTest {
     }
 
     private static GenerationSafetySettings enabledSafeSettings() {
-        return new GenerationSafetySettings(true, false, false, true, true);
+        return new GenerationSafetySettings(true, false, true, true);
     }
 
     private static WorldDefinition enabledWorld(String name) {
