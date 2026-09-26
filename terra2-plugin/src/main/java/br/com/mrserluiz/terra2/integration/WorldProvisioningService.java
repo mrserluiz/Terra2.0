@@ -33,20 +33,6 @@ public final class WorldProvisioningService {
     public ProvisioningResult provision(GenerationSafetySettings settings, WorldDefinition definition,
                                         Set<String> primaryWorldNames) {
         try {
-            if (!runtime.terraAvailable()) {
-                return result(ProvisioningResult.Status.TERRA_UNAVAILABLE, "Terra is not available.", null, Set.of());
-            }
-            Optional<PackDescriptor> found = catalog.findById(definition.packId());
-            if (found.isEmpty()) {
-                return result(ProvisioningResult.Status.PACK_NOT_FOUND, "The requested Community Pack is not installed.", null, Set.of());
-            }
-            PackDescriptor pack = found.get();
-            PackValidation validation = validator.validate(pack, definition.packId(), runtime.installedAddonIds());
-            if (!validation.valid() || !runtime.packLoaded(pack.id())) {
-                String message = validation.valid() ? "Terra did not load the requested pack." : validation.message();
-                return result(ProvisioningResult.Status.PACK_INVALID, message, null, validation.missingAddons());
-            }
-
             Optional<WorldManifest> manifest = manifests.read(definition.worldName());
             boolean exists = Files.exists(manifests.worldPath(definition.worldName()));
             WorldState state = !exists ? WorldState.MISSING
@@ -58,6 +44,21 @@ public final class WorldProvisioningService {
             if (!safety.allowed()) {
                 return result(ProvisioningResult.Status.BLOCKED, safety.message(), safety, Set.of());
             }
+
+            if (!runtime.terraAvailable()) {
+                return result(ProvisioningResult.Status.TERRA_UNAVAILABLE, "Terra is not available.", safety, Set.of());
+            }
+            Optional<PackDescriptor> found = catalog.findById(definition.packId());
+            if (found.isEmpty()) {
+                return result(ProvisioningResult.Status.PACK_NOT_FOUND, "The requested Community Pack is not installed.", safety, Set.of());
+            }
+            PackDescriptor pack = found.get();
+            PackValidation validation = validator.validate(pack, definition.packId(), runtime.installedAddonIds());
+            if (!validation.valid() || !runtime.packLoaded(pack.id())) {
+                String message = validation.valid() ? "Terra did not load the requested pack." : validation.message();
+                return result(ProvisioningResult.Status.PACK_INVALID, message, safety, validation.missingAddons());
+            }
+
             if (state == WorldState.EXISTING_MANAGED_BY_TERRA2) {
                 return result(ProvisioningResult.Status.ALREADY_MANAGED, safety.message(), safety, Set.of());
             }
