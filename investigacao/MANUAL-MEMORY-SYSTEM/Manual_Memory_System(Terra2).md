@@ -6,6 +6,119 @@ UPDATE > 00/00/00 - 00:00 - M003J
 <END UPDATE>
 =============================
 
+UPDATE > 26/09/26 - 15:36 - M002K
+
+# TERRA 2.0 — M002I CONCLUÍDO / M002J INICIADO
+
+STATUS=INVESTIGATION_ACTIVE
+PHASE=REVERSE_ENGINEERING_ORIGINAL_TERRA
+CURRENT_TARGET=M002J
+
+==================================================
+M002I — RESULTADO
+==================================================
+
+[FACT]
+
+Foi localizado e confirmado o mecanismo que transforma configuração
+declarativa em NoiseSampler executável.
+
+O JAR do addon corresponde ao commit upstream:
+
+451683aff564b98289be9aa60c3fd60b03b16ba2
+
+NoiseAddon cria um registry cujo tipo efetivo é:
+
+Supplier<ObjectTemplate<NoiseSampler>>
+
+ConfigPackImpl.getOrCreateRegistry(...) reconhece automaticamente essa forma
+genérica e instala GenericTemplateSupplierLoader<NoiseSampler>.
+
+O loader:
+
+1. recebe o mapa de configuração;
+2. lê o campo "type";
+3. procura o Supplier do template no registry;
+4. instancia o template concreto;
+5. pede ao Tectonic para preencher seus campos;
+6. executa template.get();
+7. retorna o NoiseSampler executável.
+
+Campos filhos tipados como NoiseSampler passam recursivamente pelo mesmo
+mecanismo. Assim, a própria árvore de objetos carregada é o Noise Graph
+executável.
+
+PIPELINE CONFIRMADO:
+
+Pack YAML/config
+    ↓
+Tectonic ConfigLoader
+    ↓
+GenericTemplateSupplierLoader<NoiseSampler>
+    ↓
+campo type
+    ↓
+Noise template registry
+    ↓
+ObjectTemplate<NoiseSampler>
+    ↓
+template.get()
+    ↓
+NoiseSampler executável
+    ↓
+BiomeNoiseConfigTemplate.get()
+    ↓
+BiomeNoiseProperties
+
+[DECISION]
+
+M002I = COMPLETE
+
+==================================================
+M002J — ESTADO INICIAL
+==================================================
+
+[FACT]
+
+O Noise Graph comum é montado recursivamente durante o carregamento da
+configuração. Nós compostos possuem campos NoiseSampler filhos.
+
+Exemplos confirmados:
+
+ADD/SUB/MUL/DIV/MIN/MAX -> left + right
+FBM/RIDGED/PING_PONG -> sampler
+DOMAIN_WARP -> sampler + warp
+CACHE -> sampler
+
+NoiseConfigPackTemplate fornece mapas globais de samplers e functions.
+EXPRESSION combina símbolos globais com símbolos locais, com os locais
+sobrescrevendo nomes globais, e compila a expressão através do Paralithic.
+
+Samplers nomeados de 2D/3D viram funções acessíveis nas expressões; também são
+criadas variantes com sufixo Salted.
+
+[OPEN]
+
+- catálogo completo de nós e seus campos;
+- semântica de dimensions em cada nó;
+- regras completas de propagação/transformação de seed;
+- normalizers;
+- derivatives;
+- comportamento diante de referências circulares;
+- validação completa do grafo.
+
+[EVIDENCE]
+
+investigacao/results/M002I-NoiseAddon-source-trace.txt
+investigacao/results/M002J-NoiseGraph-initial-spec.txt
+
+[NEXT]
+
+Construir uma matriz completa dos templates/nós de Noise antes de encerrar
+M002J.
+
+<END UPDATE>
+
 UPDATE > 23/08/26 - 13:34 - M002J
 
 # TERRA 2.0 — CONSOLIDAÇÃO DA INVESTIGAÇÃO
@@ -2798,4 +2911,3 @@ Antes de continuar uma investigação:
 6. Usuário atualiza a memória manual pelo GitHub quando solicitado.
 NAME=Identify configuration mechanism that populates generatorProvider
 STATUS=ACTIVE
-
