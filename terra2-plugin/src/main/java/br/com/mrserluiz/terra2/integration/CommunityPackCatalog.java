@@ -49,7 +49,8 @@ public final class CommunityPackCatalog {
             }
         }
 
-        if (!source.getFileName().toString().toLowerCase(Locale.ROOT).endsWith(".zip")) return Optional.empty();
+        String fileName = source.getFileName().toString().toLowerCase(Locale.ROOT);
+        if (!fileName.endsWith(".zip") && !fileName.endsWith(".terra")) return Optional.empty();
         try (ZipFile zip = new ZipFile(source.toFile())) {
             ZipEntry manifest = zip.getEntry("pack.yml");
             if (manifest == null) return Optional.empty();
