@@ -1,0 +1,9 @@
+name: Terra2
+version: '${project.version}'
+main: br.com.mrserluiz.terra2.paper.Terra2Plugin
+description: Safe opt-in multi-world orchestration for Terra Community Packs.
+author: mrserluiz
+website: https://github.com/mrserluiz/Terra2.0
+api-version: '26.2'
+load: POSTWORLD
+depend: [Terra]
