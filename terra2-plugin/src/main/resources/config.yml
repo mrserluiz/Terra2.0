@@ -1,0 +1,20 @@
+# O plugin nunca começa a gerar mundos automaticamente.
+generation:
+  enabled: false
+  allow-main-world: false
+  affect-existing-worlds: false
+  generate-new-chunks-only: true
+  require-explicit-world-selection: true
+
+# Cada mundo deve ser autorizado individualmente.
+worlds: {}
+
+# Exemplo seguro (mantenha comentado até a confirmação do administrador):
+# worlds:
+#   ether_expansion:
+#     enabled: true
+#     create-if-missing: true
+#     generator: terra
+#     pack: OVERWORLD
+#     seed: 128734921
+#     environment: NORMAL
