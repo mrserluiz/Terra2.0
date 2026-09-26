@@ -18,7 +18,7 @@ class CommunityPackCatalogTest {
     void discoversFolderAndZipPacks() throws IOException {
         Path folder = Files.createDirectories(temporary.resolve("Overworld"));
         Files.writeString(folder.resolve("pack.yml"), "id: OVERWORLD\nversion: 1.0.0\naddons:\n  language-yaml: '1.+'\n");
-        try (ZipOutputStream zip = new ZipOutputStream(Files.newOutputStream(temporary.resolve("skylands.zip")))) {
+        try (ZipOutputStream zip = new ZipOutputStream(Files.newOutputStream(temporary.resolve("skylands.terra")))) {
             zip.putNextEntry(new ZipEntry("pack.yml"));
             zip.write("id: SKYLANDS\nversion: 2.0.0\naddons:\n  chunk-generator-noise-3d: '1.+'\n".getBytes());
             zip.closeEntry();
