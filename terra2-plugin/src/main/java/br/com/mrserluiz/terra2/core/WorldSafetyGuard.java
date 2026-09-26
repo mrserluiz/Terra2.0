@@ -38,9 +38,9 @@ public final class WorldSafetyGuard {
 
         boolean protectedMainWorld = inspection.primaryWorld()
                 || DEFAULT_WORLD_NAMES.contains(normalize(definition.worldName()));
-        if (protectedMainWorld && !settings.allowMainWorld()) {
+        if (protectedMainWorld) {
             return SafetyDecision.deny(SafetyDecision.Code.MAIN_WORLD_BLOCKED,
-                    "Main worlds are protected by default.");
+                    "Main worlds are permanently protected by Terra 2.0.");
         }
 
         return switch (inspection.state()) {
