@@ -1,0 +1,162 @@
+M002J — NOISE GRAPH INITIAL SPECIFICATION
+DATE: 26/09/2026
+STATUS: IN_PROGRESS
+
+SCOPE
+=====
+
+Initial reconstruction of how Terra represents and builds configurable Noise
+graphs. This file records only behavior verified from source at commit 451683aff
+and from the bundled default pack.
+
+1. GRAPH CONSTRUCTION
+=====================
+
+[FACT]
+
+Noise graphs are materialized recursively while configuration is loaded.
+There is no single later graph compiler for ordinary template composition.
+
+Every config node with a "type" is resolved through the NoiseSampler template
+registry. A concrete template may contain child fields typed NoiseSampler.
+Tectonic resolves those children through the same loader before calling get().
+
+Examples:
+
+ADD/SUB/MUL/DIV/MIN/MAX
+    left: NoiseSampler
+    right: NoiseSampler
+
+FBM/RIDGED/PING_PONG
+    sampler: NoiseSampler
+
+DOMAIN_WARP
+    sampler: NoiseSampler
+    warp: NoiseSampler
+
+CACHE
+    sampler: NoiseSampler
+
+The loaded object structure is therefore the executable graph.
+
+2. NODE REGISTRY
+================
+
+[FACT]
+
+NoiseAddon owns a per-pack CheckedRegistry of suppliers for concrete
+ObjectTemplate<NoiseSampler> implementations. The registry ID selected by the
+configuration "type" determines the node kind.
+
+This preserves an extension point: another addon can register additional node
+templates before pack configuration consumes them.
+
+3. NAMED SAMPLERS AND FUNCTIONS
+===============================
+
+[FACT]
+
+NoiseConfigPackTemplate loads two global maps:
+
+samplers: Map<String, DimensionApplicableNoiseSampler>
+functions: LinkedHashMap<String, FunctionTemplate>
+
+A DimensionApplicableNoiseSampler contains:
+
+dimensions: 2 or 3 by intended configuration contract
+sampler: executable NoiseSampler
+
+Named samplers are exposed to EXPRESSION nodes as Paralithic functions. A 2D
+sampler becomes name(x,z) and nameSalted(seedSalt,x,z); a 3D sampler becomes
+name(x,y,z) and nameSalted(seedSalt,x,y,z).
+
+Local samplers/functions declared inside an EXPRESSION node are merged over
+the global maps, so local names override global names for that expression.
+
+4. EXPRESSION COMPILATION
+=========================
+
+[FACT]
+
+ExpressionFunctionTemplate merges global and local symbols, converts functions
+and samplers to Paralithic Function objects, parses the expression, and returns
+an executable ExpressionFunction NoiseSampler.
+
+FunctionTemplate represents a named mathematical function with arguments,
+expression text, and nested functions. UserDefinedFunction compiles it through
+Paralithic and caches the resulting function by FunctionTemplate equality.
+
+5. DIMENSIONS
+=============
+
+[FACT]
+
+SamplerTemplate has a dimensions property defaulting to 2 and validates only 2
+or 3. CacheSampler uses this value to select a 2D or 3D cache. Global named
+samplers also carry dimensions to select the correct expression wrapper.
+
+[OPEN QUESTION]
+
+Not every concrete node appears to change mathematical behavior based on the
+template dimensions value. The complete semantics of dimensions across every
+node still require a node-by-node matrix.
+
+6. SEED PROPAGATION
+===================
+
+[FACT]
+
+NoiseSampler evaluation receives the world seed at runtime. ExpressionFunction
+passes it through SeedContext, and named sampler wrappers call the referenced
+sampler with that seed. Salted wrappers provide the expression language with an
+explicit way to derive/evaluate a sampler with a salt.
+
+[OPEN QUESTION]
+
+The precise seed transformation rules of all base noise and composition nodes
+still require classification.
+
+7. CACHE
+========
+
+[FACT]
+
+CACHE wraps another NoiseSampler. CacheSampler maintains per-thread Caffeine
+caches, separated into 2D and 3D variants according to the configured
+dimensions value. Cache keys include coordinates and seed.
+
+8. CYCLE HANDLING
+=================
+
+[FACT]
+
+Ordinary nested template graphs are constructed from finite configuration
+objects and therefore do not use symbolic back-references between nodes.
+
+[OPEN QUESTION]
+
+No explicit general graph cycle detector has yet been located. Nested
+FunctionTemplate compilation is recursive and should be tested with recursive
+or mutually recursive definitions before claiming that cycles are rejected
+cleanly.
+
+9. DEFAULT PACK VALIDATION
+==========================
+
+[FACT]
+
+The bundled default pack declares global functions and samplers from pack.yml.
+Biome terrain files use concrete types such as EXPRESSION, LINEAR_HEIGHTMAP and
+MUL. This confirms that the registry/template mechanism is the actual public
+configuration path, not merely unused internal infrastructure.
+
+NEXT
+====
+
+1. Build a complete node catalog: template, config fields, output class,
+   children, dimension behavior, seed behavior and validation.
+2. Trace all normalizer templates.
+3. Trace derivative requirements and failure behavior.
+4. Verify reference/cycle behavior with focused configuration tests.
+5. Document the exact default-pack expression symbol surface.
+

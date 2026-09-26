@@ -1,0 +1,91 @@
+M002I — NOISEADDON SOURCE TRACE
+DATE: 26/09/2026
+STATUS: VERIFIED
+
+SOURCE VERSION
+==============
+
+The addon JARs in this repository carry build commit:
+
+451683aff564b98289be9aa60c3fd60b03b16ba2
+
+The matching upstream source was inspected at the same commit in:
+
+common/addons/config-noise-function/src/main/java/com/dfsek/terra/addons/noise/NoiseAddon.java
+common/addons/config-noise-function/src/main/java/com/dfsek/terra/addons/noise/NoiseConfigPackTemplate.java
+common/addons/config-noise-function/src/main/java/com/dfsek/terra/addons/noise/config/DimensionApplicableNoiseSampler.java
+common/addons/config-noise-function/src/main/java/com/dfsek/terra/addons/noise/config/templates/SamplerTemplate.java
+common/implementation/base/src/main/java/com/dfsek/terra/config/pack/ConfigPackImpl.java
+common/implementation/base/src/main/java/com/dfsek/terra/config/loaders/GenericTemplateSupplierLoader.java
+
+FACTS
+=====
+
+1. NoiseAddon declares a registry token whose effective type is:
+
+   Supplier<ObjectTemplate<NoiseSampler>>
+
+2. During ConfigPackPreLoadEvent, NoiseAddon obtains that registry and registers
+   template suppliers under type IDs such as:
+
+   LINEAR, LINEAR_MAP, NORMAL, CLAMP, SCALE, CUBIC_SPLINE,
+   DOMAIN_WARP, FBM, PING_PONG, RIDGED,
+   OPEN_SIMPLEX_2, OPEN_SIMPLEX_2S, PERLIN, SIMPLEX,
+   VALUE, VALUE_CUBIC, CELLULAR, CONSTANT,
+   ADD, SUB, MUL, DIV, MAX, MIN, CACHE, EXPRESSION.
+
+3. ConfigPackImpl.getOrCreateRegistry(TypeKey) detects the generic shape:
+
+   Supplier<ObjectTemplate<T>>
+
+   and automatically installs GenericTemplateSupplierLoader<T> for T.
+   In this case T is NoiseSampler.
+
+4. GenericTemplateSupplierLoader receives a configuration map, reads its
+   "type" entry, resolves the corresponding template supplier in the registry,
+   asks Tectonic to populate the template, and returns template.get().
+
+5. SamplerTemplate implements ObjectTemplate<NoiseSampler>. Concrete templates
+   create the executable sampler in get(). Fields typed NoiseSampler are loaded
+   recursively through the same generic registry loader.
+
+6. NoiseConfigPackTemplate is loaded during ConfigPackPreLoadEvent. Its
+   "samplers" entries are DimensionApplicableNoiseSampler objects. Each object
+   contains a dimension count plus a NoiseSampler loaded through the mechanism
+   above. Its "functions" entries become FunctionTemplate objects.
+
+7. NoiseAddon copies global samplers/functions into maps captured by the
+   EXPRESSION and EXPRESSION_NORMALIZER template suppliers, then stores the
+   NoiseConfigPackTemplate in the pack Context.
+
+8. BiomeNoiseConfigTemplate has fields typed NoiseSampler for:
+
+   terrain.sampler
+   terrain.sampler-2d
+   carving.sampler
+
+   ConfigurationLoadEvent loads this template for every Biome. Its get() method
+   constructs BiomeNoiseProperties with the already resolved samplers.
+
+CONFIRMED PIPELINE
+==================
+
+Pack YAML/config map
+    -> Tectonic ConfigLoader
+    -> GenericTemplateSupplierLoader<NoiseSampler>
+    -> read "type"
+    -> Noise template registry
+    -> Supplier<ObjectTemplate<NoiseSampler>>
+    -> populate concrete template
+    -> concrete template.get()
+    -> executable NoiseSampler
+    -> BiomeNoiseConfigTemplate.get()
+    -> BiomeNoiseProperties
+
+CONCLUSION
+==========
+
+The missing loader/factory/registry bridge is confirmed.
+
+M002I = COMPLETE
+
