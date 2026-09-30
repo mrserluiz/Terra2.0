@@ -37,8 +37,20 @@ autorizar um mundo nunca autoriza os demais.
 
 ## Compilação
 
-O alvo é Paper 26.2, que requer Java 25. O artefato gerado fica em
-`target/Terra2-0.1.0-SNAPSHOT.jar`.
+O alvo oficial permanece **Paper 26.2**, com `api-version: '26.2'`. O mesmo
+código também é compilado e testado no CI contra a API do **Paper 26.3**, sem
+transformar a versão nova na distribuição oficial antes do teste em servidor.
+
+As duas versões requerem Java 25. O artefato oficial continua sendo produzido
+com a API 26.2 e fica em `target/Terra2-0.1.0-SNAPSHOT.jar`. A verificação 26.3
+não publica um segundo JAR; ela funciona como alerta antecipado de
+incompatibilidade.
+
+Para executar localmente a verificação da API 26.3:
+
+```bash
+mvn '-Dpaper.version=[26.3.build,26.4.build)' verify
+```
 
 ## Testes
 
