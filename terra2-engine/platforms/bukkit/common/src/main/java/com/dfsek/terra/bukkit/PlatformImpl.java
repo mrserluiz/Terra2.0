@@ -43,6 +43,9 @@ import com.dfsek.terra.bukkit.world.BukkitPlatformBiome;
 
 
 public class PlatformImpl extends AbstractPlatform {
+
+    /** Whether world-init installs the native pack biome source before chunk generation. */
+    public boolean usesNativeBiomeProvider() { return false; }
     private static final Logger LOGGER = LoggerFactory.getLogger(PlatformImpl.class);
 
     private final ItemHandle itemHandle = new BukkitItemHandle();

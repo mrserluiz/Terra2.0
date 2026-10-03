@@ -22,7 +22,7 @@ public final class GenerationReport {
         catch(java.io.IOException e) { LoggerFactory.getLogger(GenerationReport.class).error("Could not create reports directory", e); }
     }
     public static synchronized void stalledServer(long seconds) {
-        if(directory == null || count.incrementAndGet() > 32) return;
+        if(directory == null) return;
         try {
             StringWriter buffer = new StringWriter();
             PrintWriter writer = new PrintWriter(buffer);
@@ -51,6 +51,24 @@ public final class GenerationReport {
             Files.createDirectories(directory);
             Path file = Files.createTempFile(directory, "stall-", ".txt");
             Files.writeString(file, buffer.toString());
+            Path latest = directory.resolve("stall-latest.txt");
+            Path replacement = Files.createTempFile(directory, "latest-", ".tmp");
+            try {
+                Files.copy(file, replacement, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                try {
+                    Files.move(replacement, latest, java.nio.file.StandardCopyOption.REPLACE_EXISTING,
+                        java.nio.file.StandardCopyOption.ATOMIC_MOVE);
+                } catch(java.nio.file.AtomicMoveNotSupportedException e) {
+                    Files.move(replacement, latest, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                }
+            } finally { Files.deleteIfExists(replacement); }
+            // Keep a rolling history, rather than exhausting diagnostics for this session.
+            try(var files = Files.list(directory)) {
+                var snapshots = files.filter(path -> path.getFileName().toString().matches("stall-[0-9]+\\.txt"))
+                    .sorted(java.util.Comparator.comparingLong((Path path) -> path.toFile().lastModified()).reversed())
+                    .toList();
+                for(int i = 8; i < snapshots.size(); i++) Files.deleteIfExists(snapshots.get(i));
+            }
             LoggerFactory.getLogger(GenerationReport.class).error("Terra2 stalled-server report saved: {}", file);
         } catch(Exception e) {
             LoggerFactory.getLogger(GenerationReport.class).error("Could not save stall snapshot", e);

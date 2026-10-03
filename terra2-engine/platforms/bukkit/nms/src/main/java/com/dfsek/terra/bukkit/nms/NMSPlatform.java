@@ -42,6 +42,9 @@ import com.dfsek.terra.bukkit.nms.config.VillagerTypeTemplate;
 
 public class NMSPlatform extends PlatformImpl {
 
+    @Override
+    public boolean usesNativeBiomeProvider() { return true; }
+
     public NMSPlatform(TerraBukkitPlugin plugin) {
         super(plugin);
 

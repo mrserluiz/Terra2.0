@@ -14,13 +14,20 @@ public final class ServerStallMonitor implements AutoCloseable {
     });
     private long lastReport;
     private int reports;
+    private long observedHeartbeat;
     public ServerStallMonitor() {
         worker.scheduleWithFixedDelay(this::check, 5, 5, TimeUnit.SECONDS);
     }
     public void heartbeat() { heartbeat = System.nanoTime(); }
     private void check() {
         long now = System.nanoTime();
-        long delay = TimeUnit.NANOSECONDS.toSeconds(now - heartbeat);
+        long currentHeartbeat = heartbeat;
+        if(currentHeartbeat != observedHeartbeat) {
+            observedHeartbeat = currentHeartbeat;
+            reports = 0;
+            lastReport = 0;
+        }
+        long delay = TimeUnit.NANOSECONDS.toSeconds(now - currentHeartbeat);
         if(delay >= 15 && reports < 3 && (lastReport == 0 || now - lastReport >= TimeUnit.SECONDS.toNanos(30))) {
             lastReport = now;
             reports++;

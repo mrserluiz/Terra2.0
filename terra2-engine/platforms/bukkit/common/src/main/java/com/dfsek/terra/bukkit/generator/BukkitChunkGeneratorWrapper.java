@@ -40,12 +40,18 @@ import com.dfsek.terra.bukkit.world.BukkitWorldProperties;
 public class BukkitChunkGeneratorWrapper extends org.bukkit.generator.ChunkGenerator implements GeneratorWrapper {
     private static final Logger LOGGER = LoggerFactory.getLogger(BukkitChunkGeneratorWrapper.class);
     private final BlockState air;
+    private final boolean nativeBiomes;
     private final BukkitBlockPopulator blockPopulator;
     private ChunkGenerator delegate;
     private ConfigPack pack;
 
 
     public BukkitChunkGeneratorWrapper(ChunkGenerator delegate, ConfigPack pack, BlockState air) {
+        this(delegate, pack, air, false);
+    }
+
+    public BukkitChunkGeneratorWrapper(ChunkGenerator delegate, ConfigPack pack, BlockState air, boolean nativeBiomes) {
+        this.nativeBiomes = nativeBiomes;
         this.delegate = delegate;
         this.pack = pack;
         this.air = air;
@@ -58,7 +64,11 @@ public class BukkitChunkGeneratorWrapper extends org.bukkit.generator.ChunkGener
 
     @Override
     public @Nullable BiomeProvider getDefaultBiomeProvider(@NotNull WorldInfo worldInfo) {
-        return new BukkitBiomeProvider(pack.getBiomeProvider());
+        // Paper creates its structure placement state before WorldInitEvent. Feeding the
+        // expensive pack pipeline into that state makes the stronghold ring search
+        // evaluate distant biome chunks while the server synchronously waits for spawn.
+        // Native bindings install the pack biome source in WorldInitEvent instead.
+        return nativeBiomes ? null : new BukkitBiomeProvider(pack.getBiomeProvider());
     }
 
     @Override

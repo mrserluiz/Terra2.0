@@ -27,6 +27,15 @@ class GenerationReportTest {
             }
         } finally { release.countDown(); worker.join(5000); }
     }
+    @Test void stallCaptureRemainsAvailableAfterFailureLimitAndUpdatesLatest() throws Exception {
+        GenerationReport.initialize(folder, "test");
+        for(int i = 0; i < 33; i++) GenerationReport.failure("test", "test", "test", new RuntimeException("failure"));
+        GenerationReport.stalledServer(18);
+        Path latest = folder.resolve("reports/stall-latest.txt");
+        assertTrue(Files.readString(latest).contains("Heartbeat delay: 18"));
+        GenerationReport.stalledServer(48);
+        assertTrue(Files.readString(latest).contains("Heartbeat delay: 48"));
+    }
     @Test void recordsContextAndNestedCauseWithBoundedOutput() throws Exception {
         GenerationReport.initialize(folder, "Paper 26.2 / Java 25");
         var error = new IllegalStateException("generation failed", new IllegalArgumentException("root cause"));

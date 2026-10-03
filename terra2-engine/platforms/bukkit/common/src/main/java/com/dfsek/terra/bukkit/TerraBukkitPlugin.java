@@ -227,7 +227,7 @@ public class TerraBukkitPlugin extends JavaPlugin {
             var generator = pack.getGeneratorProvider().newInstance(pack);
             generatorPacks.put(worldName, id);
             return generator;
-        }), platform.getRawConfigRegistry().getByID(id).orElseThrow(), platform.getWorldHandle().air());
+        }), platform.getRawConfigRegistry().getByID(id).orElseThrow(), platform.getWorldHandle().air(), platform.usesNativeBiomeProvider());
         } catch(RuntimeException | LinkageError e) {
             com.dfsek.terra.bukkit.util.GenerationReport.failure("generator-request", worldName, id, e);
             throw e;
