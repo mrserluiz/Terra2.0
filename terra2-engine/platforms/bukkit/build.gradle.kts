@@ -8,7 +8,8 @@ dependencies {
     paperweight.paperDevBundle(Versions.Bukkit.paperDevBundle)
 
     shaded(project(":platforms:bukkit:common"))
-    shaded(project(":platforms:bukkit:nms"))
+    // Paper 26.1+ ships unobfuscated: package the runtime variant, never reobf.
+    shaded(project(path = ":platforms:bukkit:nms", configuration = "runtimeElements"))
     shaded("xyz.jpenilla", "reflection-remapper", Versions.Bukkit.reflectionRemapper)
 }
 
