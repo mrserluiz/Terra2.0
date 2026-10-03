@@ -50,6 +50,8 @@ public class BukkitServerWorld implements ServerWorld {
     @Override
     public void setBlockState(int x, int y, int z, BlockState data, boolean physics) {
         delegate.getBlockAt(x, y, z).setBlockData(BukkitAdapter.adapt(data), physics);
+        var state = (com.dfsek.terra.bukkit.world.block.data.BukkitBlockState) data;
+        if(state.hasBlockEntityData()) state.applyBlockEntity(delegate.getBlockAt(x, y, z).getState());
     }
 
     @Override

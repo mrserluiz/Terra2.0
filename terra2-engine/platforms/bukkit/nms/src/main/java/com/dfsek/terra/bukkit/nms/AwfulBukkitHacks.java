@@ -43,6 +43,8 @@ public class AwfulBukkitHacks {
 
             // Unfreeze the biome registry to allow modification
             Reflection.MAPPED_REGISTRY.setFrozen(biomeRegistry, false);
+            terraBiomeMap.clear();
+            try {
 
             // Register the terra biomes to the registry
             configRegistry.forEach(pack -> pack.getRegistry(com.dfsek.terra.api.world.biome.Biome.class).forEach((key, biome) -> {
@@ -63,7 +65,8 @@ public class AwfulBukkitHacks {
                     NamespacedKey delegateBukkitKey = NamespacedKey.fromString(delegateMinecraftKey.toString());
                     ResourceKey<Biome> delegateKey = ResourceKey.create(Registries.BIOME, delegateMinecraftKey);
 
-                    Reference<Biome> holder = biomeRegistry.register(delegateKey, platform, RegistrationInfo.BUILT_IN);
+                    Reference<Biome> holder = biomeRegistry.get(delegateKey)
+                        .orElseGet(() -> biomeRegistry.register(delegateKey, platform, RegistrationInfo.BUILT_IN));
                     Reflection.REFERENCE.invokeBindValue(holder, platform); // IMPORTANT: bind holder.
 
                     platformBiome.getContext().put(new BukkitBiomeInfo(delegateBukkitKey));
@@ -83,7 +86,9 @@ public class AwfulBukkitHacks {
                 }
             }));
 
-            Reflection.MAPPED_REGISTRY.setFrozen(biomeRegistry, true); // freeze registry again :)
+            } finally {
+                Reflection.MAPPED_REGISTRY.setFrozen(biomeRegistry, true);
+            }
 
             LOGGER.info("Doing tag garbage....");
             Map<TagKey<Biome>, List<Holder<Biome>>> collect = biomeRegistry

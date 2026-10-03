@@ -40,9 +40,10 @@ public class BukkitWorldHandle implements WorldHandle {
 
     @Override
     public synchronized @NotNull BlockState createBlockState(@NotNull String data) {
+        var spec = com.dfsek.terra.bukkit.world.block.data.LegacyBlockSpec.parse(data);
         org.bukkit.block.data.BlockData bukkitData = Bukkit.createBlockData(
-            data); // somehow bukkit managed to make this not thread safe! :)
-        return BukkitBlockState.newInstance(bukkitData);
+            spec.blockData());
+        return BukkitBlockState.newInstance(bukkitData, spec.lootTable());
     }
 
     @Override

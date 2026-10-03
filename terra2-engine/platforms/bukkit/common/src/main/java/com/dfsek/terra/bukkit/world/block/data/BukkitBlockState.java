@@ -25,6 +25,7 @@ import com.dfsek.terra.bukkit.world.BukkitAdapter;
 
 public class BukkitBlockState implements BlockState {
     private final org.bukkit.block.data.BlockData delegate;
+    private org.bukkit.loot.LootTable lootTable;
 
     protected BukkitBlockState(org.bukkit.block.data.BlockData delegate) {
         this.delegate = delegate;
@@ -33,6 +34,28 @@ public class BukkitBlockState implements BlockState {
     public static BlockState newInstance(org.bukkit.block.data.BlockData bukkitData) {
         return new BukkitBlockState(bukkitData);
     }
+
+    public static BlockState newInstance(org.bukkit.block.data.BlockData data, String table) {
+        BukkitBlockState state = new BukkitBlockState(data);
+        if(table != null) {
+            org.bukkit.NamespacedKey key = org.bukkit.NamespacedKey.fromString(table);
+            if(key == null) throw new IllegalArgumentException("Invalid loot table " + table);
+            state.lootTable = org.bukkit.Bukkit.getLootTable(key);
+            if(state.lootTable == null) throw new IllegalArgumentException("Unknown loot table " + table);
+        }
+        return state;
+    }
+
+    public void applyBlockEntity(org.bukkit.block.BlockState placed) {
+        if(lootTable == null) return;
+        if(!(placed instanceof org.bukkit.loot.Lootable lootable)) {
+            throw new IllegalArgumentException("Loot table requires a lootable block: " + delegate.getMaterial());
+        }
+        lootable.setLootTable(lootTable);
+        if(!placed.update(true, false)) throw new IllegalStateException("Failed to update generated loot block");
+    }
+
+    public boolean hasBlockEntityData() { return lootTable != null; }
 
 
     @Override
@@ -67,7 +90,7 @@ public class BukkitBlockState implements BlockState {
 
     @Override
     public String getAsString(boolean properties) {
-        return delegate.getAsString(!properties);
+        return delegate.getAsString(!properties) + (lootTable == null ? "" : "{LootTable:'" + lootTable.getKey() + "'}");
     }
 
     @Override
