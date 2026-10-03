@@ -17,10 +17,19 @@ import com.dfsek.terra.bukkit.world.BukkitPlatformBiome;
 public class NMSBiomeProvider extends BiomeSource {
     private final BiomeProvider delegate;
     private final long seed;
+    private final org.terra2.adapter.terra.CoreTerraGenerator core;
+    private final com.dfsek.terra.api.world.info.WorldProperties world;
     private final Registry<Biome> biomeRegistry = RegistryFetcher.biomeRegistry();
 
     public NMSBiomeProvider(BiomeProvider delegate, long seed) {
+        this(delegate, seed, null, null);
+    }
+
+    public NMSBiomeProvider(BiomeProvider delegate, long seed, org.terra2.adapter.terra.CoreTerraGenerator core,
+                            com.dfsek.terra.api.world.info.WorldProperties world) {
         super();
+        this.core = core;
+        this.world = world;
         this.delegate = delegate;
         this.seed = seed;
     }
@@ -45,8 +54,9 @@ public class NMSBiomeProvider extends BiomeSource {
 
     @Override
     public @NotNull Holder<Biome> getNoiseBiome(int x, int y, int z, @NotNull Sampler sampler) {
-        return biomeRegistry.getOrThrow(((BukkitPlatformBiome) delegate.getBiome(x << 2, y << 2, z << 2, seed)
-            .getPlatformBiome()).getContext()
+        var biome = core == null ? delegate.getBiome(x << 2, y << 2, z << 2, seed)
+            : core.getBiome(world, x << 2, y << 2, z << 2);
+        return biomeRegistry.getOrThrow(((BukkitPlatformBiome) biome.getPlatformBiome()).getContext()
             .get(NMSBiomeInfo.class)
             .biomeKey());
     }

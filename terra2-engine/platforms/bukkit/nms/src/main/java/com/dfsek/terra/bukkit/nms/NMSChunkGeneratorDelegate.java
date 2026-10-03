@@ -43,9 +43,10 @@ public class NMSChunkGeneratorDelegate extends ChunkGenerator {
 
     private final long seed;
 
-    public NMSChunkGeneratorDelegate(ChunkGenerator vanilla, ConfigPack pack, NMSBiomeProvider biomeProvider, long seed) {
+    public NMSChunkGeneratorDelegate(ChunkGenerator vanilla, ConfigPack pack, NMSBiomeProvider biomeProvider, long seed,
+                                     com.dfsek.terra.api.world.chunk.generation.ChunkGenerator generator) {
         super(biomeProvider);
-        this.delegate = pack.getGeneratorProvider().newInstance(pack);
+        this.delegate = generator;
         this.vanilla = vanilla;
         this.pack = pack;
         this.seed = seed;

@@ -54,6 +54,7 @@ public class TerraBukkitPlugin extends JavaPlugin {
     private com.dfsek.terra.bukkit.util.ServerStallMonitor stallMonitor;
     private io.papermc.paper.threadedregions.scheduler.ScheduledTask heartbeatTask;
     private PlatformImpl platform;
+    private org.terra2.core.GenerationManager<com.dfsek.terra.api.block.state.BlockState, com.dfsek.terra.api.world.biome.Biome> core;
     private volatile YamlConfiguration generationSettings;
     private String primaryWorldName;
     private AsyncScheduler asyncScheduler = this.getServer().getAsyncScheduler();
@@ -83,11 +84,19 @@ public class TerraBukkitPlugin extends JavaPlugin {
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
+        core = new org.terra2.core.GenerationManager<>(java.util.Set.of(primaryWorldName, primaryWorldName + "_nether", primaryWorldName + "_the_end"));
         if(!doVersionCheck()) {
             return;
         }
 
         platform = NMSInitializer.init(this);
+        Bukkit.getPluginManager().registerEvents(new org.bukkit.event.Listener() {
+            @org.bukkit.event.EventHandler(priority = org.bukkit.event.EventPriority.LOWEST)
+            public void bindWorld(org.bukkit.event.world.WorldInitEvent event) {
+                if(event.getWorld().getGenerator() instanceof BukkitChunkGeneratorWrapper)
+                    bindCoreDimension(event.getWorld());
+            }
+        }, this);
         if(platform == null) {
             Bukkit.getPluginManager().disablePlugin(this);
             return;
@@ -214,6 +223,12 @@ public class TerraBukkitPlugin extends JavaPlugin {
         return true;
     }
 
+    public void bindCoreDimension(org.bukkit.World world) {
+        core.bindDimension(world.getName(), world.getKey().toString());
+        logger.info("Terra2 core bound {} to {} using {}", world.getName(), world.getKey(),
+            core.binding(world.getName()).plan().identity());
+    }
+
     @Override
     public @Nullable
     synchronized ChunkGenerator getDefaultWorldGenerator(@NotNull String worldName, String id) {
@@ -224,7 +239,10 @@ public class TerraBukkitPlugin extends JavaPlugin {
         return new BukkitChunkGeneratorWrapper(generatorMap.computeIfAbsent(worldName, name -> {
             ConfigPack pack = platform.getConfigRegistry().getByID(id).orElseThrow(
                 () -> new IllegalArgumentException("No such config pack \"" + id + "\""));
-            var generator = pack.getGeneratorProvider().newInstance(pack);
+            var legacy = pack.getGeneratorProvider().newInstance(pack);
+            var plan = org.terra2.adapter.terra.TerraPlanCompiler.compile(pack, legacy);
+            core.authorize(new org.terra2.core.WorldTarget(name, null), plan);
+            var generator = new org.terra2.adapter.terra.CoreTerraGenerator(core, name, legacy);
             generatorPacks.put(worldName, id);
             return generator;
         }), platform.getRawConfigRegistry().getByID(id).orElseThrow(), platform.getWorldHandle().air(), platform.usesNativeBiomeProvider());

@@ -59,6 +59,8 @@ public class BukkitChunkGeneratorWrapper extends org.bukkit.generator.ChunkGener
     }
 
     public void setDelegate(ChunkGenerator delegate) {
+        if(this.delegate instanceof org.terra2.adapter.terra.CoreTerraGenerator)
+            throw new IllegalStateException("Cannot replace a core-bound generation plan; create a new authorized world");
         this.delegate = delegate;
     }
 
@@ -114,6 +116,8 @@ public class BukkitChunkGeneratorWrapper extends org.bukkit.generator.ChunkGener
     }
 
     public void setPack(ConfigPack pack) {
+        if(this.delegate instanceof org.terra2.adapter.terra.CoreTerraGenerator)
+            throw new IllegalStateException("Cannot replace a core-bound pack; create a new authorized world");
         this.pack = pack;
         setDelegate(pack.getGeneratorProvider().newInstance(pack));
     }

@@ -44,12 +44,14 @@ public class NMSInjectListener implements Listener {
             ConfigPack pack = bukkitChunkGeneratorWrapper.getPack();
 
             ChunkGenerator vanilla = serverWorld.getChunkSource().getGenerator();
-            NMSBiomeProvider provider = new NMSBiomeProvider(pack.getBiomeProvider(), craftWorld.getSeed());
+            NMSBiomeProvider provider = new NMSBiomeProvider(pack.getBiomeProvider(), craftWorld.getSeed(),
+                bukkitChunkGeneratorWrapper.getHandle() instanceof org.terra2.adapter.terra.CoreTerraGenerator core ? core : null,
+                new com.dfsek.terra.bukkit.world.BukkitWorldProperties(craftWorld));
             ChunkMap chunkMap = serverWorld.getChunkSource().chunkMap;
             WorldGenContext worldGenContext = Reflection.CHUNKMAP.getWorldGenContext(chunkMap);
             Reflection.CHUNKMAP.setWorldGenContext(chunkMap, new WorldGenContext(
                 worldGenContext.level(),
-                new NMSChunkGeneratorDelegate(vanilla, pack, provider, craftWorld.getSeed()),
+                new NMSChunkGeneratorDelegate(vanilla, pack, provider, craftWorld.getSeed(), bukkitChunkGeneratorWrapper.getHandle()),
                 worldGenContext.structureManager(),
                 worldGenContext.lightEngine(),
                 worldGenContext.mainThreadExecutor(),
