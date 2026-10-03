@@ -4,10 +4,12 @@ on:
   push:
     paths:
       - 'terra2-plugin/**'
+      - 'terra2-engine/**'
       - '.github/workflows/build-terra2.yml'
   pull_request:
     paths:
       - 'terra2-plugin/**'
+      - 'terra2-engine/**'
       - '.github/workflows/build-terra2.yml'
   workflow_dispatch:
 
@@ -38,7 +40,11 @@ jobs:
       - name: Validate packaged plugin descriptor
         run: |
           unzip -p target/Terra2-*.jar plugin.yml > /tmp/terra2-plugin.yml
-          grep -F "version: '0.1.1-SNAPSHOT'" /tmp/terra2-plugin.yml
+          grep -F "version: '0.2.0-SNAPSHOT'" /tmp/terra2-plugin.yml
+          if grep -E '^(depend|softdepend):.*Terra' /tmp/terra2-plugin.yml; then
+            echo "plugin.yml must not depend on the legacy Terra plugin"
+            exit 1
+          fi
           if grep -F '${project.version}' /tmp/terra2-plugin.yml; then
             echo "plugin.yml still contains an unresolved Maven placeholder"
             exit 1
@@ -70,3 +76,34 @@ jobs:
 
       - name: Test against Paper 26.3
         run: mvn --batch-mode --no-transfer-progress '-Dpaper.version=[26.3.build,26.4.build)' verify
+
+  recovered-engine-26-2:
+    name: Recovered engine / Paper 26.2
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terra2-engine
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: gradle
+
+      - name: Validate Gradle wrapper
+        uses: gradle/actions/wrapper-validation@v4
+
+      - name: Compile and test the Paper engine
+        run: ./gradlew --no-daemon :platforms:bukkit:build
+
+      - name: Upload experimental engine JAR
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Terra2-engine-experimental-26.2
+          path: terra2-engine/platforms/bukkit/build/libs/Terra2-*.jar
+          if-no-files-found: error

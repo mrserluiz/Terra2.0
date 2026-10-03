@@ -1,7 +1,8 @@
-# Terra 2.0 — plugin Paper/Terra
+# Terra 2.0 — sucessor independente para Paper
 
-Este módulo inicia a implementação do Terra 2.0 sem alterar o dump e os artefatos
-usados na engenharia reversa.
+O Terra 2.0 é um novo plugin independente e uma continuação conceitual do projeto
+Terra. Ele não depende, não carrega e não delega geração ao plugin Terra legado.
+O dump e os artefatos de engenharia reversa permanecem somente como referência.
 
 ## Princípio de segurança
 
@@ -19,21 +20,25 @@ O plugin pode administrar vários mundos, mas a configuração distribuída cont
 inerte: nenhum mundo é criado, carregado ou modificado até o administrador
 autorizar cada destino e seu pack explicitamente.
 
-## Integração de packs e mundos
+## Packs, mundos e motor nativo
 
 O segundo módulo adiciona:
 
 - descoberta de Community Packs em pasta, `.zip` ou `.terra`;
 - leitura de `id`, `version` e addons obrigatórios do `pack.yml`;
-- validação dos addons disponíveis no runtime do Terra;
-- orquestração da criação por uma interface isolada do Paper;
+- validação dos addons disponíveis no runtime nativo do Terra 2.0;
+- orquestração da criação por uma interface própria e isolada do Paper;
 - manifesto `.terra2/manifest.properties` dentro de cada mundo gerenciado;
 - bloqueio anterior à chamada do gerador quando o mundo não é autorizado.
 
-O adaptador Paper chama o Terra somente após todas essas verificações, obtém o
-gerador por `TerraBukkitPlugin#getDefaultWorldGenerator(worldName, packId)` e
-então cria o mundo com `WorldCreator`. Cada entrada é processada isoladamente:
-autorizar um mundo nunca autoriza os demais.
+O marco `0.2.0-SNAPSHOT` remove completamente a dependência do Terra legado. O
+plugin já carrega sozinho e mantém sua configuração segura, mas o motor nativo
+ainda informa `ENGINE_UNAVAILABLE` caso alguém force a geração. Nenhum mundo é
+criado até que o gerador próprio do Terra 2.0 seja implementado e validado.
+
+Cada entrada continuará sendo processada isoladamente: autorizar um mundo nunca
+autorizará os demais. Community Packs serão interpretados pela camada de
+compatibilidade própria, sem exigir o plugin abandonado.
 
 ## Compilação
 
@@ -42,7 +47,7 @@ código também é compilado e testado no CI contra a API do **Paper 26.3**, sem
 transformar a versão nova na distribuição oficial antes do teste em servidor.
 
 As duas versões requerem Java 25. O artefato oficial continua sendo produzido
-com a API 26.2 e fica em `target/Terra2-0.1.0-SNAPSHOT.jar`. A verificação 26.3
+com a API 26.2 e fica em `target/Terra2-0.2.0-SNAPSHOT.jar`. A verificação 26.3
 não publica um segundo JAR; ela funciona como alerta antecipado de
 incompatibilidade.
 

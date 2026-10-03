@@ -6,4 +6,3 @@ author: mrserluiz
 website: https://github.com/mrserluiz/Terra2.0
 api-version: '26.2'
 load: POSTWORLD
-depend: [Terra]

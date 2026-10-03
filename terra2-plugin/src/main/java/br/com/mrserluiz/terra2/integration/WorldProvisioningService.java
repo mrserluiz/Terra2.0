@@ -15,12 +15,12 @@ public final class WorldProvisioningService {
     private final CommunityPackCatalog catalog;
     private final PackValidator validator;
     private final WorldManifestStore manifests;
-    private final TerraRuntimeAdapter runtime;
+    private final GenerationRuntime runtime;
     private final WorldSafetyGuard safetyGuard;
     private final Clock clock;
 
     public WorldProvisioningService(CommunityPackCatalog catalog, PackValidator validator,
-                                    WorldManifestStore manifests, TerraRuntimeAdapter runtime,
+                                    WorldManifestStore manifests, GenerationRuntime runtime,
                                     WorldSafetyGuard safetyGuard, Clock clock) {
         this.catalog = catalog;
         this.validator = validator;
@@ -45,8 +45,10 @@ public final class WorldProvisioningService {
                 return result(ProvisioningResult.Status.BLOCKED, safety.message(), safety, Set.of());
             }
 
-            if (!runtime.terraAvailable()) {
-                return result(ProvisioningResult.Status.TERRA_UNAVAILABLE, "Terra is not available.", safety, Set.of());
+            if (!runtime.engineAvailable()) {
+                return result(ProvisioningResult.Status.ENGINE_UNAVAILABLE,
+                        "The standalone Terra 2.0 generation engine is not available yet. No world was touched.",
+                        safety, Set.of());
             }
             Optional<PackDescriptor> found = catalog.findById(definition.packId());
             if (found.isEmpty()) {
@@ -55,7 +57,7 @@ public final class WorldProvisioningService {
             PackDescriptor pack = found.get();
             PackValidation validation = validator.validate(pack, definition.packId(), runtime.installedAddonIds());
             if (!validation.valid() || !runtime.packLoaded(pack.id())) {
-                String message = validation.valid() ? "Terra did not load the requested pack." : validation.message();
+                String message = validation.valid() ? "Terra 2.0 did not load the requested pack." : validation.message();
                 return result(ProvisioningResult.Status.PACK_INVALID, message, safety, validation.missingAddons());
             }
 

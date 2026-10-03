@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class Terra2Plugin extends JavaPlugin {
@@ -40,19 +39,13 @@ public final class Terra2Plugin extends JavaPlugin {
             return;
         }
 
-        Plugin terra = getServer().getPluginManager().getPlugin("Terra");
-        if (terra == null || !terra.isEnabled()) {
-            getLogger().severe("Terra is unavailable. No world was touched.");
-            return;
-        }
-
         Path worldsRoot = Bukkit.getWorldContainer().toPath();
-        Path packsDirectory = terra.getDataFolder().toPath().resolve("packs");
+        Path packsDirectory = getDataFolder().toPath().resolve("packs");
         WorldProvisioningService service = new WorldProvisioningService(
                 new CommunityPackCatalog(packsDirectory),
                 new PackValidator(),
                 new WorldManifestStore(worldsRoot),
-                new PaperTerraRuntimeAdapter(terra),
+                new StandaloneGenerationRuntime(),
                 new WorldSafetyGuard(),
                 Clock.systemUTC()
         );

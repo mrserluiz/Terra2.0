@@ -53,7 +53,24 @@ class WorldProvisioningServiceTest {
 
         assertEquals(ProvisioningResult.Status.BLOCKED, result.status());
         assertEquals(0, runtime.createCalls);
-        assertEquals(0, runtime.terraChecks);
+        assertEquals(0, runtime.engineChecks);
+    }
+
+    @Test
+    void reportsNativeEngineUnavailableWithoutCreatingAWorld() throws Exception {
+        Path packs = Files.createDirectories(temporary.resolve("packs"));
+        Path worlds = Files.createDirectories(temporary.resolve("worlds"));
+        FakeRuntime runtime = new FakeRuntime(worlds, false);
+        var service = new WorldProvisioningService(new CommunityPackCatalog(packs), new PackValidator(),
+                new WorldManifestStore(worlds), runtime, new WorldSafetyGuard(), Clock.systemUTC());
+
+        var result = service.provision(new GenerationSafetySettings(true, false, true, true),
+                new WorldDefinition("ether_expansion", true, true, "OVERWORLD", "NORMAL", null),
+                Set.of("world"));
+
+        assertEquals(ProvisioningResult.Status.ENGINE_UNAVAILABLE, result.status());
+        assertEquals(0, runtime.createCalls);
+        assertEquals(1, runtime.engineChecks);
     }
 
     @Test
@@ -82,12 +99,17 @@ class WorldProvisioningServiceTest {
         assertEquals(2, runtime.createCalls);
     }
 
-    private static final class FakeRuntime implements TerraRuntimeAdapter {
+    private static final class FakeRuntime implements GenerationRuntime {
         private final Path worlds;
         private int createCalls;
-        private int terraChecks;
-        private FakeRuntime(Path worlds) { this.worlds = worlds; }
-        public boolean terraAvailable() { terraChecks++; return true; }
+        private int engineChecks;
+        private final boolean available;
+        private FakeRuntime(Path worlds) { this(worlds, true); }
+        private FakeRuntime(Path worlds, boolean available) {
+            this.worlds = worlds;
+            this.available = available;
+        }
+        public boolean engineAvailable() { engineChecks++; return available; }
         public Set<String> installedAddonIds() { return Set.of("language-yaml"); }
         public boolean packLoaded(String packId) { return packId.equals("OVERWORLD"); }
         public boolean createWorld(WorldDefinition definition, PackDescriptor pack) throws Exception {
