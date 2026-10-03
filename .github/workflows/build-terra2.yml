@@ -35,6 +35,15 @@ jobs:
       - name: Test and package
         run: mvn --batch-mode --no-transfer-progress verify
 
+      - name: Validate packaged plugin descriptor
+        run: |
+          unzip -p target/Terra2-*.jar plugin.yml > /tmp/terra2-plugin.yml
+          grep -F "version: '0.1.1-SNAPSHOT'" /tmp/terra2-plugin.yml
+          if grep -F '${project.version}' /tmp/terra2-plugin.yml; then
+            echo "plugin.yml still contains an unresolved Maven placeholder"
+            exit 1
+          fi
+
       - name: Upload plugin JAR
         uses: actions/upload-artifact@v4
         with:
