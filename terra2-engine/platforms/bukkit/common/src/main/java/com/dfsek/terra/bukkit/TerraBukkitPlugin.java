@@ -52,6 +52,7 @@ public class TerraBukkitPlugin extends JavaPlugin {
     private final Map<String, com.dfsek.terra.api.world.chunk.generation.ChunkGenerator> generatorMap = new HashMap<>();
     private PlatformImpl platform;
     private YamlConfiguration generationSettings;
+    private String primaryWorldName;
     private AsyncScheduler asyncScheduler = this.getServer().getAsyncScheduler();
 
     private GlobalRegionScheduler globalRegionScheduler = this.getServer().getGlobalRegionScheduler();
@@ -61,6 +62,15 @@ public class TerraBukkitPlugin extends JavaPlugin {
         File settingsFile = new File(getDataFolder(), "terra2-settings.yml");
         if(!settingsFile.exists()) saveResource("terra2-settings.yml", false);
         generationSettings = YamlConfiguration.loadConfiguration(settingsFile);
+        java.util.Properties serverProperties = new java.util.Properties();
+        try(var input = java.nio.file.Files.newInputStream(java.nio.file.Path.of("server.properties"))) {
+            serverProperties.load(input);
+            primaryWorldName = serverProperties.getProperty("level-name", "world");
+        } catch(java.io.IOException e) {
+            logger.error("Cannot identify the primary world; disabling Terra2.", e);
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
         if(!doVersionCheck()) {
             return;
         }
@@ -187,6 +197,16 @@ public class TerraBukkitPlugin extends JavaPlugin {
     public @Nullable
     ChunkGenerator getDefaultWorldGenerator(@NotNull String worldName, String id) {
         if(id == null || id.trim().isEmpty()) { return null; }
+        assertGenerationAuthorized(worldName, id);
+        if(platform == null) throw new IllegalStateException("Terra2 engine is not initialized");
+        return new BukkitChunkGeneratorWrapper(generatorMap.computeIfAbsent(worldName, name -> {
+            ConfigPack pack = platform.getConfigRegistry().getByID(id).orElseThrow(
+                () -> new IllegalArgumentException("No such config pack \"" + id + "\""));
+            return pack.getGeneratorProvider().newInstance(pack);
+        }), platform.getRawConfigRegistry().getByID(id).orElseThrow(), platform.getWorldHandle().air());
+    }
+
+    public void assertGenerationAuthorized(String worldName, String id) {
         if(generationSettings == null || !generationSettings.getBoolean("generation.enabled", false)) {
             throw new IllegalStateException("Terra2 generation is disabled; refusing generator request for " + worldName);
         }
@@ -198,16 +218,15 @@ public class TerraBukkitPlugin extends JavaPlugin {
                 .anyMatch(name -> name.equalsIgnoreCase(worldName))) {
             throw new IllegalArgumentException("Terra2 refuses generation in protected world " + worldName);
         }
+        if(primaryWorldName == null || worldName.equalsIgnoreCase(primaryWorldName)
+                || worldName.equalsIgnoreCase(primaryWorldName + "_nether")
+                || worldName.equalsIgnoreCase(primaryWorldName + "_the_end")) {
+            throw new IllegalArgumentException("Terra2 refuses generation in the primary world or its vanilla dimensions");
+        }
         org.bukkit.World loaded = Bukkit.getWorld(worldName);
         if(loaded != null && loaded.getKey().getNamespace().equals("minecraft")) {
             throw new IllegalArgumentException("Terra2 refuses generation in vanilla dimension " + loaded.getKey());
         }
-        if(platform == null) throw new IllegalStateException("Terra2 engine is not initialized");
-        return new BukkitChunkGeneratorWrapper(generatorMap.computeIfAbsent(worldName, name -> {
-            ConfigPack pack = platform.getConfigRegistry().getByID(id).orElseThrow(
-                () -> new IllegalArgumentException("No such config pack \"" + id + "\""));
-            return pack.getGeneratorProvider().newInstance(pack);
-        }), platform.getRawConfigRegistry().getByID(id).orElseThrow(), platform.getWorldHandle().air());
     }
 
     public AsyncScheduler getAsyncScheduler() {

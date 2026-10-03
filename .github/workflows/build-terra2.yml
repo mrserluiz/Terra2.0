@@ -103,7 +103,7 @@ jobs:
           gradle-version: '9.7.1'
 
       - name: Compile and test the Paper engine
-        run: gradle --no-daemon --stacktrace :platforms:bukkit:build
+        run: gradle --no-daemon --stacktrace :platforms:bukkit:build :platforms:bukkit:nms:test :common:implementation:base:test
 
       - name: Upload experimental engine JAR
         if: success()

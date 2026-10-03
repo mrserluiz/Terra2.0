@@ -18,19 +18,25 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import com.dfsek.terra.api.config.ConfigPack;
 import com.dfsek.terra.bukkit.generator.BukkitChunkGeneratorWrapper;
+import com.dfsek.terra.bukkit.TerraBukkitPlugin;
 
 
 public class NMSInjectListener implements Listener {
     private static final Logger LOGGER = LoggerFactory.getLogger(NMSInjectListener.class);
     private static final Set<World> INJECTED = new HashSet<>();
     private static final ReentrantLock INJECT_LOCK = new ReentrantLock();
+    private final TerraBukkitPlugin plugin;
+
+    public NMSInjectListener(TerraBukkitPlugin plugin) { this.plugin = plugin; }
 
     @EventHandler
     public void onWorldInit(WorldInitEvent event) {
         if(!INJECTED.contains(event.getWorld()) &&
            event.getWorld().getGenerator() instanceof BukkitChunkGeneratorWrapper bukkitChunkGeneratorWrapper) {
             INJECT_LOCK.lock();
-            INJECTED.add(event.getWorld());
+            try {
+            if(INJECTED.contains(event.getWorld())) return;
+            plugin.assertGenerationAuthorized(event.getWorld().getName(), bukkitChunkGeneratorWrapper.getPack().getID());
             LOGGER.info("Preparing to take over the world: {}", event.getWorld().getName());
             CraftWorld craftWorld = (CraftWorld) event.getWorld();
             ServerLevel serverWorld = craftWorld.getHandle();
@@ -51,8 +57,10 @@ public class NMSInjectListener implements Listener {
             ));
 
             LOGGER.info("Successfully injected into world.");
-
+            INJECTED.add(event.getWorld());
+            } finally {
             INJECT_LOCK.unlock();
+            }
         }
     }
 }

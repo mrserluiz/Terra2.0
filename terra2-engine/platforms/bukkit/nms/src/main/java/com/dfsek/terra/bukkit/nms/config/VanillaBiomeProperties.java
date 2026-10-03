@@ -56,7 +56,7 @@ public class VanillaBiomeProperties implements ConfigTemplate, Properties {
 
     @Value("climate.precipitation")
     @Default
-    private Boolean precipitation = true;
+    private Boolean precipitation = null;
 
     @Value("climate.temperature")
     @Default
