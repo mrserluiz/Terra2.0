@@ -92,7 +92,7 @@ public class BukkitProtoWorld implements ProtoWorld {
     @Override
     public Entity spawnEntity(double x, double y, double z, EntityType entityType) {
         return access((int) x, (int) y, (int) z, () -> new BukkitEntity(
-            delegate.spawnEntity(new Location(delegate.getWorld(), x, y, z), ((BukkitEntityType) entityType).getHandle()))).orElse(
+            ((BukkitEntityType) entityType).configure(delegate.spawnEntity(new Location(delegate.getWorld(), x, y, z), ((BukkitEntityType) entityType).getHandle())))).orElse(
             null);
     }
 

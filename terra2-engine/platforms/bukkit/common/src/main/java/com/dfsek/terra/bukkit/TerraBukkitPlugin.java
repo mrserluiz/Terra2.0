@@ -224,7 +224,8 @@ public class TerraBukkitPlugin extends JavaPlugin {
             throw new IllegalArgumentException("Terra2 refuses generation in the primary world or its vanilla dimensions");
         }
         org.bukkit.World loaded = Bukkit.getWorld(worldName);
-        if(loaded != null && loaded.getKey().getNamespace().equals("minecraft")) {
+        if(loaded != null && java.util.Set.of("minecraft:overworld", "minecraft:the_nether", "minecraft:the_end")
+                .contains(loaded.getKey().toString())) {
             throw new IllegalArgumentException("Terra2 refuses generation in vanilla dimension " + loaded.getKey());
         }
     }

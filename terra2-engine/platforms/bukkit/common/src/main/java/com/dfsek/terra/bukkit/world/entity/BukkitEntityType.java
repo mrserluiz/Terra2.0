@@ -23,8 +23,22 @@ import com.dfsek.terra.api.entity.EntityType;
 public class BukkitEntityType implements EntityType {
     private final org.bukkit.entity.EntityType delegate;
 
+    private final Boolean showBottom;
+
     public BukkitEntityType(org.bukkit.entity.EntityType delegate) {
+        this(delegate, null);
+    }
+
+    public BukkitEntityType(org.bukkit.entity.EntityType delegate, Boolean showBottom) {
         this.delegate = delegate;
+        this.showBottom = showBottom;
+    }
+
+    public org.bukkit.entity.Entity configure(org.bukkit.entity.Entity entity) {
+        if(showBottom != null) {
+            ((org.bukkit.entity.EnderCrystal) entity).setShowingBottom(showBottom);
+        }
+        return entity;
     }
 
     @Override

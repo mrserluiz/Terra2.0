@@ -44,7 +44,7 @@ public class BukkitServerWorld implements ServerWorld {
     @Override
     public Entity spawnEntity(double x, double y, double z, EntityType entityType) {
         return new BukkitEntity(
-            delegate.spawnEntity(new Location(delegate, x, y, z), ((BukkitEntityType) entityType).getHandle()));
+            ((BukkitEntityType) entityType).configure(delegate.spawnEntity(new Location(delegate, x, y, z), ((BukkitEntityType) entityType).getHandle())));
     }
 
     @Override
