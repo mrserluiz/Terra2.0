@@ -40,7 +40,7 @@ public class Reflection {
     public static final VillagerTypeProxy VILLAGER_TYPE;
 
     static {
-        ReflectionRemapper reflectionRemapper = ReflectionRemapper.forReobfMappingsInPaperJar();
+        ReflectionRemapper reflectionRemapper = ReflectionRemapper.noop();
         ReflectionProxyFactory reflectionProxyFactory = ReflectionProxyFactory.create(reflectionRemapper,
             Reflection.class.getClassLoader());
 

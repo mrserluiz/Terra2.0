@@ -63,7 +63,7 @@ public class NMSPlatform extends PlatformImpl {
             .registerLoader(GrassColorModifier.class,
                 (type, o, loader, depthTracker) -> GrassColorModifier.valueOf(((String) o).toUpperCase(
                     Locale.ROOT)))
-            .registerLoader(GrassColorModifier.class,
+            .registerLoader(TemperatureModifier.class,
                 (type, o, loader, depthTracker) -> TemperatureModifier.valueOf(((String) o).toUpperCase(
                     Locale.ROOT)))
             .registerLoader(MobCategory.class, (type, o, loader, depthTracker) -> MobCategory.valueOf((String) o))

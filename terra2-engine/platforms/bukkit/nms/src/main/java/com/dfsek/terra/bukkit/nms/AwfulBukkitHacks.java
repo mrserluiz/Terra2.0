@@ -73,7 +73,7 @@ public class AwfulBukkitHacks {
 
                     villagerMap.put(delegateKey,
                         Objects.requireNonNullElse(vanillaBiomeProperties.getVillagerType(),
-                            villagerMap.getOrDefault(delegateKey, VillagerType.PLAINS)));
+                            villagerMap.getOrDefault(ResourceKey.create(Registries.BIOME, vanillaMinecraftKey), VillagerType.PLAINS)));
 
                     terraBiomeMap.computeIfAbsent(vanillaMinecraftKey, i -> new ArrayList<>()).add(delegateKey.identifier());
 
