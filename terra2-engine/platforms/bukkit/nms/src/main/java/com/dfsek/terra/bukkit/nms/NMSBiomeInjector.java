@@ -2,7 +2,7 @@ package com.dfsek.terra.bukkit.nms;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeGenerationSettings;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
@@ -17,7 +17,7 @@ import com.dfsek.terra.bukkit.nms.config.VanillaBiomeProperties;
 
 public class NMSBiomeInjector {
 
-    public static <T> Optional<Holder<T>> getEntry(Registry<T> registry, ResourceLocation identifier) {
+    public static <T> Optional<Holder<T>> getEntry(Registry<T> registry, Identifier identifier) {
         return registry.getOptional(identifier)
             .flatMap(registry::getResourceKey)
             .flatMap(registry::get);
@@ -50,7 +50,7 @@ public class NMSBiomeInjector {
         }
 
         if(vanillaBiomeProperties.getParticleConfig() == null) {
-            vanilla.getSpecialEffects().getAmbientParticleSettings().ifPresent(effects::ambientParticle);
+            vanilla.getSpecialEffects().getAmbientParticle().ifPresent(effects::ambientParticle);
         } else {
             effects.ambientParticle(vanillaBiomeProperties.getParticleConfig());
         }
@@ -58,7 +58,7 @@ public class NMSBiomeInjector {
         if(vanillaBiomeProperties.getLoopSound() == null) {
             vanilla.getSpecialEffects().getAmbientLoopSoundEvent().ifPresent(effects::ambientLoopSound);
         } else {
-            RegistryFetcher.soundEventRegistry().get(vanillaBiomeProperties.getLoopSound().location()).ifPresent(effects::ambientLoopSound);
+            RegistryFetcher.soundEventRegistry().get(vanillaBiomeProperties.getLoopSound().identifier()).ifPresent(effects::ambientLoopSound);
         }
 
         if(vanillaBiomeProperties.getMoodSound() == null) {
