@@ -64,7 +64,13 @@ public class BukkitChunkGeneratorWrapper extends org.bukkit.generator.ChunkGener
     @Override
     public void generateNoise(@NotNull WorldInfo worldInfo, @NotNull Random random, int x, int z, @NotNull ChunkData chunkData) {
         BukkitWorldProperties properties = new BukkitWorldProperties(worldInfo);
-        delegate.generateChunkData(new BukkitProtoChunk(chunkData), properties, pack.getBiomeProvider(), x, z);
+        try {
+            delegate.generateChunkData(new BukkitProtoChunk(chunkData), properties, pack.getBiomeProvider(), x, z);
+        } catch(RuntimeException | LinkageError e) {
+            com.dfsek.terra.bukkit.util.GenerationReport.failure("noise chunk " + x + "," + z,
+                worldInfo.getName(), pack.getID(), e);
+            throw e;
+        }
     }
 
     @Override

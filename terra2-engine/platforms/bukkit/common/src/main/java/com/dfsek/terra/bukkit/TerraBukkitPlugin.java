@@ -59,6 +59,9 @@ public class TerraBukkitPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        com.dfsek.terra.bukkit.util.GenerationReport.initialize(getDataFolder().toPath(),
+            "Plugin: " + getDescription().getVersion() + "; Server: " + Bukkit.getVersion()
+                + "; Java: " + System.getProperty("java.version"));
         File settingsFile = new File(getDataFolder(), "terra2-settings.yml");
         if(!settingsFile.exists()) saveResource("terra2-settings.yml", false);
         generationSettings = YamlConfiguration.loadConfiguration(settingsFile);
@@ -197,6 +200,7 @@ public class TerraBukkitPlugin extends JavaPlugin {
     public @Nullable
     ChunkGenerator getDefaultWorldGenerator(@NotNull String worldName, String id) {
         if(id == null || id.trim().isEmpty()) { return null; }
+        try {
         assertGenerationAuthorized(worldName, id);
         if(platform == null) throw new IllegalStateException("Terra2 engine is not initialized");
         return new BukkitChunkGeneratorWrapper(generatorMap.computeIfAbsent(worldName, name -> {
@@ -204,6 +208,10 @@ public class TerraBukkitPlugin extends JavaPlugin {
                 () -> new IllegalArgumentException("No such config pack \"" + id + "\""));
             return pack.getGeneratorProvider().newInstance(pack);
         }), platform.getRawConfigRegistry().getByID(id).orElseThrow(), platform.getWorldHandle().air());
+        } catch(RuntimeException | LinkageError e) {
+            com.dfsek.terra.bukkit.util.GenerationReport.failure("generator-request", worldName, id, e);
+            throw e;
+        }
     }
 
     public void assertGenerationAuthorized(String worldName, String id) {

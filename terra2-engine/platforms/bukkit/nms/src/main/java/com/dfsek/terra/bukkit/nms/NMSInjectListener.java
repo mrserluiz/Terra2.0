@@ -58,6 +58,10 @@ public class NMSInjectListener implements Listener {
 
             LOGGER.info("Successfully injected into world.");
             INJECTED.add(event.getWorld());
+            } catch(RuntimeException | LinkageError e) {
+                com.dfsek.terra.bukkit.util.GenerationReport.failure("nms-world-init", event.getWorld().getName(),
+                    bukkitChunkGeneratorWrapper.getPack().getID(), e);
+                throw e;
             } finally {
             INJECT_LOCK.unlock();
             }
