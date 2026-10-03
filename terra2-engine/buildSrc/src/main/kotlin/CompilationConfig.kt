@@ -30,6 +30,7 @@ fun Project.configureCompilation() {
     }
     
     configure<JavaPluginExtension> {
+        toolchain.languageVersion.set(org.gradle.jvm.toolchain.JavaLanguageVersion.of(25))
         sourceCompatibility = JavaVersion.toVersion(25)
         targetCompatibility = JavaVersion.toVersion(25)
     }

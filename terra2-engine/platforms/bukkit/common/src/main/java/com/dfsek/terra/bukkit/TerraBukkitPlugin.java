@@ -22,6 +22,8 @@ import io.papermc.paper.threadedregions.scheduler.GlobalRegionScheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.configuration.file.YamlConfiguration;
+import java.io.File;
 import org.incendo.cloud.SenderMapper;
 import org.incendo.cloud.execution.ExecutionCoordinator;
 import org.incendo.cloud.paper.PaperCommandManager;
@@ -49,12 +51,16 @@ public class TerraBukkitPlugin extends JavaPlugin {
     private static final Logger logger = LoggerFactory.getLogger(TerraBukkitPlugin.class);
     private final Map<String, com.dfsek.terra.api.world.chunk.generation.ChunkGenerator> generatorMap = new HashMap<>();
     private PlatformImpl platform;
+    private YamlConfiguration generationSettings;
     private AsyncScheduler asyncScheduler = this.getServer().getAsyncScheduler();
 
     private GlobalRegionScheduler globalRegionScheduler = this.getServer().getGlobalRegionScheduler();
 
     @Override
     public void onEnable() {
+        File settingsFile = new File(getDataFolder(), "terra2-settings.yml");
+        if(!settingsFile.exists()) saveResource("terra2-settings.yml", false);
+        generationSettings = YamlConfiguration.loadConfiguration(settingsFile);
         if(!doVersionCheck()) {
             return;
         }
@@ -181,6 +187,22 @@ public class TerraBukkitPlugin extends JavaPlugin {
     public @Nullable
     ChunkGenerator getDefaultWorldGenerator(@NotNull String worldName, String id) {
         if(id == null || id.trim().isEmpty()) { return null; }
+        if(generationSettings == null || !generationSettings.getBoolean("generation.enabled", false)) {
+            throw new IllegalStateException("Terra2 generation is disabled; refusing generator request for " + worldName);
+        }
+        String authorizedPack = generationSettings.getString("worlds." + worldName + ".pack");
+        if(!id.equals(authorizedPack)) {
+            throw new IllegalArgumentException("World/pack pair is not authorized: " + worldName + "/" + id);
+        }
+        if(generationSettings.getStringList("generation.protected-worlds").stream()
+                .anyMatch(name -> name.equalsIgnoreCase(worldName))) {
+            throw new IllegalArgumentException("Terra2 refuses generation in protected world " + worldName);
+        }
+        org.bukkit.World loaded = Bukkit.getWorld(worldName);
+        if(loaded != null && loaded.getKey().getNamespace().equals("minecraft")) {
+            throw new IllegalArgumentException("Terra2 refuses generation in vanilla dimension " + loaded.getKey());
+        }
+        if(platform == null) throw new IllegalStateException("Terra2 engine is not initialized");
         return new BukkitChunkGeneratorWrapper(generatorMap.computeIfAbsent(worldName, name -> {
             ConfigPack pack = platform.getConfigRegistry().getByID(id).orElseThrow(
                 () -> new IllegalArgumentException("No such config pack \"" + id + "\""));

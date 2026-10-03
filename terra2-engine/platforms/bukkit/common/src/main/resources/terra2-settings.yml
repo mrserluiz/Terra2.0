@@ -1,0 +1,8 @@
+# This file controls the recovered Terra2 engine, independently of upstream config.yml.
+# Installing the plugin never authorizes a world or changes its generator.
+generation:
+  enabled: false
+  protected-worlds: [world, world_nether, world_the_end]
+# Exact world name -> Community Pack ID. Empty by default.
+# This does not create or register dimensions; provisioning is under migration.
+worlds: {}

@@ -39,12 +39,12 @@ public final class Terra2Plugin extends JavaPlugin {
             return;
         }
 
-        Path worldsRoot = Bukkit.getWorldContainer().toPath();
         Path packsDirectory = getDataFolder().toPath().resolve("packs");
+        PaperWorldStorage storage = new PaperWorldStorage();
         WorldProvisioningService service = new WorldProvisioningService(
                 new CommunityPackCatalog(packsDirectory),
                 new PackValidator(),
-                new WorldManifestStore(worldsRoot),
+                new WorldManifestStore(storage::resolve),
                 new StandaloneGenerationRuntime(),
                 new WorldSafetyGuard(),
                 Clock.systemUTC()
@@ -62,6 +62,10 @@ public final class Terra2Plugin extends JavaPlugin {
             names.add(primary.getName());
             names.add(primary.getName() + "_nether");
             names.add(primary.getName() + "_the_end");
+            // Modern vanilla dimensions can have names unrelated to the old suffixes.
+            for (World world : getServer().getWorlds()) {
+                if (world.getKey().getNamespace().equals("minecraft")) names.add(world.getName());
+            }
         }
         return Set.copyOf(names);
     }

@@ -8,14 +8,23 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.function.Function;
 
 public final class WorldManifestStore {
     private static final String DIRECTORY = ".terra2";
     private static final String FILE = "manifest.properties";
     private final Path worldsRoot;
+    private final Function<String, Path> pathResolver;
 
     public WorldManifestStore(Path worldsRoot) {
         this.worldsRoot = worldsRoot.toAbsolutePath().normalize();
+        this.pathResolver = null;
+    }
+
+    /** Uses platform-provided dimension folders instead of guessing Bukkit's legacy layout. */
+    public WorldManifestStore(Function<String, Path> pathResolver) {
+        this.worldsRoot = null;
+        this.pathResolver = java.util.Objects.requireNonNull(pathResolver);
     }
 
     public Optional<WorldManifest> read(String worldName) throws IOException {
@@ -52,6 +61,10 @@ public final class WorldManifestStore {
     }
 
     public Path worldPath(String worldName) {
+        if (pathResolver != null) {
+            return java.util.Objects.requireNonNull(pathResolver.apply(worldName),
+                    "The platform must resolve a dimension folder").toAbsolutePath().normalize();
+        }
         Path candidate = worldsRoot.resolve(worldName).normalize();
         if (!candidate.getParent().equals(worldsRoot)) {
             throw new IllegalArgumentException("Invalid world name path: " + worldName);

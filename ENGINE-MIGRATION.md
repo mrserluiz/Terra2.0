@@ -50,6 +50,16 @@ Paper platform so the final distribution contains one plugin and one engine.
 
 ## Current status
 
+Modern storage milestone: manifests now use the dimension folder returned by
+Paper (`World.getWorldFolder`) for loaded dimensions. Unloaded dimensions are
+blocked until the platform can register and resolve them explicitly; no legacy
+folder name is guessed. Loaded `minecraft:*` worlds are protected by default.
+This is storage safety, not implementation of custom dimension registration.
+
+The first CI run passed the standalone scaffold on Paper 26.2 and 26.3 but the
+recovered Gradle build failed during Java 25 bootstrap. CI now runs the existing
+Gradle runtime on Java 21 with an explicit Java 25 compilation toolchain.
+
 R0 is implemented in source. The earlier standalone plugin scaffold remains
 safe but its placeholder runtime does not generate terrain. Do not install an
 engine build on a production server until R1–R3 pass their integration tests.
