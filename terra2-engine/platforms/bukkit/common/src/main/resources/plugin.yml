@@ -7,3 +7,13 @@ website: "@WIKI@"
 api-version: "26.2"
 description: "@DESCRIPTION@"
 folia-supported: true
+
+commands:
+  terra2:
+    description: Recarrega as autorizações de geração
+    usage: /terra2 reload
+    permission: terra2.settings.reload
+permissions:
+  terra2.settings.reload:
+    description: Permite recarregar as autorizações do Terra2
+    default: op

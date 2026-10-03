@@ -50,8 +50,9 @@ import com.dfsek.terra.bukkit.world.BukkitAdapter;
 public class TerraBukkitPlugin extends JavaPlugin {
     private static final Logger logger = LoggerFactory.getLogger(TerraBukkitPlugin.class);
     private final Map<String, com.dfsek.terra.api.world.chunk.generation.ChunkGenerator> generatorMap = new HashMap<>();
+    private final Map<String, String> generatorPacks = new HashMap<>();
     private PlatformImpl platform;
-    private YamlConfiguration generationSettings;
+    private volatile YamlConfiguration generationSettings;
     private String primaryWorldName;
     private AsyncScheduler asyncScheduler = this.getServer().getAsyncScheduler();
 
@@ -64,7 +65,13 @@ public class TerraBukkitPlugin extends JavaPlugin {
                 + "; Java: " + System.getProperty("java.version"));
         File settingsFile = new File(getDataFolder(), "terra2-settings.yml");
         if(!settingsFile.exists()) saveResource("terra2-settings.yml", false);
-        generationSettings = YamlConfiguration.loadConfiguration(settingsFile);
+        try {
+            generationSettings = com.dfsek.terra.bukkit.util.GenerationSettings.load(settingsFile);
+        } catch(java.io.IOException | org.bukkit.configuration.InvalidConfigurationException e) {
+            logger.error("Invalid Terra2 settings; disabling plugin", e);
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
         java.util.Properties serverProperties = new java.util.Properties();
         try(var input = java.nio.file.Files.newInputStream(java.nio.file.Path.of("server.properties"))) {
             serverProperties.load(input);
@@ -198,7 +205,7 @@ public class TerraBukkitPlugin extends JavaPlugin {
 
     @Override
     public @Nullable
-    ChunkGenerator getDefaultWorldGenerator(@NotNull String worldName, String id) {
+    synchronized ChunkGenerator getDefaultWorldGenerator(@NotNull String worldName, String id) {
         if(id == null || id.trim().isEmpty()) { return null; }
         try {
         assertGenerationAuthorized(worldName, id);
@@ -206,7 +213,9 @@ public class TerraBukkitPlugin extends JavaPlugin {
         return new BukkitChunkGeneratorWrapper(generatorMap.computeIfAbsent(worldName, name -> {
             ConfigPack pack = platform.getConfigRegistry().getByID(id).orElseThrow(
                 () -> new IllegalArgumentException("No such config pack \"" + id + "\""));
-            return pack.getGeneratorProvider().newInstance(pack);
+            var generator = pack.getGeneratorProvider().newInstance(pack);
+            generatorPacks.put(worldName, id);
+            return generator;
         }), platform.getRawConfigRegistry().getByID(id).orElseThrow(), platform.getWorldHandle().air());
         } catch(RuntimeException | LinkageError e) {
             com.dfsek.terra.bukkit.util.GenerationReport.failure("generator-request", worldName, id, e);
@@ -214,15 +223,55 @@ public class TerraBukkitPlugin extends JavaPlugin {
         }
     }
 
+    @Override
+    public boolean onCommand(org.bukkit.command.CommandSender sender, org.bukkit.command.Command command,
+                             String label, String[] args) {
+        if(!command.getName().equalsIgnoreCase("terra2")) return false;
+        if(!sender.hasPermission("terra2.settings.reload")) {
+            sender.sendMessage("Sem permissão: terra2.settings.reload");
+            return true;
+        }
+        if(args.length != 1 || !args[0].equalsIgnoreCase("reload")) {
+            sender.sendMessage("Uso: /terra2 reload");
+            return true;
+        }
+        try {
+            reloadGenerationSettings();
+            sender.sendMessage("Terra2: autorizações recarregadas. Mundos já carregados mantêm seus geradores.");
+        } catch(Exception e) {
+            sender.sendMessage("Terra2: configuração recusada; autorizações anteriores mantidas. " + e.getMessage());
+            logger.error("Could not reload Terra2 generation settings", e);
+        }
+        return true;
+    }
+
+    public synchronized void reloadGenerationSettings() throws Exception {
+        var next = com.dfsek.terra.bukkit.util.GenerationSettings.load(new File(getDataFolder(), "terra2-settings.yml"));
+        var worlds = next.getConfigurationSection("worlds");
+        for(String world : worlds.getKeys(false)) {
+            String pack = next.getString("worlds." + world + ".pack");
+            if(platform.getConfigRegistry().getByID(pack).isEmpty())
+                throw new IllegalArgumentException("Pack não carregado: " + pack);
+        }
+        for(String world : generatorMap.keySet()) {
+            String oldPack = generatorPacks.get(world);
+            String newPack = next.getString("worlds." + world + ".pack");
+            if(newPack != null && !java.util.Objects.equals(oldPack, newPack))
+                throw new IllegalArgumentException("Não é possível trocar o pack do gerador existente: " + world);
+        }
+        generationSettings = next;
+    }
+
     public void assertGenerationAuthorized(String worldName, String id) {
-        if(generationSettings == null || !generationSettings.getBoolean("generation.enabled", false)) {
+        YamlConfiguration settings = generationSettings;
+        if(settings == null || !settings.getBoolean("generation.enabled", false)) {
             throw new IllegalStateException("Terra2 generation is disabled; refusing generator request for " + worldName);
         }
-        String authorizedPack = generationSettings.getString("worlds." + worldName + ".pack");
+        String authorizedPack = settings.getString("worlds." + worldName + ".pack");
         if(!id.equals(authorizedPack)) {
             throw new IllegalArgumentException("World/pack pair is not authorized: " + worldName + "/" + id);
         }
-        if(generationSettings.getStringList("generation.protected-worlds").stream()
+        if(settings.getStringList("generation.protected-worlds").stream()
                 .anyMatch(name -> name.equalsIgnoreCase(worldName))) {
             throw new IllegalArgumentException("Terra2 refuses generation in protected world " + worldName);
         }
