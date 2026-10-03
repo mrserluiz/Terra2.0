@@ -6,7 +6,7 @@
 
     <groupId>br.com.mrserluiz.terra2</groupId>
     <artifactId>terra2</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>0.1.1-SNAPSHOT</version>
     <name>Terra 2.0</name>
     <description>Safe, opt-in world generation orchestration for Terra config packs.</description>
 
@@ -42,6 +42,12 @@
 
     <build>
         <finalName>Terra2-${project.version}</finalName>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
