@@ -6,6 +6,27 @@ import org.junit.jupiter.api.io.TempDir;
 import static org.junit.jupiter.api.Assertions.*;
 class GenerationReportTest {
     @TempDir Path folder;
+    @Test void capturesWorkerStackWithoutAnException() throws Exception {
+        GenerationReport.initialize(folder, "diagnostic test");
+        assertTrue(Files.isDirectory(folder.resolve("reports")));
+        var entered = new java.util.concurrent.CountDownLatch(1);
+        var release = new java.util.concurrent.CountDownLatch(1);
+        Thread worker = new Thread(() -> {
+            entered.countDown();
+            try { release.await(); } catch(InterruptedException e) { Thread.currentThread().interrupt(); }
+        }, "Terra2-test-blocked-worker");
+        worker.start();
+        try {
+            assertTrue(entered.await(5, java.util.concurrent.TimeUnit.SECONDS));
+            GenerationReport.stalledServer(15);
+            try(var files = Files.list(folder.resolve("reports"))) {
+                String report = Files.readString(files.findFirst().orElseThrow());
+                assertTrue(report.contains("Terra2-test-blocked-worker"));
+                assertTrue(report.contains("Heartbeat delay: 15"));
+                assertTrue(report.contains("Recent Paper console log"));
+            }
+        } finally { release.countDown(); worker.join(5000); }
+    }
     @Test void recordsContextAndNestedCauseWithBoundedOutput() throws Exception {
         GenerationReport.initialize(folder, "Paper 26.2 / Java 25");
         var error = new IllegalStateException("generation failed", new IllegalArgumentException("root cause"));

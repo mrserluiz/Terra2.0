@@ -51,6 +51,8 @@ public class TerraBukkitPlugin extends JavaPlugin {
     private static final Logger logger = LoggerFactory.getLogger(TerraBukkitPlugin.class);
     private final Map<String, com.dfsek.terra.api.world.chunk.generation.ChunkGenerator> generatorMap = new HashMap<>();
     private final Map<String, String> generatorPacks = new HashMap<>();
+    private com.dfsek.terra.bukkit.util.ServerStallMonitor stallMonitor;
+    private io.papermc.paper.threadedregions.scheduler.ScheduledTask heartbeatTask;
     private PlatformImpl platform;
     private volatile YamlConfiguration generationSettings;
     private String primaryWorldName;
@@ -111,6 +113,15 @@ public class TerraBukkitPlugin extends JavaPlugin {
 
         Bukkit.getPluginManager().registerEvents(new CommonListener(platform), this); // Register master event listener
         PaperUtil.checkPaper(this);
+        stallMonitor = new com.dfsek.terra.bukkit.util.ServerStallMonitor();
+        heartbeatTask = globalRegionScheduler.runAtFixedRate(this, task -> stallMonitor.heartbeat(), 1, 20);
+        logger.info("Terra2 diagnostics enabled; reports directory: {}", getDataFolder().toPath().resolve("reports"));
+    }
+
+    @Override
+    public void onDisable() {
+        if(heartbeatTask != null) heartbeatTask.cancel();
+        if(stallMonitor != null) stallMonitor.close();
     }
 
     @NotNull
