@@ -58,6 +58,18 @@ class StructureNbtTest {
         }
         assertEquals(2, StructureNbt.read(bytes.toByteArray()).blocks().size());
     }
+    @Test void preservesEmptyRemovalTemplatesAsNoOpPieces() throws Exception {
+        var bytes = new ByteArrayOutputStream();
+        try(var out = new DataOutputStream(bytes)) {
+            tag(out, 10, ""); tag(out, 3, "DataVersion"); out.writeInt(4440); vector(out, "size", 1, 1, 1);
+            for(String field : List.of("palette", "blocks", "entities")) {
+                tag(out, 9, field); out.writeByte(10); out.writeInt(0);
+            }
+            out.writeByte(0);
+        }
+        var piece = StructureNbt.read(bytes.toByteArray());
+        assertTrue(piece.blocks().isEmpty()); assertTrue(piece.palettes().getFirst().isEmpty());
+    }
     @Test void tracksLocalMissingAndUnvalidatedVanillaDependenciesWithoutMarkingStructuresReady() throws Exception {
         Path input = directory.resolve("conversion/input/source"); Files.createDirectories(input);
         Files.writeString(input.resolve("pack.mcmeta"), "{\"pack\":{\"description\":\"Structure fixture\",\"pack_format\":88}}");

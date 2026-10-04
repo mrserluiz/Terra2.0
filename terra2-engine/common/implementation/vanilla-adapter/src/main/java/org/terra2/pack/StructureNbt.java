@@ -101,7 +101,9 @@ public final class StructureNbt {
                 });
                 states.add(new State((String) name, Collections.unmodifiableMap(properties)));
             }
-            if(states.isEmpty() || states.size() > 65536) throw new IllegalArgumentException("Invalid palette size");
+            // Empty templates are valid no-op pool elements (including vanilla structure removers).
+            // Any block referencing an empty palette is still rejected below.
+            if(states.size() > 65536) throw new IllegalArgumentException("Invalid palette size");
             if(!palettes.isEmpty() && palettes.getFirst().size() != states.size()) throw new IllegalArgumentException("Palette sizes differ");
             palettes.add(List.copyOf(states));
         }

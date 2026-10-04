@@ -211,3 +211,9 @@ must be accounted for rather than silently discarded or installed globally.
 Reports and pack archives are built in temporary files. A report-write failure
 cannot leave a published pack without its report; archive publication failure
 rolls back the newly published report. Existing IDs are never overwritten.
+
+A local Java-reader probe decoded all 4,894 supplied NBT templates (67 source
+DataVersions), including the intentional empty `vanilla_structure_remover` piece.
+The probe used the same reader with List.getFirst replaced by get(0) for the local
+Java 17 runtime; the Java 25 plugin and unit tests are validated separately in CI.
+Decoding is not data fixing, jigsaw assembly or an in-server generation test.
