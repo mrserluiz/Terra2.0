@@ -39,7 +39,7 @@ public final class NativeResourceGraph {
             var object = json.getAsJsonObject(); var result = new JsonObject();
             object.entrySet().forEach(entry -> {
                 String name = entry.getKey();
-                if(name.equals("options") && (!object.has("function") || !Set.of("minecraft:enchant_randomly", "minecraft:enchant_with_levels")
+                if(name.equals("options") && (!object.has("function") || !Set.of("minecraft:enchant_randomly", "minecraft:enchant_with_levels", "enchant_randomly", "enchant_with_levels")
                         .contains(object.get("function").getAsString()))) result.add(name, entry.getValue());
                 else result.add(name, inlineHolderSets(entry.getValue(), name));
             }); return result;

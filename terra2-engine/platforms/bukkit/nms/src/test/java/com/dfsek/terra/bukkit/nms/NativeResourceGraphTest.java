@@ -77,14 +77,11 @@ class NativeResourceGraphTest {
         assertFalse(graph.report().valid());
         assertThrows(IllegalStateException.class, () -> graph.resource(Registries.STRUCTURE, "test:dungeon"));
     }
-    @Test void executesNativeLootUsingTheIsolatedResolver() throws Exception {
+    private java.util.List<net.minecraft.world.item.ItemStack> roll(String table, NativeResourceGraph graph) throws Exception {
         var configuration = new io.papermc.paper.configuration.GlobalConfiguration();
         configuration.misc = configuration.new Misc();
         var configure = io.papermc.paper.configuration.GlobalConfiguration.class.getDeclaredMethod("set", io.papermc.paper.configuration.GlobalConfiguration.class);
         configure.setAccessible(true); configure.invoke(null, configuration);
-        fixtures();
-        var graph = new NativeResourceGraph(ResourceBundle.read(directory), vanilla());
-        assertTrue(graph.report().valid(), () -> String.join("\n", graph.report().errors()));
         var parameters = new net.minecraft.world.level.storage.loot.LootParams(null,
             new net.minecraft.util.context.ContextMap.Builder().withParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.ORIGIN,
                 new net.minecraft.world.phys.Vec3(0, 64, 0)).create(net.minecraft.world.level.storage.loot.parameters.LootContextParamSets.CHEST), Map.of(), 0);
@@ -93,7 +90,50 @@ class NativeResourceGraphTest {
         constructor.setAccessible(true);
         var context = constructor.newInstance(parameters, net.minecraft.util.RandomSource.create(42), graph.lookup());
         var items = new ArrayList<net.minecraft.world.item.ItemStack>();
-        graph.resource(Registries.LOOT_TABLE, "test:chest").value().getRandomItemsRaw(context, items::add);
+        graph.resource(Registries.LOOT_TABLE, table).value().getRandomItemsRaw(context, items::add);
+        return items;
+    }
+    @Test void executesNativeLootUsingTheIsolatedResolver() throws Exception {
+        fixtures();
+        var graph = new NativeResourceGraph(ResourceBundle.read(directory), vanilla());
+        assertTrue(graph.report().valid(), () -> String.join("\n", graph.report().errors()));
+        var items = roll("test:chest", graph);
         assertEquals(1, items.size()); assertEquals(net.minecraft.world.item.Items.STONE, items.getFirst().getItem());
+    }
+    @Test void resolvesNestedLootAndNativeItemFunctionsWithoutRenamingClientAssets() throws Exception {
+        fixtures();
+        write("data/test/loot_table/relic.json", """
+            {"type":"minecraft:chest","pools":[{"rolls":1,"entries":[{"type":"minecraft:item","name":"minecraft:stone","functions":[
+              {"function":"minecraft:set_count","count":3},
+              {"function":"minecraft:set_name","name":{"text":"Relíquia da dimensão"},"target":"item_name"},
+              {"function":"minecraft:set_lore","lore":[{"text":"Encontrada nesta dimensão"}],"mode":"replace_all"},
+              {"function":"minecraft:set_components","components":{"minecraft:item_model":"test:relic"}}
+            ]}]}]}
+            """);
+        write("data/test/loot_table/nested.json", """
+            {"type":"minecraft:chest","pools":[{"rolls":1,"entries":[{"type":"minecraft:loot_table","value":"test:relic"}]}]}
+            """);
+        var graph = new NativeResourceGraph(ResourceBundle.read(directory), vanilla());
+        assertTrue(graph.report().valid(), () -> String.join("\n", graph.report().errors()));
+        var items = roll("test:nested", graph);
+        assertEquals(1, items.size()); var item = items.getFirst();
+        assertEquals(3, item.getCount());
+        assertEquals("Relíquia da dimensão", item.get(net.minecraft.core.component.DataComponents.ITEM_NAME).getString());
+        assertEquals("Encontrada nesta dimensão", item.get(net.minecraft.core.component.DataComponents.LORE).lines().getFirst().getString());
+        assertEquals("test:relic", item.get(net.minecraft.core.component.DataComponents.ITEM_MODEL).toString());
+    }
+    @Test void decodesInstrumentOptionsAsAnInstrumentTag() throws Exception {
+        fixtures();
+        write("data/test/tags/instrument/horns.json", "{\"replace\":true,\"values\":[\"minecraft:ponder_goat_horn\"]}");
+        write("data/test/loot_table/horn.json", """
+            {"type":"minecraft:chest","pools":[{"rolls":1,"entries":[{"type":"minecraft:item","name":"minecraft:goat_horn",
+              "functions":[{"function":"minecraft:set_instrument","options":"#test:horns"}]}]}]}
+            """);
+        var graph = new NativeResourceGraph(ResourceBundle.read(directory), vanilla());
+        assertTrue(graph.report().valid(), () -> String.join("\n", graph.report().errors()));
+        var items = roll("test:horn", graph);
+        assertEquals(1, items.size());
+        assertEquals(net.minecraft.world.item.Items.GOAT_HORN, items.getFirst().getItem());
+        assertNotNull(items.getFirst().get(net.minecraft.core.component.DataComponents.INSTRUMENT));
     }
 }
