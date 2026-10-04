@@ -13,6 +13,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.levelgen.structure.templatesystem.*;
 import org.terra2.core.WorldTarget;
 import org.terra2.pack.*;
+import org.terra2.pack.ResourceBundle;
 
 /** Persistent private resources are restored before a bound world's chunks can generate/load. */
 public final class NativePackRuntime {
