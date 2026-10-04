@@ -40,6 +40,9 @@ public final class NativeRegistryInstaller {
             for(Object raw : sources) {
                 Holder.Reference source = (Holder.Reference) raw;
                 Holder.Reference canonical = (Holder.Reference) registry.get(source.key()).orElseGet(() -> registry.register(source.key(), source.value(), RegistrationInfo.BUILT_IN));
+                // register() queues value binding until freeze(); we preserve existing server tag state
+                // instead of refreezing the whole registry, so bind each new canonical holder here.
+                if(!canonical.isBound()) Reflection.REFERENCE.invokeBindValue(canonical, source.value());
                 if(!canonical.areComponentsBound()) canonical.bindComponents(DataComponentMap.EMPTY);
                 if(!source.areComponentsBound()) source.bindComponents(DataComponentMap.EMPTY);
                 if(source.value() instanceof net.minecraft.world.level.storage.loot.LootTable table)
