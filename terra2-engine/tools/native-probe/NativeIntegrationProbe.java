@@ -34,7 +34,11 @@ public final class NativeIntegrationProbe extends JavaPlugin {
                 boolean found = false;
                 for(int x = -12; x < 32 && !found; x++) for(int z = -12; z < 32 && !found; z++) for(int y = 98; y < 106 && !found; y++) {
                     if(world.getBlockAt(x, y, z).getState() instanceof Chest chest && chest.getLootTable() != null
-                        && chest.getLootTable().getKey().toString().startsWith("terra2:")) {
+                        && chest.getLootTable().getKey().toString().endsWith("/smoke/chest")) {
+                        // Reading the backing item list does not open a Minecraft loot container.
+                        var level = ((org.bukkit.craftbukkit.CraftWorld) world).getHandle();
+                        ((net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity) level.getBlockEntity(
+                            new net.minecraft.core.BlockPos(x, y, z))).unpackLootTable(null);
                         var items = chest.getBlockInventory().getContents();
                         var item = Arrays.stream(items).filter(Objects::nonNull).findFirst().orElseThrow();
                         if(!engine.lootManager().authentic(item)) throw new IllegalStateException("Loot origin not signed");
