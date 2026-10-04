@@ -105,6 +105,10 @@ jobs:
       - name: Compile and test the Paper engine
         run: gradle --no-daemon --stacktrace :platforms:bukkit:build :common:implementation:terra2-core:test :common:implementation:vanilla-adapter:test :platforms:bukkit:common:test :platforms:bukkit:nms:test :common:implementation:base:test
 
+      - name: Inspect native worldgen adapter signatures
+        if: success()
+        run: bash tools/inspect-paper-worldgen.sh
+
       - name: Upload experimental engine JAR
         if: success()
         uses: actions/upload-artifact@v4
