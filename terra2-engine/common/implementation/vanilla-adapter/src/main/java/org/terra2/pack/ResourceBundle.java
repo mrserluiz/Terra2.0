@@ -12,6 +12,7 @@ public final class ResourceBundle {
     private static final int FILE_LIMIT = 8 * 1024 * 1024, TOTAL_LIMIT = 128 * 1024 * 1024, ENTRY_LIMIT = 20000;
     private final SortedMap<String, byte[]> files = new TreeMap<>();
     private long total;
+    private volatile String fingerprint;
     public static ResourceBundle read(Path path) throws IOException {
         if(Files.isSymbolicLink(path)) throw new IOException("Symbolic link refused: " + path.getFileName());
         ResourceBundle result = new ResourceBundle();
@@ -57,6 +58,7 @@ public final class ResourceBundle {
         if(bytes.length > FILE_LIMIT || total > TOTAL_LIMIT || files.size() >= ENTRY_LIMIT)
             throw new IOException("Source limits exceeded (8 MiB/file, 128 MiB total, 20000 files)");
         files.put(name, bytes);
+        fingerprint = null;
     }
     public ResourceBundle subtree(String prefix) throws IOException {
         ResourceBundle result = new ResourceBundle();
@@ -84,10 +86,11 @@ public final class ResourceBundle {
     public boolean contains(String path) { return files.containsKey(path); }
     public String text(String path) { return new String(bytes(path), StandardCharsets.UTF_8); }
     public String fingerprint() {
+        var cached = fingerprint; if(cached != null) return cached;
         try {
             var digest = MessageDigest.getInstance("SHA-256");
             files.forEach((key, value) -> { digest.update(key.getBytes(StandardCharsets.UTF_8)); digest.update((byte) 0); digest.update(value); });
-            return HexFormat.of().formatHex(digest.digest());
+            return fingerprint = HexFormat.of().formatHex(digest.digest());
         } catch(NoSuchAlgorithmException error) { throw new IllegalStateException(error); }
     }
     public static void checkPath(String name) {

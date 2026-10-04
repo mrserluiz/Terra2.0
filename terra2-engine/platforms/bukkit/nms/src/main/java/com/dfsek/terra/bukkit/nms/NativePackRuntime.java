@@ -34,7 +34,7 @@ public final class NativePackRuntime {
         }
         return true;
     }
-    public record Installed(NativeResourceGraph graph, Map<Identifier, StructureTemplate> templates, Map<String, String> lootOwners) {}
+    public record Installed(NativeResourceGraph graph, Map<Identifier, Path> templates, Map<String, String> lootOwners) {}
     private final TerraBukkitPlugin plugin;
     private final Map<String, Installed> resources = new HashMap<>();
     private final Map<String, Installed> worlds = new ConcurrentHashMap<>();
@@ -56,21 +56,19 @@ public final class NativePackRuntime {
             if(!org.bukkit.Bukkit.getOnlinePlayers().isEmpty()) throw new IllegalStateException("New native registry identities require startup before players join");
             var live = registries(); var graph = new NativeResourceGraph(source, live);
             if(!graph.report().valid()) throw new IllegalStateException(String.join("\n", graph.report().errors()));
-            Map<Identifier, StructureTemplate> templates = new HashMap<>();
+            Map<Identifier, Path> templates = new HashMap<>();
             Map<String, String> owners = new HashMap<>();
             for(var pack : nativePacks) {
                 var nativeResources = pack.nativeResources();
                 if(nativeResources.dataVersion() != org.bukkit.Bukkit.getUnsafe().getDataVersion()) throw new IllegalArgumentException("Reconvert pack for this server DataVersion: " + pack.id());
                 for(var entry : nativeResources.templates().entrySet()) {
-                    var root = NativeTemplateScope.rewrite(NativeTemplateScope.read(entry.getValue()), graph.scope());
-                    var template = new StructureTemplate(); template.load(net.minecraft.core.registries.BuiltInRegistries.BLOCK, root);
                     String[] parts = entry.getKey().split("/", 4);
                     String id = parts[1] + ":" + parts[3].substring(0, parts[3].length() - 4);
                     Identifier alias = Identifier.parse(graph.scope().privateId(id));
-                    if(templates.putIfAbsent(alias, template) != null) throw new IllegalArgumentException("Conflicting native template: " + id);
                     Path file = plugin.getDataFolder().toPath().resolve("native-runtime").resolve(source.fingerprint()).resolve("templates")
                         .resolve(parts[1]).resolve(parts[3]);
-                    persistTemplate(file, root);
+                    if(templates.putIfAbsent(alias, file) != null) throw new IllegalArgumentException("Conflicting native template: " + id);
+                    persistTemplate(file, entry.getValue());
                 }
                 nativeResources.source().paths().stream().filter(path -> path.matches("data/[^/]+/loot_table/.+\\.json")).forEach(path -> {
                     String[] parts = path.split("/", 4);
@@ -88,22 +86,22 @@ public final class NativePackRuntime {
         var previous = worlds.putIfAbsent(world, installed);
         if(previous != null && previous != installed) throw new IllegalStateException("Cannot replace active native world resources: " + world);
     }
-    private static void persistTemplate(Path file, net.minecraft.nbt.CompoundTag data) throws IOException {
+    private static void persistTemplate(Path file, byte[] data) throws IOException {
         Files.createDirectories(file.getParent());
         if(Files.isSymbolicLink(file)) throw new IOException("Scoped template cannot be a symlink");
         if(Files.exists(file)) {
-            if(!NativeTemplateScope.read(Files.readAllBytes(file)).equals(data)) throw new IOException("Stored native template differs: " + file);
+            if(!Arrays.equals(Files.readAllBytes(file), data)) throw new IOException("Stored native template differs: " + file);
             return;
         }
         Path temporary = Files.createTempFile(file.getParent(), ".template-", ".tmp");
-        try { Files.write(temporary, NativeTemplateScope.write(data)); Files.move(temporary, file); }
+        try { Files.write(temporary, data); Files.move(temporary, file); }
         finally { Files.deleteIfExists(temporary); }
     }
     public NativeWorldExecutor bind(ServerLevel level, StructureTemplateManager manager) {
         var installed = worlds.get(level.getWorld().getName());
         if(installed == null) return null;
         plugin.assertGenerationAuthorized(level.getWorld().getName(), "PACKS");
-        installed.templates.forEach((key, value) -> manager.structureRepository.put(key, Optional.of(value)));
+        NativeTemplateRepository.install(manager, installed.templates, installed.graph.scope());
         var target = new WorldTarget(level.getWorld().getName(), level.dimension().identifier().toString());
         return new NativeWorldExecutor(target, installed.graph, actual -> {
             if(!actual.equals(target)) return false;
