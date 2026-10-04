@@ -9,11 +9,18 @@ description: "@DESCRIPTION@"
 folia-supported: true
 
 commands:
+  terra2reportlog:
+    description: Captura o console durante testes de geração
+    usage: /terra2reportlog [start|stop|status]
+    permission: terra2.diagnostics.capture
   terra2:
     description: Recarrega as autorizações de geração
     usage: /terra2 reload
     permission: terra2.settings.reload
 permissions:
+  terra2.diagnostics.capture:
+    description: Permite iniciar e encerrar a captura do console
+    default: op
   terra2.settings.reload:
     description: Permite recarregar as autorizações do Terra2
     default: op

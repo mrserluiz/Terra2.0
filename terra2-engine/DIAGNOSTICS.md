@@ -24,3 +24,24 @@ stronghold ring selection now uses vanilla biomes, so positions may differ from 
 for newly created worlds. Bukkit-only fallback retains its pack biome provider.
 This addresses the observed expensive initialization path; server reproduction
 is still required to establish whether other generation stalls remain.
+
+## 7.0.10: console capture before Multiverse commands
+
+`/terra2reportlog` (or `/terra2reportlog start`) opens a capture; `stop` flushes
+and closes it; `status` reports whether it is active. Permission:
+`terra2.diagnostics.capture`, OP by default. Console/RCON may use the same command.
+Player, console and RCON commands with root label `mv` or `multiverse` start the
+same capture automatically, before execution. Namespaced root labels are accepted.
+Subsequent commands append markers and renew the ten-minute window.
+
+The independent daemon reads `logs/latest.log` every second and forces report writes
+to disk. It includes up to 64 KiB of preceding context, writes `console-latest.txt`
+and a numbered `console-*.log`, stops at ten minutes or about 16 MiB, and retains
+eight numbered sessions. These reports complement stall thread snapshots. Files
+remain available after failure/restart; a new capture replaces only the latest alias.
+
+This captures the console file, not GUI chat feedback that a plugin never logs.
+An abrupt process kill can lose lines written since the last poll, or console lines
+not yet flushed by Paper. Commands invoked by another plugin via dispatchCommand
+may bypass Bukkit command events; manual start covers that case. No remote upload
+or global server reload is performed.

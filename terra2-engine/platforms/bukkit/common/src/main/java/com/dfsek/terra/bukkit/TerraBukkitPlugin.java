@@ -52,6 +52,7 @@ public class TerraBukkitPlugin extends JavaPlugin {
     private final Map<String, com.dfsek.terra.api.world.chunk.generation.ChunkGenerator> generatorMap = new HashMap<>();
     private final Map<String, String> generatorPacks = new HashMap<>();
     private com.dfsek.terra.bukkit.util.ServerStallMonitor stallMonitor;
+    private com.dfsek.terra.bukkit.util.ConsoleCapture consoleCapture;
     private io.papermc.paper.threadedregions.scheduler.ScheduledTask heartbeatTask;
     private PlatformImpl platform;
     private org.terra2.core.GenerationManager<com.dfsek.terra.api.block.state.BlockState, com.dfsek.terra.api.world.biome.Biome> core;
@@ -124,6 +125,22 @@ public class TerraBukkitPlugin extends JavaPlugin {
         PaperUtil.checkPaper(this);
         stallMonitor = new com.dfsek.terra.bukkit.util.ServerStallMonitor();
         heartbeatTask = globalRegionScheduler.runAtFixedRate(this, task -> stallMonitor.heartbeat(), 1, 20);
+        consoleCapture = new com.dfsek.terra.bukkit.util.ConsoleCapture(getDataFolder().toPath().resolve("reports"),
+            java.nio.file.Path.of("logs", "latest.log"), "Plugin: " + getDescription().getVersion() + "; Server: " + Bukkit.getVersion());
+        Bukkit.getPluginManager().registerEvents(new org.bukkit.event.Listener() {
+            @org.bukkit.event.EventHandler(priority = org.bukkit.event.EventPriority.MONITOR, ignoreCancelled = true)
+            public void playerCommand(org.bukkit.event.player.PlayerCommandPreprocessEvent event) {
+                captureMultiverseCommand(event.getMessage(), event.getPlayer().getName());
+            }
+            @org.bukkit.event.EventHandler(priority = org.bukkit.event.EventPriority.MONITOR, ignoreCancelled = true)
+            public void serverCommand(org.bukkit.event.server.ServerCommandEvent event) {
+                captureMultiverseCommand(event.getCommand(), event.getSender().getName());
+            }
+            @org.bukkit.event.EventHandler(priority = org.bukkit.event.EventPriority.MONITOR, ignoreCancelled = true)
+            public void remoteCommand(org.bukkit.event.server.RemoteServerCommandEvent event) {
+                captureMultiverseCommand(event.getCommand(), event.getSender().getName());
+            }
+        }, this);
         logger.info("Terra2 diagnostics enabled; reports directory: {}", getDataFolder().toPath().resolve("reports"));
     }
 
@@ -131,6 +148,7 @@ public class TerraBukkitPlugin extends JavaPlugin {
     public void onDisable() {
         if(heartbeatTask != null) heartbeatTask.cancel();
         if(stallMonitor != null) stallMonitor.close();
+        if(consoleCapture != null) consoleCapture.close();
     }
 
     @NotNull
@@ -255,6 +273,26 @@ public class TerraBukkitPlugin extends JavaPlugin {
     @Override
     public boolean onCommand(org.bukkit.command.CommandSender sender, org.bukkit.command.Command command,
                              String label, String[] args) {
+        if(command.getName().equalsIgnoreCase("terra2reportlog")) {
+            if(!sender.hasPermission("terra2.diagnostics.capture")) {
+                sender.sendMessage("Sem permissão: terra2.diagnostics.capture"); return true;
+            }
+            String action = args.length == 0 ? "start" : args[0].toLowerCase(java.util.Locale.ROOT);
+            if(args.length > 1 || !java.util.Set.of("start", "stop", "status").contains(action)) {
+                sender.sendMessage("Uso: /terra2reportlog [start|stop|status]"); return true;
+            }
+            if(consoleCapture == null) { sender.sendMessage("Captura indisponível: Terra2 ainda não inicializado."); return true; }
+            try {
+                switch(action) {
+                    case "start" -> sender.sendMessage("Terra2: captura iniciada: " + consoleCapture.start("/terra2reportlog", sender.getName()));
+                    case "stop" -> sender.sendMessage("Terra2: captura encerrada: " + consoleCapture.stop("Comando manual"));
+                    case "status" -> sender.sendMessage("Terra2: " + consoleCapture.status());
+                }
+            } catch(java.io.IOException error) {
+                sender.sendMessage("Terra2: falha ao salvar captura. Consulte o console."); logger.error("Could not start/stop console capture", error);
+            }
+            return true;
+        }
         if(!command.getName().equalsIgnoreCase("terra2")) return false;
         if(!sender.hasPermission("terra2.settings.reload")) {
             sender.sendMessage("Sem permissão: terra2.settings.reload");
@@ -272,6 +310,16 @@ public class TerraBukkitPlugin extends JavaPlugin {
             logger.error("Could not reload Terra2 generation settings", e);
         }
         return true;
+    }
+
+    private void captureMultiverseCommand(String command, String sender) {
+        String label = command.stripLeading().split("\\s+", 2)[0].replaceFirst("^/", "").toLowerCase(java.util.Locale.ROOT);
+        int namespace = label.lastIndexOf(':');
+        if(namespace >= 0) label = label.substring(namespace + 1);
+        if(!label.equals("mv") && !label.equals("multiverse")) return;
+        if(consoleCapture == null) return;
+        try { consoleCapture.start(command, sender); }
+        catch(java.io.IOException error) { logger.error("Could not capture Multiverse command", error); }
     }
 
     public synchronized void reloadGenerationSettings() throws Exception {
