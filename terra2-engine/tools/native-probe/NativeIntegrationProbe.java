@@ -13,6 +13,10 @@ public final class NativeIntegrationProbe extends JavaPlugin {
         try {
             var engine = (TerraBukkitPlugin) getServer().getPluginManager().getPlugin("Terra2");
             if(engine == null || !engine.isEnabled()) throw new IllegalStateException("Engine did not enable");
+            boolean protectedWorld = false;
+            try { engine.assertGenerationAuthorized("world", "PACKS"); }
+            catch(RuntimeException expected) { protectedWorld = true; }
+            if(!protectedWorld) throw new IllegalStateException("Primary world authorization was not blocked");
             var world = WorldCreator.name("terra2_native_smoke").seed(42).environment(World.Environment.NORMAL)
                 .generator("Terra2:PACKS").createWorld();
             if(world == null) throw new IllegalStateException("World creation failed");
@@ -35,9 +39,14 @@ public final class NativeIntegrationProbe extends JavaPlugin {
                     }
                 }
                 if(!found) throw new IllegalStateException("Generated native chest not found");
-                long gold = 0;
-                for(int x = 0; x < 32; x++) for(int z = 0; z < 32; z++) for(int y = 98; y < 106; y++) if(world.getBlockAt(x, y, z).getType() == Material.GOLD_BLOCK) gold++;
+                long gold = 0, childMarker = 0;
+                for(int x = 0; x < 32; x++) for(int z = 0; z < 32; z++) for(int y = 98; y < 106; y++) {
+                    var type = world.getBlockAt(x, y, z).getType();
+                    if(type == Material.GOLD_BLOCK) gold++;
+                    if(type == Material.EMERALD_BLOCK) childMarker++;
+                }
                 if(gold < 18) throw new IllegalStateException("Jigsaw child/processor output missing: " + gold);
+                if(childMarker < 1) throw new IllegalStateException("Jigsaw child template not assembled");
                 data.setProperty("gold", Long.toString(gold)); data.setProperty("world", world.getUID().toString()); data.setProperty("dimension", world.getKey().toString());
                 try(var output = Files.newOutputStream(checkpoint)) { data.store(output, "Native save/restart checkpoint"); }
                 world.save(); getServer().savePlayers();

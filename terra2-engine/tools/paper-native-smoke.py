@@ -42,7 +42,8 @@ def template(child):
     palette = [compound([('Name', 8, string('minecraft:stone_bricks'))]),
         compound([('Name', 8, string('minecraft:jigsaw')), ('Properties', 10,
             compound([('orientation', 8, string('west_up' if child else 'east_up'))]))]),
-        compound([('Name', 8, string('minecraft:chest'))])]
+        compound([('Name', 8, string('minecraft:chest'))]),
+        compound([('Name', 8, string('minecraft:emerald_block'))])]
     blocks = []
     def block(pos, state, nbt=None):
         fields = [('pos', 9, vector(pos)), ('state', 3, integer(state))]
@@ -56,6 +57,7 @@ def template(child):
     if not child:
         block([1, 1, 1], 2, [('id', 8, string('minecraft:chest')), ('LootTable', 8, string('smoke:chest')),
             ('LootTableSeed', 4, struct.pack('>q', 42))])
+    else: block([1, 1, 1], 3)
     return gzip.compress(b'\x0a\0\0' + compound([('DataVersion', 3, integer(2586)),
         ('size', 9, vector([3, 3, 3])), ('palette', 9, listed(10, palette)),
         ('blocks', 9, listed(10, blocks)), ('entities', 9, listed(10, []))]))
@@ -147,13 +149,16 @@ def main():
     server = build['downloads']['server:default']
     checksum = server.get('checksums', {}).get('sha256')
     download(server['url'], SERVER / 'paper.jar', 'sha256', checksum)
-    release = api('https://api.github.com/repos/PolyhedralDev/TerraOverworldConfig/releases/latest')
-    asset = next(a for a in release['assets'] if a['name'] == 'Overworld.zip')
-    download(asset['browser_download_url'], PLUGIN / 'packs/Overworld.zip', 'sha256', asset.get('digest', '').removeprefix('sha256:') or None)
+    # Pinned official release content: avoid unauthenticated GitHub API rate limits.
+    download('https://github.com/PolyhedralDev/TerraOverworldConfig/releases/download/latest/Overworld.zip',
+        PLUGIN / 'packs/Overworld.zip', 'sha256', '64e715bc1e591f59d5835650a76fd638c1615772187d91e74eb0255e922afd27')
     fixture(); dnt()
     cp = os.pathsep.join([str(jars[0])] + [str(p) for p in (pathlib.Path.home() / '.gradle/caches').rglob('*.jar')])
     classes = SERVER / 'probe-classes'; classes.mkdir(exist_ok=True)
-    subprocess.run(['javac', '-cp', cp, '-d', str(classes), str(ROOT / 'tools/native-probe/NativeIntegrationProbe.java')], check=True)
+    arguments = SERVER / 'javac.args'
+    arguments.write_text('\n'.join('"' + arg.replace('\\', '\\\\').replace('"', '\\"') + '"'
+        for arg in ['-cp', cp, '-d', str(classes), str(ROOT / 'tools/native-probe/NativeIntegrationProbe.java')]))
+    subprocess.run(['javac', '@' + str(arguments)], check=True)
     (classes / 'plugin.yml').write_text("name: Terra2NativeProbe\nversion: '1'\nmain: NativeIntegrationProbe\napi-version: '26.2'\ndepend: [Terra2]\ncommands:\n  nativeprobe: {}\n")
     subprocess.run(['jar', '--create', '--file', str(SERVER / 'plugins/NativeProbe.jar'), '-C', str(classes), '.'], check=True)
     (SERVER / 'eula.txt').write_text('eula=true\n')
