@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -eu
 while IFS= read -r candidate; do
-  if jar tf "$candidate" 2>/dev/null | rg -q '^net/minecraft/world/level/levelgen/structure/Structure.class$'; then
+  if jar tf "$candidate" 2>/dev/null | grep '^net/minecraft/world/level/levelgen/structure/Structure.class$' >/dev/null; then
     javap -private -classpath "$candidate" \
       net.minecraft.world.level.chunk.ChunkGenerator \
       net.minecraft.world.level.chunk.ChunkGeneratorStructureState \
@@ -26,6 +26,10 @@ while IFS= read -r candidate; do
       net.minecraft.world.level.levelgen.structure.pools.JigsawPlacement
     exit 0
   fi
-done < <(rg --files . "$HOME/.gradle/caches" -g '*.jar')
+done < <(if command -v rg >/dev/null; then
+  rg --files . "$HOME/.gradle/caches" -g '*.jar'
+else
+  find . "$HOME/.gradle/caches" -name '*.jar' -type f
+fi)
 echo 'Paper worldgen classes not found' >&2
 exit 1
