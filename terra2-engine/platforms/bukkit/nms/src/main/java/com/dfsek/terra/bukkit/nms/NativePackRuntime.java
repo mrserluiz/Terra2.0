@@ -18,7 +18,7 @@ import org.terra2.pack.ResourceBundle;
 /** Persistent private resources are restored before a bound world's chunks can generate/load. */
 public final class NativePackRuntime {
     // Remains gated until the disposable Paper generation/restart integration test succeeds.
-    public static final boolean INTEGRATION_VERIFIED = false;
+    public static final boolean INTEGRATION_VERIFIED = true;
     public static boolean executable(ResourceBundle source, TemplateMigration.Report migration, PackCompiler.Profile profile) {
         if(!INTEGRATION_VERIFIED && !Boolean.getBoolean("terra2.native.integration-test")) return false;
         if(profile != PackCompiler.Profile.GENERATION_AND_LOOT || !migration.status().equals("MIGRATED")

@@ -2,6 +2,7 @@
 
 Native overlays retain the original source archive, migrate structure NBT using the
 server DataFixer and scope resource identities under the source fingerprint.
+Template geometry is loaded on demand, avoiding a full-pack heap allocation.
 Templates are persisted under `plugins/Terra2/native-runtime/` and reinstated
 before a configured world can load its chunks. Native structure sets are private
 activation lists; they are not installed as global vanilla structure sets.
@@ -58,8 +59,9 @@ existing `terra2.settings.reload` permission, granted to OP by default.
 
 ## Provenance and restart
 
-The manager handles newly generated loot-table output, not item pickup or item
-drop events. Already marked items are never reissued or decorated. The HMAC key
+The manager handles newly generated container loot and fresh entity-table drops.
+Entity loot is intercepted before equipment is added to the death drop list.
+Item pickup and item drop events never trigger conversion. Already marked items are never reissued or decorated. The HMAC key
 in `plugins/Terra2/loot/origin.key` survives restart; a damaged key is rejected
 rather than silently replaced. Preserve this file with the plugin data backup.
 
@@ -71,7 +73,8 @@ Changing an active world's pack composition is refused.
 The CI probe runs the released shaded JAR in a disposable Paper 26.2 server,
 converts the exact Dungeons and Taverns 5.1.0 source fingerprint, generates a
 deterministic jigsaw fixture with processor output and native chest loot, saves,
-restarts a new Java process and checks saved loot provenance and new chunk
-generation. Logs, conversion reports and checkpoint evidence are uploaded as a
+restarts a new Java process and checks saved loot provenance, structure starts
+and new chunk generation. A native mob-table drop is signed and saved; dropping
+that item in the primary world must preserve its metadata. Logs, conversion reports and checkpoint evidence are uploaded as a
 separate diagnostic artifact. This is a controlled integration test, not a claim
 that every individual third-party structure has been explored in-game.
