@@ -114,6 +114,7 @@ public class TerraBukkitPlugin extends JavaPlugin {
         }
 
         platform = NMSInitializer.init(this);
+        if(platform != null && platform.nativePackBackend() != null) terraPacks.nativeBackend(platform.nativePackBackend());
         Bukkit.getPluginManager().registerEvents(new org.bukkit.event.Listener() {
             @org.bukkit.event.EventHandler(priority = org.bukkit.event.EventPriority.LOWEST)
             public void bindWorld(org.bukkit.event.world.WorldInitEvent event) {

@@ -46,6 +46,7 @@ public class PlatformImpl extends AbstractPlatform {
 
     /** Whether world-init installs the native pack biome source before chunk generation. */
     public boolean usesNativeBiomeProvider() { return false; }
+    public org.terra2.pack.NativePackBackend nativePackBackend() { return null; }
     private static final Logger LOGGER = LoggerFactory.getLogger(PlatformImpl.class);
 
     private final ItemHandle itemHandle = new BukkitItemHandle();

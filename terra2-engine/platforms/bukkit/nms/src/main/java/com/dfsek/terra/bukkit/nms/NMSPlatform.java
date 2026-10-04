@@ -44,6 +44,17 @@ public class NMSPlatform extends PlatformImpl {
 
     @Override
     public boolean usesNativeBiomeProvider() { return true; }
+    @Override public org.terra2.pack.NativePackBackend nativePackBackend() {
+        return source -> {
+            var server = net.minecraft.server.MinecraftServer.getServer();
+            var registries = new java.util.LinkedHashMap<net.minecraft.resources.ResourceKey<? extends net.minecraft.core.Registry<?>>, net.minecraft.core.HolderLookup.RegistryLookup<?>>();
+            server.registryAccess().listRegistries().forEach(lookup -> registries.put(lookup.key(), lookup));
+            server.reloadableRegistries().lookup().listRegistries().forEach(lookup -> registries.put(lookup.key(), lookup));
+            var graph = new NativeResourceGraph(source, net.minecraft.core.HolderLookup.Provider.create(registries.values().stream()));
+            var report = graph.report();
+            return new org.terra2.pack.NativePackBackend.Validation("paper-26.2-native-graph-1", report.fingerprint(), report.decoded(), report.errors());
+        };
+    }
 
     public NMSPlatform(TerraBukkitPlugin plugin) {
         super(plugin);

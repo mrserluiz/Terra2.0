@@ -11,6 +11,8 @@ import java.util.zip.*;
 public final class TerraPackStore {
     private static final Gson JSON = new GsonBuilder().setPrettyPrinting().create();
     private final Path input, output, reports;
+    private NativePackBackend nativeBackend;
+    public synchronized void nativeBackend(NativePackBackend backend) { nativeBackend = Objects.requireNonNull(backend); }
     public record Conversion(String id, String status, Path output, Path report, int blockers, int features, boolean terrain) {}
     public TerraPackStore(Path pluginDirectory) throws IOException {
         input = pluginDirectory.resolve("conversion/input"); output = pluginDirectory.resolve("terrapacks"); reports = pluginDirectory.resolve("conversion/reports");
@@ -65,6 +67,7 @@ public final class TerraPackStore {
         // Decoded structure inventory is diagnostic, not authorization to execute unfinished stages.
         manifest.add("structureMigration", JSON.toJsonTree(StructureCatalog.audit(merged)));
         manifest.add("nativeTemplateMigration", JSON.toJsonTree(migration.report()));
+        if(nativeBackend != null) manifest.add("nativeResourceValidation", JSON.toJsonTree(nativeBackend.validate(merged)));
         // Readiness always comes from the executable compiler; MIGRATED only describes NBT.
         Path temp = Files.createTempFile(output, ".conversion-", ".tmp");
         Path reportTemp = Files.createTempFile(reports, ".conversion-", ".tmp");

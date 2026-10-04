@@ -13,6 +13,9 @@ while IFS= read -r candidate; do
       net.minecraft.resources.RegistryOps \
       net.minecraft.core.RegistryAccess \
       net.minecraft.core.HolderLookup\$Provider \
+      net.minecraft.core.HolderLookup\$RegistryLookup \
+      net.minecraft.core.HolderGetter\$Provider \
+      net.minecraft.core.Holder\$Reference \
       net.minecraft.core.MappedRegistry \
       net.minecraft.server.MinecraftServer \
       net.minecraft.server.ReloadableServerRegistries \
