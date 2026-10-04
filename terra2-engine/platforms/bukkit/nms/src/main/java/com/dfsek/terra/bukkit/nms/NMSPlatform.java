@@ -50,9 +50,14 @@ public class NMSPlatform extends PlatformImpl {
             var registries = new java.util.LinkedHashMap<net.minecraft.resources.ResourceKey<? extends net.minecraft.core.Registry<?>>, net.minecraft.core.HolderLookup.RegistryLookup<?>>();
             server.registryAccess().listRegistries().forEach(lookup -> registries.put(lookup.key(), lookup));
             server.reloadableRegistries().lookup().listRegistries().forEach(lookup -> registries.put(lookup.key(), lookup));
-            var graph = new NativeResourceGraph(source, net.minecraft.core.HolderLookup.Provider.create(registries.values().stream()));
-            var report = graph.report();
-            return new org.terra2.pack.NativePackBackend.Validation("paper-26.2-native-graph-1", report.fingerprint(), report.decoded(), report.errors());
+            try {
+                var graph = new NativeResourceGraph(source, net.minecraft.core.HolderLookup.Provider.create(registries.values().stream()));
+                var report = graph.report();
+                return new org.terra2.pack.NativePackBackend.Validation("paper-26.2-native-graph-1", report.fingerprint(), report.decoded(), report.errors());
+            } catch(RuntimeException | LinkageError error) {
+                return new org.terra2.pack.NativePackBackend.Validation("paper-26.2-native-graph-1", source.fingerprint(), java.util.Map.of(),
+                    java.util.List.of("Native graph initialization: " + error.getMessage()));
+            }
         };
     }
 

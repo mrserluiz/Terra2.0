@@ -149,9 +149,16 @@ public final class NativeResourceGraph {
                         found.ifPresent(entries::add);
                     }
                 }
-                var named = new HolderSet.Named<T>(parent, target);
+                var named = namedTag(parent, target);
                 Reflection.HOLDER_SET.invokeBind(named, entries.stream().distinct().toList()); tags.put(target, named); return named;
             } finally { resolving.remove(target); }
         }
+    }
+    @SuppressWarnings("unchecked") private static <T> HolderSet.Named<T> namedTag(HolderOwner<T> owner, TagKey<T> key) {
+        try {
+            var constructor = HolderSet.Named.class.getDeclaredConstructor(HolderOwner.class, TagKey.class);
+            constructor.setAccessible(true);
+            return (HolderSet.Named<T>) constructor.newInstance(owner, key);
+        } catch(ReflectiveOperationException error) { throw new IllegalStateException("Cannot construct an isolated native tag", error); }
     }
 }
