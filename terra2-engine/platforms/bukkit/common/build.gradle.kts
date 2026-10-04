@@ -19,3 +19,8 @@ dependencies {
 
     shadedApi("org.incendo", "cloud-paper", Versions.Bukkit.cloud)
 }
+
+// Ship the same reviewable demo used in the documentation; never auto-authorize it.
+tasks.named<ProcessResources>("processResources") {
+    from(rootProject.file("examples/datapacks")) { into("datapacks") }
+}

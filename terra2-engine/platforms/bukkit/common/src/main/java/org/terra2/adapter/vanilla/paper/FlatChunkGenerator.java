@@ -1,7 +1,5 @@
 package org.terra2.adapter.vanilla.paper;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.*;
@@ -11,6 +9,7 @@ import org.bukkit.block.Biome;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.generator.*;
 import org.terra2.adapter.vanilla.FlatDefinition;
+import org.terra2.adapter.vanilla.DatapackManifest;
 import org.terra2.core.*;
 
 /** Flat terrain runs through the same neutral core contracts, with no Terra noise/addon dependency. */
@@ -32,21 +31,8 @@ public final class FlatChunkGenerator extends ChunkGenerator {
         core.bindDimension(world, loaded.getKey().toString());
         Path manifest = loaded.getWorldFolder().toPath().resolve("terra2-generation.json");
         String identity = core.binding(world).plan().identity();
-        if(Files.exists(manifest)) {
-            var json = JsonParser.parseString(Files.readString(manifest)).getAsJsonObject();
-            if(!identity.equals(json.get("plan").getAsString()) || !selection.equals(json.get("selection").getAsString())
-                    || !loaded.getKey().toString().equals(json.get("dimension").getAsString())
-                    || loaded.getSeed() != json.get("seed").getAsLong())
-                throw new IllegalArgumentException("Existing world manifest differs; refusing generator change: " + world);
-        } else {
-            var json = new JsonObject();
-            json.addProperty("schema", 1); json.addProperty("world", world);
-            json.addProperty("dimension", loaded.getKey().toString()); json.addProperty("seed", loaded.getSeed());
-            json.addProperty("plan", identity); json.addProperty("selection", selection);
-            json.addProperty("sourceDimension", definition.dimension());
-            json.addProperty("minecraft", "26.2"); json.addProperty("minY", -64); json.addProperty("maxY", 320);
-            Files.writeString(manifest, json.toString() + "\n", StandardOpenOption.CREATE_NEW);
-        }
+        new DatapackManifest(world, loaded.getKey().toString(), loaded.getSeed(), identity, selection,
+            definition.dimension(), loaded.getMinHeight(), loaded.getMaxHeight()).verifyOrCreate(manifest);
         // Publish only after manifest validation/write; a failed init cannot produce chunks.
         dimensionKey = loaded.getKey().toString();
     }

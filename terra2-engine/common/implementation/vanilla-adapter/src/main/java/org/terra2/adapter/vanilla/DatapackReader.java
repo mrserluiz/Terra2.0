@@ -26,6 +26,7 @@ public final class DatapackReader {
         var metadata = object("pack.mcmeta");
         fields(metadata, Set.of("pack"), "pack.mcmeta");
         var pack = child(metadata, "pack");
+        if(!pack.has("description")) throw new IllegalArgumentException("Missing pack.description");
         fields(pack, Set.of("description", "pack_format", "supported_formats", "min_format", "max_format"), "pack");
         // Paper 26.2 / Minecraft 26.2 has data format 107.1. No implicit version upgrade.
         int[] min, max;
@@ -43,7 +44,7 @@ public final class DatapackReader {
         } else {
             min = version(pack.get("pack_format")); max = min.clone(); max[1] = Integer.MAX_VALUE;
         }
-        if(compare(min, max) > 0 || compare(min, new int[]{107, 1}) > 0 || compare(max, new int[]{107, 1}) < 0)
+        if(min[0] < 0 || min[1] < 0 || max[0] < 0 || max[1] < 0 || compare(min, max) > 0 || compare(min, new int[]{107, 1}) > 0 || compare(max, new int[]{107, 1}) < 0)
             throw new IllegalArgumentException("Datapack format does not support Minecraft 26.2 (107.1)");
     }
     public static DatapackReader open(Path root) throws IOException {

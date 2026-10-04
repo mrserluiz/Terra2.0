@@ -88,6 +88,10 @@ public class TerraBukkitPlugin extends JavaPlugin {
         }
         core = new org.terra2.core.GenerationManager<>(java.util.Set.of(primaryWorldName, primaryWorldName + "_nether", primaryWorldName + "_the_end"));
         try {
+            for(String resource : java.util.List.of("datapacks/terra2-flat-demo/pack.mcmeta",
+                    "datapacks/terra2-flat-demo/data/terra2_demo/dimension/flat.json")) {
+                if(!new File(getDataFolder(), resource).exists()) saveResource(resource, false);
+            }
             datapacks = new org.terra2.adapter.vanilla.paper.DatapackRuntime(getDataFolder().toPath().resolve("datapacks"),
                 java.util.Set.of(primaryWorldName, primaryWorldName + "_nether", primaryWorldName + "_the_end"));
         } catch(java.io.IOException error) {
@@ -329,7 +333,8 @@ public class TerraBukkitPlugin extends JavaPlugin {
                 } else if((args.length == 3 || args.length == 4) && args[1].equalsIgnoreCase("inspect")) {
                     var reader = datapacks.read(args[2]); var inspection = reader.inspect();
                     sender.sendMessage("Dimensões encontradas: " + inspection.dimensions());
-                    sender.sendMessage("Recursos não suportados: " + inspection.unsupported());
+                    sender.sendMessage("Recursos não suportados (" + inspection.unsupported().size() + "): "
+                        + inspection.unsupported().stream().sorted().limit(10).toList());
                     if(args.length == 4) {
                         var definition = reader.flat(args[3]);
                         sender.sendMessage("Conversão flat validada: " + definition.dimension() + "; SHA-256: " + definition.fingerprint());

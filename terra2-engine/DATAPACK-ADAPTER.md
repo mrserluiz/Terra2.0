@@ -31,9 +31,10 @@ registered datapack dimension type.
 
 1. Install `Terra2-bukkit-7.0.13-BETA.jar` in place of the previous engine JAR;
    keep exactly one Terra2 plugin. A JAR update requires one complete restart.
-2. Copy `examples/datapacks/terra2-flat-demo/` to
-   `plugins/Terra2/datapacks/terra2-flat-demo/` (pack.mcmeta at the folder root).
-   Alternatively use a ZIP with the same root layout. Do **not** put the example
+2. The plugin installs the included demo into
+   `plugins/Terra2/datapacks/terra2-flat-demo/` if missing; it does not authorize
+   or create a world. The source is also in `examples/datapacks/terra2-flat-demo/`.
+   For other compatible sources copy a folder or ZIP with pack.mcmeta at its root. Do **not** put the example
    or imported pack into the primary world's datapacks directory.
 3. Add the explicit test-world source alongside existing Community Pack entries:
 
