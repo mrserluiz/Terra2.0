@@ -8,6 +8,12 @@ import com.dfsek.terra.bukkit.TerraBukkitPlugin;
 
 /** Runs only in disposable CI servers. Never included in the released plugin. */
 public final class NativeIntegrationProbe extends JavaPlugin {
+    private long nativeStarts(World world, int x, int z) {
+        var level = ((org.bukkit.craftbukkit.CraftWorld) world).getHandle();
+        var registry = level.registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.STRUCTURE);
+        return level.getChunk(x, z).getAllStarts().entrySet().stream().filter(entry -> entry.getValue().isValid())
+            .filter(entry -> registry.getKey(entry.getKey()).getNamespace().equals("terra2")).count();
+    }
     @Override public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if(args.length != 1) return false;
         try {
@@ -47,6 +53,10 @@ public final class NativeIntegrationProbe extends JavaPlugin {
                 }
                 if(gold < 18) throw new IllegalStateException("Jigsaw child/processor output missing: " + gold);
                 if(childMarker < 1) throw new IllegalStateException("Jigsaw child template not assembled");
+                long starts = nativeStarts(world, 0, 0);
+                if(starts < 1) throw new IllegalStateException("Native structure-start record missing");
+                data.setProperty("starts", Long.toString(starts));
+                if(nativeStarts(getServer().getWorld("world"), 8, 8) != 0) throw new IllegalStateException("Native structures activated in primary world");
                 data.setProperty("gold", Long.toString(gold)); data.setProperty("world", world.getUID().toString()); data.setProperty("dimension", world.getKey().toString());
                 try(var output = Files.newOutputStream(checkpoint)) { data.store(output, "Native save/restart checkpoint"); }
                 world.save(); getServer().savePlayers();
@@ -55,6 +65,8 @@ public final class NativeIntegrationProbe extends JavaPlugin {
                 try(var input = Files.newInputStream(checkpoint)) { data.load(input); }
                 if(!data.getProperty("world").equals(world.getUID().toString()) || !data.getProperty("dimension").equals(world.getKey().toString()))
                     throw new IllegalStateException("World identity changed after restart");
+                if(nativeStarts(world, 0, 0) != Long.parseLong(data.getProperty("starts")))
+                    throw new IllegalStateException("Native structure starts did not survive restart");
                 var xyz = Arrays.stream(data.getProperty("chest").split(",")).mapToInt(Integer::parseInt).toArray();
                 var chest = (Chest) world.getBlockAt(xyz[0], xyz[1], xyz[2]).getState();
                 var item = Arrays.stream(chest.getBlockInventory().getContents()).filter(Objects::nonNull).findFirst().orElseThrow();

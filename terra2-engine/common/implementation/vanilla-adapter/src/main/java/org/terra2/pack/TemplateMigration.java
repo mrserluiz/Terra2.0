@@ -69,7 +69,8 @@ public final class TemplateMigration {
                 for(String field : List.of("pool", "name", "target", "LootTable"))
                     if(block.nbt().containsKey(field) && !Objects.equals(block.nbt().get(field), next.nbt().get(field)))
                         throw new IOException("Native migration changed " + field + " at " + block.position());
-                if(!block.nbt().isEmpty() && next.nbt().isEmpty()) throw new IOException("Native migration lost block entity NBT at " + block.position());
+                if(!block.nbt().isEmpty() && next.nbt().isEmpty() && !removedEmptyBed(block, original, target))
+                    throw new IOException("Native migration lost block entity NBT at " + block.position());
             }
             int jigsaws = jigsaws(original);
             if(jigsaws != jigsaws(result)) throw new IOException("Native migration lost jigsaw connectors");
@@ -85,5 +86,13 @@ public final class TemplateMigration {
     private static int jigsaws(StructureNbt.Template template) {
         return (int) template.blocks().stream().filter(block -> template.palettes().getFirst()
             .get(block.state()).name().equals("minecraft:jigsaw")).count();
+    }
+    private static boolean removedEmptyBed(StructureNbt.Block block, StructureNbt.Template template, int target) {
+        // 26.2 removed bed block entities. Permit only empty metadata, never custom loot/components.
+        if(target < 4886 || !"minecraft:bed".equals(block.nbt().get("id"))) return false;
+        if(template.palettes().stream().anyMatch(palette -> !palette.get(block.state()).name().endsWith("_bed"))) return false;
+        if(!Set.of("id", "components", "x", "y", "z").containsAll(block.nbt().keySet())) return false;
+        Object components = block.nbt().get("components");
+        return components == null || components instanceof Map<?, ?> map && map.isEmpty();
     }
 }

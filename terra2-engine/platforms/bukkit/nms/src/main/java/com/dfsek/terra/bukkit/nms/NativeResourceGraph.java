@@ -165,7 +165,7 @@ public final class NativeResourceGraph {
         RegistryOps.RegistryInfo<T> info() { return new RegistryOps.RegistryInfo<>(parent, lookup, parent.registryLifecycle()); }
         void decode() {
             for(var entry : paths.entrySet()) try {
-                JsonElement json = inlineHolderSets(scope.rewrite(JsonParser.parseString(source.text(entry.getValue()))), "");
+                JsonElement json = inlineHolderSets(scope.rewrite(NativeJsonMigration.migrate(JsonParser.parseString(source.text(entry.getValue())))), "");
                 T value = codec.parse(ops, json).getOrThrow();
                 Reflection.REFERENCE.invokeBindValue(holders.get(entry.getKey()), value);
                 decoded.merge(key.identifier().toString(), 1, Integer::sum);
