@@ -36,7 +36,7 @@ public final class NativeResourceGraph {
     public NativeResourceGraph(ResourceBundle source, HolderLookup.Provider base) {
         this.source = source; this.scope = new ResourceScope(source); this.base = base;
         RegistryDataLoader.WORLDGEN_REGISTRIES.forEach(data -> data.runWithArguments(this::declare));
-        LootDataType.values().forEach(data -> declare(data.registryKey(), data.codec()));
+        LootDataType.values().forEach(this::declareLoot);
         // Sources for built-in-registry tags (blocks/items/entities) also need a private lookup.
         base.listRegistries().forEach(lookup -> declareTags(lookup));
         ops = RegistryOps.create(JsonOps.INSTANCE, new RegistryOps.RegistryInfoLookup() {
@@ -62,10 +62,14 @@ public final class NativeResourceGraph {
         if(parent.isEmpty()) { errors.add("Missing server registry " + key.identifier()); return; }
         nodes.computeIfAbsent(key, ignored -> new Node<>(key, parent.get(), codec));
     }
+    private <T extends net.minecraft.world.level.storage.loot.Validatable> void declareLoot(LootDataType<T> type) {
+        declare(type.registryKey(), type.codec());
+    }
+    @SuppressWarnings("unchecked")
     private <T> void declareTags(HolderLookup.RegistryLookup<T> parent) {
         String category = parent.key().identifier().getPath();
         if(source.paths().stream().anyMatch(path -> path.matches("data/[^/]+/tags/" + category + "/.+\\.json")))
-            nodes.computeIfAbsent(parent.key(), ignored -> new Node<>(parent.key(), parent, null));
+            nodes.computeIfAbsent(parent.key(), ignored -> new Node<>((ResourceKey<? extends Registry<T>>) (ResourceKey<?>) parent.key(), parent, null));
     }
     private final class Node<T> {
         private final ResourceKey<? extends Registry<T>> key;
@@ -102,6 +106,10 @@ public final class NativeResourceGraph {
                     return Stream.concat(parent.listTags(), tags.values().stream());
                 }
                 public Optional<Holder.Reference<T>> get(ResourceKey<T> target) { return Optional.ofNullable(holders.get(target)).or(() -> parent.get(target)); }
+                public Optional<T> getValueForCopying(ResourceKey<T> target) {
+                    var holder = holders.get(target);
+                    return holder != null && holder.isBound() ? Optional.of(holder.value()) : parent.getValueForCopying(target);
+                }
                 public Optional<HolderSet.Named<T>> get(TagKey<T> target) { return tagPaths.containsKey(target) ? Optional.of(tag(target)) : parent.get(target); }
             };
         }
@@ -116,9 +124,9 @@ public final class NativeResourceGraph {
             for(var tagKey : tagPaths.keySet()) try { tag(tagKey); }
             catch(RuntimeException | LinkageError error) { errors.add(tagPaths.get(tagKey) + ": " + error.getMessage()); }
         }
-        @SuppressWarnings("unchecked") HolderSet.Named<T> tag(TagKey<T> target) {
+        HolderSet.Named<T> tag(TagKey<T> target) {
             if(tags.containsKey(target)) return tags.get(target);
-            if(!resolving.add(target)) throw new IllegalArgumentException("Cyclic source tag: " + target.identifier());
+            if(!resolving.add(target)) throw new IllegalArgumentException("Cyclic source tag: " + target.location());
             try {
                 var root = JsonParser.parseString(source.text(tagPaths.get(target))).getAsJsonObject();
                 var entries = new ArrayList<Holder<T>>();
@@ -141,8 +149,7 @@ public final class NativeResourceGraph {
                         found.ifPresent(entries::add);
                     }
                 }
-                if(!(parent instanceof MappedRegistry<?> registry)) throw new IllegalArgumentException("Registry does not expose native tag owner: " + key.identifier());
-                var named = Reflection.MAPPED_REGISTRY.invokeCreateTag((MappedRegistry<T>) registry, target);
+                var named = new HolderSet.Named<T>(parent, target);
                 Reflection.HOLDER_SET.invokeBind(named, entries.stream().distinct().toList()); tags.put(target, named); return named;
             } finally { resolving.remove(target); }
         }
