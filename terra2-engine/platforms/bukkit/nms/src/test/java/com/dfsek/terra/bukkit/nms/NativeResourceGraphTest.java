@@ -76,6 +76,10 @@ class NativeResourceGraphTest {
         assertThrows(IllegalStateException.class, () -> graph.resource(Registries.STRUCTURE, "test:dungeon"));
     }
     @Test void executesNativeLootUsingTheIsolatedResolver() throws Exception {
+        var configuration = new io.papermc.paper.configuration.GlobalConfiguration();
+        configuration.misc = configuration.new Misc();
+        var configure = io.papermc.paper.configuration.GlobalConfiguration.class.getDeclaredMethod("set", io.papermc.paper.configuration.GlobalConfiguration.class);
+        configure.setAccessible(true); configure.invoke(null, configuration);
         fixtures();
         var graph = new NativeResourceGraph(ResourceBundle.read(directory), vanilla());
         assertTrue(graph.report().valid(), () -> String.join("\n", graph.report().errors()));

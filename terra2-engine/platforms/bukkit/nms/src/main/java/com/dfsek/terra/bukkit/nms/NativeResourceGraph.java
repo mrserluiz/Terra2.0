@@ -36,7 +36,13 @@ public final class NativeResourceGraph {
     /** Named.contains in 26.2 consults holder tags. Inline holder sets instead of mutating global tags. */
     private JsonElement inlineHolderSets(JsonElement json, String field) {
         if(json.isJsonObject()) {
-            var result = new JsonObject(); json.getAsJsonObject().entrySet().forEach(entry -> result.add(entry.getKey(), inlineHolderSets(entry.getValue(), entry.getKey()))); return result;
+            var object = json.getAsJsonObject(); var result = new JsonObject();
+            object.entrySet().forEach(entry -> {
+                String name = entry.getKey();
+                if(name.equals("options") && (!object.has("function") || !Set.of("minecraft:enchant_randomly", "minecraft:enchant_with_levels")
+                        .contains(object.get("function").getAsString()))) result.add(name, entry.getValue());
+                else result.add(name, inlineHolderSets(entry.getValue(), name));
+            }); return result;
         }
         if(json.isJsonArray()) {
             var result = new JsonArray(); json.getAsJsonArray().forEach(entry -> result.add(inlineHolderSets(entry, field))); return result;
