@@ -1,4 +1,4 @@
-# TerraPacks and per-world compositions — 7.0.16-BETA
+# TerraPacks and per-world compositions — 7.0.17-BETA
 
 This build implements an immutable local pack format, an asynchronous conversion
 workspace and executable composition of one terrain base with additive supported
@@ -245,3 +245,39 @@ execution are still blocked by the compiler. A `MIGRATED` NBT result does not im
 READY, runtime placement, loot execution or successful restart persistence.
 The migration contracts have automated tests; actual DataFixer migration of the
 full uploaded pack still requires a running Paper 26.2 conversion test.
+
+## Native execution interfaces and scoped resource validation (7.0.17)
+
+New conversions include `nativeResourceValidation`: the Paper backend decodes
+worldgen and loot JSON with Minecraft's codecs, resolves forward pool/loot
+references and evaluates source tags in a detached lookup. Missing custom
+dependencies and codec failures are recorded in the report. This does not modify
+server registries or change BLOCKED to READY.
+
+Resource identifiers use `terra2:<full-source-sha256>/<original-namespace>/<path>`.
+Codec type identifiers, jigsaw start connector labels, translations, textures and
+item-model identifiers retain their original meaning. Source tags have isolated
+aliases. This layer never replaces a vanilla resource.
+
+`NativeWorldExecutor` contains world-bound operations for native placement-state
+construction, Structure.generate (including jigsaw expansion),
+StructureStart.placeInChunk (including processors) and native loot evaluation with
+an invocation-specific resolver. It checks the actual world name and dimension,
+rejects the three primary vanilla dimension keys, and refuses structures or loot
+dependencies without persistent registry identities. **The executor is not yet
+connected to the Bukkit world-generation lifecycle.**
+
+Before enabling the full pack, the platform still needs a complete startup/reload
+lifecycle for isolated registry identifiers, scoped migrated templates, vanilla
+structure-set overrides, chunk start/reference persistence and live-world
+generator installation. It also needs full-pack generation/restart verification.
+Dungeons and Taverns therefore remains BLOCKED; this build is not a full-pack
+server generation test release.
+
+The future item layer has a tested `WorldLootPolicy` and HMAC-SHA256 origin receipt.
+Issuance requires an exact authorized world/dimension, pack and loot table. Drop,
+item-spawn and pickup triggers cannot issue origin, and any existing origin marker
+prevents reminting. Receipts cannot be reassigned to another world or server key.
+This is a policy foundation, not an active item renderer, inventory-transfer ban
+or general duplication fix. The platform must persist a random server key and
+connect trusted loot creation before applying custom names/lore/item models.
