@@ -7,6 +7,22 @@ import org.junit.jupiter.api.io.TempDir;
 import static org.junit.jupiter.api.Assertions.*;
 class GenerationSettingsTest {
     @TempDir Path folder;
+    @Test void supportsSemicolonAndListSelectionsAndRefusesAmbiguity() throws Exception {
+        Path file = folder.resolve("composition.yml");
+        String prefix = "generation:\n  enabled: true\n  protected-worlds: [world]\nworlds:\n  test:\n";
+        for(String entry : new String[]{"    pack: OVERWORLD;Dungeons-and-Taverns;Yggdrasil\n",
+            "    packs: [OVERWORLD, Dungeons-and-Taverns, Yggdrasil]\n"}) {
+            Files.writeString(file, prefix + entry);
+            var config = GenerationSettings.load(file.toFile());
+            assertEquals(java.util.List.of("OVERWORLD", "Dungeons-and-Taverns", "Yggdrasil"), GenerationSettings.packIds(config, "test"));
+            assertEquals("OVERWORLD;Dungeons-and-Taverns;Yggdrasil", GenerationSettings.packSelection(config, "test"));
+        }
+        for(String entry : new String[]{"    pack: OVERWORLD;\n", "    pack: OVERWORLD;OVERWORLD\n", "    packs: [OVERWORLD, 42]\n",
+            "    pack: OVERWORLD\n    packs: [Other]\n", "    packs: []\n"}) {
+            Files.writeString(file, prefix + entry);
+            assertThrows(InvalidConfigurationException.class, () -> GenerationSettings.load(file.toFile()));
+        }
+    }
     @Test void acceptsExplicitDatapackAndRejectsAmbiguousSources() throws Exception {
         Path file = folder.resolve("datapack-settings.yml");
         String valid = "generation:\n  enabled: true\n  protected-worlds: [world]\nworlds:\n  dp_test:\n    datapack: example.zip\n    dimension: test:flat\n";

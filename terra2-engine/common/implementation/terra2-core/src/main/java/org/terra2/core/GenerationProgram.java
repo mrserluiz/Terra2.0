@@ -3,5 +3,6 @@ package org.terra2.core;
 public interface GenerationProgram<B, M> {
     void generate(GenerationContext context, int chunkX, int chunkZ, BlockVolume<B> output);
     B blockAt(GenerationContext context, int x, int y, int z);
+    default void decorate(GenerationContext context, int chunkX, int chunkZ, BlockVolume<B> output) {}
     M biomeAt(GenerationContext context, int x, int y, int z);
 }

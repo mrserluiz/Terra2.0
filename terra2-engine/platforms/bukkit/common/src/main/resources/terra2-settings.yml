@@ -12,4 +12,10 @@ generation:
 # Source lives in plugins/Terra2/datapacks/; do not install it in world/datapacks.
 # Create with /mv create terra2_dp_teste normal --generator Terra2:DATAPACK
 # Inspect first: /terra2 datapack inspect terra2-flat-demo terra2_demo:flat
+# Compositions: choose exactly one terrain base, then READY converted extensions.
+#   terra2_mix_teste:
+#     packs: [OVERWORLD, Debris]
+# Equivalent: pack: OVERWORLD;Debris
+# Create with --generator Terra2:PACKS after /terra2 reload.
+# Convert inputs separately: /terra2 convert Debris scatter-demo
 worlds: {}

@@ -14,8 +14,8 @@ commands:
     usage: /terra2reportlog [start|stop|status]
     permission: terra2.diagnostics.capture
   terra2:
-    description: Gerencia autorizações e inspeciona datapacks vanilla
-    usage: /terra2 reload | /terra2 datapack list | /terra2 datapack inspect <arquivo> [dimensão]
+    description: Gerencia mundos, conversões e TerraPacks
+    usage: /terra2 reload | /terra2 convert <ID> <fontes> [dimensão] | /terra2 packs list | /terra2 packs inspect <ID>
     permission: terra2.settings.reload
 permissions:
   terra2.diagnostics.capture:

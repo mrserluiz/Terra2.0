@@ -44,6 +44,8 @@ public class BukkitChunkGeneratorWrapper extends org.bukkit.generator.ChunkGener
     private final BukkitBlockPopulator blockPopulator;
     private ChunkGenerator delegate;
     private ConfigPack pack;
+    private java.util.List<BlockPopulator> extraPopulators = java.util.List.of();
+    public void setExtraPopulators(java.util.List<BlockPopulator> value) { extraPopulators = java.util.List.copyOf(value); }
 
 
     public BukkitChunkGeneratorWrapper(ChunkGenerator delegate, ConfigPack pack, BlockState air) {
@@ -87,7 +89,8 @@ public class BukkitChunkGeneratorWrapper extends org.bukkit.generator.ChunkGener
 
     @Override
     public @NotNull List<BlockPopulator> getDefaultPopulators(@NotNull World world) {
-        return List.of(blockPopulator);
+        var result = new java.util.ArrayList<BlockPopulator>(); result.add(blockPopulator); result.addAll(extraPopulators);
+        return java.util.List.copyOf(result);
     }
 
     @Override

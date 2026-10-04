@@ -39,6 +39,49 @@ public final class DatapackRuntime {
     public static String selection(YamlConfiguration settings, String world) {
         return settings.getString("worlds." + world + ".datapack") + "#" + settings.getString("worlds." + world + ".dimension");
     }
+    private GenerationPlan<BlockData, Biome> compile(org.terra2.adapter.vanilla.FlatDefinition definition) {
+        if(definition.layers().stream().mapToInt(FlatDefinition.Layer::height).sum() > 382)
+            throw new IllegalArgumentException("Flat world needs at least two air blocks above terrain for spawn");
+        return definition.compile(block -> {
+            BlockData data = Bukkit.createBlockData(block);
+            if(!data.getMaterial().isBlock()) throw new IllegalArgumentException("Not a block: " + block);
+            return data;
+        }, biome -> {
+            Biome value = Registry.BIOME.get(Objects.requireNonNull(NamespacedKey.fromString(biome)));
+            if(value == null) throw new IllegalArgumentException("Unknown biome: " + biome);
+            return value;
+        });
+    }
+    public synchronized FlatChunkGenerator preparePacks(String world, String selection, List<org.terra2.pack.TerraPack> packs) {
+        org.terra2.pack.TerraPackStore.validateComposition(packs, false);
+        String fingerprint = String.join("+", packs.stream().map(org.terra2.pack.TerraPack::fingerprint).toList());
+        FlatChunkGenerator previous = generators.get(world);
+        if(previous != null) {
+            if(!previous.selection().equals(selection) || !previous.fingerprint().equals(fingerprint))
+                throw new IllegalArgumentException("Cannot replace active TerraPack composition: " + world);
+            return previous;
+        }
+        var original = packs.stream().filter(pack -> pack.terrain() != null).findFirst().orElseThrow().terrain();
+        var definition = new FlatDefinition(original.dimension(), original.biome(), original.layers(), fingerprint);
+        var plan = org.terra2.pack.PlanComposition.compose(selection, fingerprint, compile(definition),
+            org.terra2.pack.TerraPackStore.features(packs), block -> {
+                var data = Bukkit.createBlockData(block);
+                if(!data.getMaterial().isSolid()) throw new IllegalArgumentException("Simple-block feature requires a solid block: " + block);
+                return data;
+            }, data -> data.getMaterial().isAir());
+        core.authorize(new WorldTarget(world, null), plan);
+        var generator = new FlatChunkGenerator(core, world, selection, definition);
+        if(!org.terra2.pack.TerraPackStore.features(packs).isEmpty()) generator.setExtraPopulators(List.of(
+            new CoreDecorationPopulator<>(core, world, data -> data, data -> data)));
+        generators.put(world, generator); return generator;
+    }
+    public boolean hasWorld(String world) { return generators.containsKey(world); }
+    public synchronized void validatePackReload(String world, String selection, List<org.terra2.pack.TerraPack> packs) {
+        var existing = generators.get(world);
+        if(existing != null && (!existing.selection().equals(selection) ||
+            !existing.fingerprint().equals(String.join("+", packs.stream().map(org.terra2.pack.TerraPack::fingerprint).toList()))))
+            throw new IllegalArgumentException("Cannot replace active TerraPack composition: " + world);
+    }
     public synchronized FlatChunkGenerator prepare(String world, YamlConfiguration settings) throws IOException {
         String selected = selection(settings, world);
         FlatChunkGenerator previous = generators.get(world);
@@ -48,15 +91,7 @@ public final class DatapackRuntime {
         }
         FlatDefinition definition = read(settings.getString("worlds." + world + ".datapack"))
             .flat(settings.getString("worlds." + world + ".dimension"));
-        GenerationPlan<BlockData, Biome> plan = definition.compile(block -> {
-            BlockData data = Bukkit.createBlockData(block);
-            if(!data.getMaterial().isBlock()) throw new IllegalArgumentException("Not a block: " + block);
-            return data;
-        }, biome -> {
-            Biome value = Registry.BIOME.get(Objects.requireNonNull(NamespacedKey.fromString(biome)));
-            if(value == null) throw new IllegalArgumentException("Unknown biome: " + biome);
-            return value;
-        });
+        GenerationPlan<BlockData, Biome> plan = compile(definition);
         core.authorize(new WorldTarget(world, null), plan);
         FlatChunkGenerator generator = new FlatChunkGenerator(core, world, selected, definition);
         generators.put(world, generator);
@@ -72,7 +107,6 @@ public final class DatapackRuntime {
             if(existing != null && !existing.fingerprint().equals(definition.fingerprint()))
                 throw new IllegalArgumentException("Datapack content changed for active world: " + world);
         }
-        for(String world : generators.keySet()) if(next.isString("worlds." + world + ".pack"))
-            throw new IllegalArgumentException("Cannot replace an active datapack generator with a Terra pack: " + world);
+        // Source-exclusive transitions are checked by the plugin's full composition validator.
     }
 }

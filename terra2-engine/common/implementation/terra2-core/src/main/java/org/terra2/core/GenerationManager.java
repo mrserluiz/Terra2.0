@@ -63,6 +63,11 @@ public final class GenerationManager<B, M> {
             throw new IllegalArgumentException("Output height bounds differ from generation context");
         resolve(context).generate(context, x, z, output);
     }
+    public void decorate(GenerationContext context, int x, int z, BlockVolume<B> output) {
+        if(output.minY() != context.minY() || output.maxY() != context.maxY())
+            throw new IllegalArgumentException("Decoration height bounds differ from context");
+        resolve(context).decorate(context, x, z, output);
+    }
     public B blockAt(GenerationContext context, int x, int y, int z) { return resolve(context).blockAt(context, x, y, z); }
     public M biomeAt(GenerationContext context, int x, int y, int z) { return resolve(context).biomeAt(context, x, y, z); }
 }

@@ -1,0 +1,176 @@
+# TerraPacks and per-world compositions — 7.0.14-BETA
+
+This build implements an immutable local pack format, an asynchronous conversion
+workspace and executable composition of one terrain base with additive supported
+features. It is not a universal importer for large worldgen datapacks. Existing
+Community Packs still execute through the tested Terra compatibility backend.
+
+## Workspace and commands
+
+The plugin creates these directories, but never creates/authorizes a world by default:
+
+- `plugins/Terra2/conversion/input/`: user-supplied datapack folders or ZIPs.
+- `plugins/Terra2/terrapacks/<ID>.terrapack`: converted pack ZIP container.
+- `plugins/Terra2/conversion/reports/<ID>.json`: conversion results and blockers.
+
+Every input must have `pack.mcmeta` at its root. Use simple filenames without spaces;
+rename only the input ZIP/folder, not namespaced IDs inside it. The uploaded
+`terrenos.zip` is a collection of separate packs under `terrenos/datas`; select each
+individual pack, rather than treating the entire collection as one datapack.
+
+```text
+/terra2 convert <ID> <input.zip> [namespace:dimension]
+/terra2 convert <ID> <input-a.zip;input-b.zip> [namespace:dimension]
+/terra2 packs list
+/terra2 packs inspect <ID>
+```
+
+Conversion runs in an async worker, one job at a time. Commands require
+`terra2.settings.reload` (OP by default, configurable through permissions). Sources
+are not deleted or modified; files/scripts are not executed. Output IDs cannot
+silently overwrite an existing pack/report. Convert updates to a new ID.
+
+Two outcomes are intentionally distinct:
+
+- `READY`: the complete supported semantic resource set compiled to executable IR.
+  Paper additionally validates block/biome references before binding the world.
+- `BLOCKED`: an archive/report preserves the merged resources and source metadata,
+  but loading it as a generator is refused. Inspect/report lists the unsupported
+  resources. Creating an archive is not a successful complete semantic conversion.
+
+A merge rejects different bytes at the same `data/<namespace>/<resource>` path.
+Identical bytes are deduplicated. Original metadata/licenses/readmes are preserved
+under provenance; selecting several packs does not imply approval to redistribute
+their contents. Version-dependent overlays/filters block compilation rather than
+being dropped. Old pack-format numbers alone are not rewritten to claim 26.2 support:
+supported flat/feature definitions are translated to the neutral Terra2 model.
+
+## Current executable subset
+
+- Terrain: vanilla `minecraft:flat` with overworld type, vanilla block IDs, fixed
+  vanilla biome, explicit empty structure overrides and no vanilla lakes/features.
+- Additive feature extension: `minecraft:simple_block`, simple state provider,
+  vanilla solid block state, `in_square` + `WORLD_SURFACE_WG` heightmap, optional
+  constant `count` and `rarity_filter`. The compiled feature is applied after
+  existing world population stages using Paper's LimitedRegion, within its chunk.
+- One terrain base, either a legacy Community Pack or a converted flat TerraPack.
+  Extensions can add compiled features without replacing terrain or biome queries.
+
+Feature randomness is Terra2's deterministic sampler; exact vanilla PRNG parity and
+arbitrary plant/block survival behavior are not claimed. Non-solid feature blocks
+are refused by the Paper bridge. Budgets are 32 features/128 placement attempts per
+chunk across the composition. Conversion inputs are bounded (8 MiB per resource,
+128 MiB combined, 20000 entries); ZIPs are never extracted, symlinks/traversal refused.
+
+Still unsupported: noise/density/surface graphs, custom biome/dimension types,
+biome/tag placement filtering, jigsaw/templates/NBT structures, processor lists,
+loot integration, scheduled ticks, functions, recipes and non-worldgen gameplay.
+A pack containing any of these semantic resources becomes BLOCKED. They are not
+ignored or run globally. Most uploaded packs are therefore still conversion drafts.
+
+## Per-world settings
+
+Preferred explicit list:
+
+```yaml
+generation:
+  enabled: true
+  protected-worlds: [world, world_nether, world_the_end]
+worlds:
+  terra2_mix_teste:
+    packs: [OVERWORLD, Debris]
+```
+
+Equivalent compact syntax:
+
+```yaml
+worlds:
+  terra2_mix_teste:
+    pack: OVERWORLD;Debris
+```
+
+Only use `pack`, `packs` OR the earlier `datapack`/`dimension` selection in an entry.
+The first pack supplies terrain. Each ID must match a loaded Community Pack or a
+READY local TerraPack. Repeat IDs, unknown IDs, a second terrain base, duplicate
+feature IDs and BLOCKED packs are refused before a generator binding is created.
+
+`pack: OVERWORLD;Dungeons-and-Taverns;Yggdrasil` is recognized as a selection, but
+those uploaded full datapacks do not yet compile to READY extensions. It cannot
+be used as a working world recipe until their missing stages are ported. Yggdrasil's
+own custom dimension is not automatically merged into OVERWORLD. Supporting the
+syntax is distinct from supporting every pack's semantics.
+
+For a composition, request the configuration-selected generator:
+
+```text
+/mv create terra2_mix_teste normal --generator Terra2:PACKS
+```
+
+Single legacy IDs continue to work with `Terra2:OVERWORLD` etc. A world still needs
+explicit authorization and generation.enabled. World/vanilla dimension protection
+remains enforced. No primary-world datapacks are installed and no global registries
+are replaced. Paper supplies the actual world path/key; no save layout is guessed.
+
+## Included executable test, without external packs
+
+Install `Terra2-bukkit-7.0.14-BETA.jar` in place of the previous JAR and restart once.
+The plugin creates two example inputs (`flat-demo`, `scatter-demo`) if missing;
+it does not automatically convert them. Run these commands separately, waiting for
+each conversion's result before the next command:
+
+```text
+/terra2 convert Plano flat-demo terra2_demo:flat
+/terra2 convert Debris scatter-demo
+/terra2 packs inspect Plano
+/terra2 packs inspect Debris
+```
+
+Add a new disposable world entry to the existing settings:
+
+```yaml
+  terra2_mix_teste:
+    packs: [Plano, Debris]
+```
+
+Then:
+
+```text
+/terra2 reload
+/terra2reportlog start
+/mv create terra2_mix_teste normal --generator Terra2:PACKS
+/mv tp terra2_mix_teste
+```
+
+Expected: flat grass surface Y=0, with scattered mossy cobblestone on new chunks.
+Alternatively use `packs: [OVERWORLD, Debris]` in a different new test world to
+check the Terra compatibility backend plus a converted vanilla feature extension.
+Do not attach a changed composition to the existing validated test world.
+
+You can also merge the two inputs into one converted TerraPack:
+
+```text
+/terra2 convert PlanoComDebris flat-demo;scatter-demo terra2_demo:flat
+```
+
+Select `pack: PlanoComDebris` and use the same `Terra2:PACKS` generator marker.
+The original `datapack`/`dimension` flat importer remains supported.
+
+A composed world stores its plan/source fingerprints, selected IDs, seed and actual
+dimension key in `terra2-generation.json`. Reload refuses a changed active source
+or selection; restart checks the manifest before allowing new generation. Already
+loaded worlds retain their generators if authorization is removed. Existing chunks
+are never rewritten. Hot-swapping the plugin JAR is unsupported.
+
+## Verification and remaining work
+
+CI tests neutral flat conversion from an older schema, asynchronous workspace
+contracts, source merge/provenance, legacy-base/feature compatibility, duplicate
+terrain/features, blocked functions/structures/secondary-source overlays, and
+conflicts/traversal before output publication. Deterministic additive execution is
+checked through GenerationManager on a bounded in-memory chunk volume. Bukkit/NMS
+and the existing core tests also run. Server creation/exploration must still be tested.
+
+Next work is actual noise/density/surface compilation, version-aware overlay/resource
+resolution, custom biome/type provisioning and per-world structure stages (including
+jigsaw, NBT templates and loot). The uploaded Tectonic/Terralith/structure collections
+are compatibility targets, not packs supported by this release.

@@ -36,7 +36,7 @@ public class NMSInjectListener implements Listener {
             INJECT_LOCK.lock();
             try {
             if(INJECTED.contains(event.getWorld())) return;
-            plugin.assertGenerationAuthorized(event.getWorld().getName(), bukkitChunkGeneratorWrapper.getPack().getID());
+            plugin.assertLegacyGenerationAuthorized(event.getWorld().getName(), bukkitChunkGeneratorWrapper.getPack().getID());
             LOGGER.info("Preparing to take over the world: {}", event.getWorld().getName());
             CraftWorld craftWorld = (CraftWorld) event.getWorld();
             ServerLevel serverWorld = craftWorld.getHandle();

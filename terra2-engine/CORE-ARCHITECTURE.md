@@ -37,3 +37,11 @@ Current world commands and default-off settings remain the same. Look for
 `Terra2 core bound <world> to <dimension> using terra:<pack>@<version>` in console.
 Only new chunks generate terrain; no existing chunk rewriting or save-layout migration
 is performed. Paper owns world storage. Build success does not replace a server test.
+
+7.0.14 adds an immutable local TerraPack format, async conversion and composition.
+GenerationProgram now has an optional decoration stage; GenerationManager routes it
+with the same target/seed/height guards. Legacy terrain keeps its existing population
+stages, followed by compiled simple-block extension stages through LimitedRegion.
+Converted flat plans use the same neutral composition contract. TerraPacks preserve
+source/provenance and expose READY vs BLOCKED explicitly. See TERRAPACKS.md; universal
+noise, biome and structure conversion remains pending, not silently approximated.

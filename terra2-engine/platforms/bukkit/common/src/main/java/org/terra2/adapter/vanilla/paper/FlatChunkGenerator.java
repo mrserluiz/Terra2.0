@@ -18,6 +18,9 @@ public final class FlatChunkGenerator extends ChunkGenerator {
     private final String world, selection, fingerprint;
     private final FlatDefinition definition;
     private volatile String dimensionKey;
+    private List<BlockPopulator> extraPopulators = List.of();
+    public void setExtraPopulators(List<BlockPopulator> value) { extraPopulators = List.copyOf(value); }
+    @Override public List<BlockPopulator> getDefaultPopulators(World loaded) { return extraPopulators; }
     FlatChunkGenerator(GenerationManager<BlockData, Biome> core, String world, String selection, FlatDefinition definition) {
         this.core = core; this.world = world; this.selection = selection;
         this.definition = definition; this.fingerprint = definition.fingerprint();
