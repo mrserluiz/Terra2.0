@@ -407,6 +407,12 @@ public class TerraBukkitPlugin extends JavaPlugin {
                     sender.sendMessage("TerraPack " + args[2] + ": " + info.get("status").getAsString());
                     var compiled = info.getAsJsonObject("compiled");
                     sender.sendMessage("Recursos: " + compiled.get("resourceKinds"));
+                    if(info.has("nativeResourceValidation")) {
+                        var nativeReport = info.getAsJsonObject("nativeResourceValidation");
+                        sender.sendMessage("Grafo nativo decodificado: " + nativeReport.get("decoded")
+                            + "; erros: " + nativeReport.getAsJsonArray("errors").size());
+                        sender.sendMessage("Este diagnóstico não autoriza a execução de um pack BLOCKED.");
+                    }
                     if(info.has("structureMigration")) {
                         var migration = info.getAsJsonObject("structureMigration");
                         sender.sendMessage("Estruturas NBT lidas: " + migration.getAsJsonArray("pieces").size()
