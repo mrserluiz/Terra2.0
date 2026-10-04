@@ -55,3 +55,12 @@ Minecraft's inclusive `getMaxY` as Terra's exclusive max height. It now computes
 `getMinY + getHeight`, matching Bukkit and core contracts, while retaining the
 seed/bounds protection. NMS tests verify Overworld and alternate dimension heights.
 Future mismatches include world name and expected/received values in the exception.
+
+## 7.0.12: legacy noise capabilities through the core facade
+
+`crash-2026-10-04_01.51.23-server.txt` identifies a ClassCastException in SlantLocator
+during chunk decoration. It cast CoreTerraGenerator to NoiseChunkGenerator3D.
+Generator capability lookup now exposes the existing Terra noise backend through the
+facade, without replacing the world's core routing. SlantLocator and the analogous
+TerraScript CheckFunction use that lookup. The wrapped backend is tested, and
+decoration remains enabled. This is a compatibility bridge, not a vanilla converter.

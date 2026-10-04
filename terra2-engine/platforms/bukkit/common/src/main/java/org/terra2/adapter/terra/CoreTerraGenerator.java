@@ -16,6 +16,11 @@ public final class CoreTerraGenerator implements ChunkGenerator {
     public CoreTerraGenerator(GenerationManager<BlockState, Biome> manager, String worldName, ChunkGenerator paletteDelegate) {
         this.manager = manager; this.worldName = worldName; this.paletteDelegate = paletteDelegate;
     }
+    @Override
+    public <T> T requireCapability(Class<T> capability) {
+        if(capability.isInstance(this)) return capability.cast(this);
+        return paletteDelegate.requireCapability(capability);
+    }
     private GenerationContext context(WorldProperties world) {
         return new GenerationContext(manager.binding(worldName).target(), world.getSeed(), world.getMinHeight(),
             world.getMaxHeight(), world.getHandle());

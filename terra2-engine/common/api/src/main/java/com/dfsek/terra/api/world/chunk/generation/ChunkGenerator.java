@@ -18,6 +18,12 @@ import com.dfsek.terra.api.world.info.WorldProperties;
 
 
 public interface ChunkGenerator {
+    /** Compatibility capability lookup; wrappers can expose their backend without changing world routing. */
+    default <T> T requireCapability(Class<T> capability) {
+        if(capability.isInstance(this)) return capability.cast(this);
+        throw new IllegalStateException("Generator capability is not supported: " + capability.getName());
+    }
+
     void generateChunkData(@NotNull ProtoChunk chunk, @NotNull WorldProperties world, @NotNull BiomeProvider biomeProvider,
                            int chunkX, int chunkZ);
 

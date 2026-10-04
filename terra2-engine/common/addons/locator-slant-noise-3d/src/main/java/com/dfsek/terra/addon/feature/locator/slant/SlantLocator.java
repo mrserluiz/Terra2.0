@@ -24,7 +24,7 @@ public class SlantLocator implements Locator {
             int x = column.getX();
             int z = column.getZ();
             World world = column.getWorld();
-            NoiseChunkGenerator3D generator = (NoiseChunkGenerator3D) world.getGenerator();
+            NoiseChunkGenerator3D generator = world.getGenerator().requireCapability(NoiseChunkGenerator3D.class);
             BiomeProvider biomeProvider = world.getBiomeProvider();
             return predicate.test(generator.getSlant(x, y, z, world, biomeProvider));
         });
