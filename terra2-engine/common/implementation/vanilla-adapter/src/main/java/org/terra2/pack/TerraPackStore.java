@@ -20,6 +20,12 @@ public final class TerraPackStore {
         }
     }
     public synchronized Conversion convert(String id, List<String> sourceNames, String dimension) throws IOException {
+        return convert(id, sourceNames, dimension, null);
+    }
+    public synchronized Conversion convert(String id, List<String> sourceNames, String dimension, TemplateMigration.Backend migrationBackend) throws IOException {
+        return convert(id, sourceNames, dimension, migrationBackend, PackCompiler.Profile.FULL);
+    }
+    public synchronized Conversion convert(String id, List<String> sourceNames, String dimension, TemplateMigration.Backend migrationBackend, PackCompiler.Profile profile) throws IOException {
         ResourceBundle.fileName(id);
         if(sourceNames.isEmpty() || sourceNames.size() > 8 || new HashSet<>(sourceNames).size() != sourceNames.size())
             throw new IllegalArgumentException("Select 1..8 distinct input sources");
@@ -39,8 +45,10 @@ public final class TerraPackStore {
             provenance.add(entry);
         }
         ResourceBundle merged = ResourceBundle.merge(sources);
-        var compiled = PackCompiler.compile(merged, dimension);
+        var migration = TemplateMigration.run(merged, migrationBackend);
+        var compiled = PackCompiler.compile(merged, dimension, profile);
         var blockers = new ArrayList<>(compiled.blockers());
+        if(migration.report().status().equals("FAILED")) blockers.addAll(migration.report().errors());
         for(int index = 0; index < sources.size(); index++) for(String issue : PackCompiler.metadataIssues(sources.get(index))) {
             String message = sourceNames.get(index) + ": " + issue;
             if(!blockers.contains(issue)) blockers.add(message);
@@ -49,18 +57,22 @@ public final class TerraPackStore {
         String status = compiled.ready() ? "READY" : "BLOCKED";
         var manifest = new JsonObject(); manifest.addProperty("schema", 1); manifest.addProperty("compiler", "terra2-vanilla-1");
         manifest.addProperty("id", id); manifest.addProperty("status", status); manifest.addProperty("target", "paper-26.2");
+        manifest.addProperty("profile", profile.name());
         if(compiled.terrain() != null) manifest.addProperty("sourceDimension", compiled.terrain().dimension());
         else if(dimension != null) manifest.addProperty("sourceDimension", dimension);
         manifest.addProperty("resourceSha256", merged.fingerprint()); manifest.add("sources", provenance);
         manifest.add("compiled", JSON.toJsonTree(compiled));
         // Decoded structure inventory is diagnostic, not authorization to execute unfinished stages.
         manifest.add("structureMigration", JSON.toJsonTree(StructureCatalog.audit(merged)));
+        manifest.add("nativeTemplateMigration", JSON.toJsonTree(migration.report()));
+        // Readiness always comes from the executable compiler; MIGRATED only describes NBT.
         Path temp = Files.createTempFile(output, ".conversion-", ".tmp");
         Path reportTemp = Files.createTempFile(reports, ".conversion-", ".tmp");
         try {
             try(var zip = new ZipOutputStream(Files.newOutputStream(temp))) {
                 write(zip, "terrapack.json", JSON.toJson(manifest).getBytes(StandardCharsets.UTF_8));
                 for(String path : merged.paths()) write(zip, "resources/" + path, merged.bytes(path));
+                for(var entry : migration.templates().entrySet()) write(zip, "native-templates/" + entry.getKey(), entry.getValue());
                 for(int index = 0; index < sources.size(); index++) for(String path : sources.get(index).paths()) {
                     if(!path.startsWith("data/") && !path.equals("pack.png"))
                         write(zip, "provenance/" + index + "/" + path, sources.get(index).bytes(path));
@@ -120,7 +132,8 @@ public final class TerraPackStore {
         var snapshot = snapshot(id); var manifest = snapshot.manifest;
         var source = snapshot.archive.subtree("resources/");
         if(!source.fingerprint().equals(PackCompiler.string(manifest, "resourceSha256"))) throw new IllegalArgumentException("TerraPack resources were modified: " + id);
-        var compiled = PackCompiler.compile(source, manifest.has("sourceDimension") ? PackCompiler.string(manifest, "sourceDimension") : null);
+        var profile = manifest.has("profile") ? PackCompiler.Profile.valueOf(PackCompiler.string(manifest, "profile")) : PackCompiler.Profile.FULL;
+        var compiled = PackCompiler.compile(source, manifest.has("sourceDimension") ? PackCompiler.string(manifest, "sourceDimension") : null, profile);
         if(!compiled.ready() || !JSON.toJsonTree(compiled).equals(manifest.get("compiled")))
             throw new IllegalArgumentException("TerraPack compiled IR failed validation: " + id);
         return new TerraPack(id, snapshot.archive.fingerprint(), compiled.terrain(), compiled.features());

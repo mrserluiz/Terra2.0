@@ -1,4 +1,4 @@
-# TerraPacks and per-world compositions — 7.0.15-BETA
+# TerraPacks and per-world compositions — 7.0.16-BETA
 
 This build implements an immutable local pack format, an asynchronous conversion
 workspace and executable composition of one terrain base with additive supported
@@ -217,3 +217,31 @@ DataVersions), including the intentional empty `vanilla_structure_remover` piece
 The probe used the same reader with List.getFirst replaced by get(0) for the local
 Java 17 runtime; the Java 25 plugin and unit tests are validated separately in CI.
 Decoding is not data fixing, jigsaw assembly or an in-server generation test.
+
+## Native template migration (7.0.16)
+
+The Bukkit conversion command now invokes Paper's structure reader and writer,
+which use Minecraft's structure DataFixer. Migrated templates are stored separately
+in `native-templates/data/...`; original source bytes remain in `resources/`.
+`nativeTemplateMigration` records the source and actual server target DataVersion
+for each successfully migrated piece. This stage neither registers structures
+globally nor changes a world. It runs on the existing conversion worker.
+
+Future DataVersions, incorrect target versions, invalid output, changes to geometry
+or loss of entities/jigsaw connectors fail the stage. Any failure discards the
+entire migrated template set; partial graphs are never published for execution.
+The report remains available with errors and the pack remains BLOCKED. Migration
+uses the existing byte limits, including original and derived template bytes.
+
+New Bukkit conversions use the explicit `GENERATION_AND_LOOT` profile: functions,
+function tags, advancements and recipes are preserved as provenance/source but
+excluded from execution, with every exclusion listed in the report. Loot tables,
+predicates, item modifiers, enchantments and trial spawners remain required
+resources. Existing manifests without a profile retain FULL validation.
+
+This build does **not** complete Dungeons and Taverns. Jigsaw assembly, native
+structure placement (including concentric rings), processors and world-scoped loot
+execution are still blocked by the compiler. A `MIGRATED` NBT result does not imply
+READY, runtime placement, loot execution or successful restart persistence.
+The migration contracts have automated tests; actual DataFixer migration of the
+full uploaded pack still requires a running Paper 26.2 conversion test.

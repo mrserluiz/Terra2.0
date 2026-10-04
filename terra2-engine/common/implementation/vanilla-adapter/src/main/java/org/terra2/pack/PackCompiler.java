@@ -6,6 +6,7 @@ import org.terra2.adapter.vanilla.FlatDefinition;
 
 /** Supported definitions become neutral IR. Every unsupported semantic resource blocks READY status. */
 public final class PackCompiler {
+    public enum Profile { FULL, GENERATION_AND_LOOT }
     public record Result(FlatDefinition terrain, List<SimpleBlockFeature> features, List<String> blockers,
                          List<String> notes, Map<String, Integer> resourceKinds) {
         public Result { features = List.copyOf(features); blockers = List.copyOf(blockers); notes = List.copyOf(notes); resourceKinds = Map.copyOf(resourceKinds); }
@@ -13,6 +14,9 @@ public final class PackCompiler {
     }
     private PackCompiler() {}
     public static Result compile(ResourceBundle source, String dimension) {
+        return compile(source, dimension, Profile.FULL);
+    }
+    public static Result compile(ResourceBundle source, String dimension, Profile profile) {
         List<String> blockers = new ArrayList<>(), notes = new ArrayList<>();
         List<SimpleBlockFeature> features = new ArrayList<>();
         Map<String, Integer> kinds = new TreeMap<>();
@@ -85,6 +89,10 @@ public final class PackCompiler {
             String kind = pieces.length >= 3 ? pieces[2] : "invalid";
             if(kind.equals("worldgen") && pieces.length == 4) kind += "/" + pieces[3].split("/", 2)[0];
             kinds.merge(kind, 1, Integer::sum);
+            if(profile == Profile.GENERATION_AND_LOOT && excludedGameplay(path)) {
+                notes.add("Excluded from GENERATION_AND_LOOT profile (original preserved): " + path);
+                continue;
+            }
             if(!handled.contains(path)) blockers.add("Unsupported/unconsumed resource: " + path);
         }
         if(features.size() > 32 || features.stream().mapToInt(SimpleBlockFeature::count).sum() > 128)
@@ -93,6 +101,10 @@ public final class PackCompiler {
         if(!features.isEmpty()) notes.add("Features use Terra2's deterministic sampler; vanilla placement seed parity/survival rules are not claimed");
         features.sort(Comparator.comparing(SimpleBlockFeature::id));
         return new Result(terrain, features, blockers, notes, kinds);
+    }
+    public static boolean excludedGameplay(String path) {
+        return path.matches("data/[^/]+/(function|advancement|recipe)/.+")
+            || path.matches("data/[^/]+/tags/function/.+");
     }
     public static List<String> metadataIssues(ResourceBundle source) {
         List<String> issues = new ArrayList<>();

@@ -15,7 +15,7 @@ dependencies {
 
 tasks {
     shadowJar {
-        archiveFileName.set("Terra2-bukkit-7.0.15-BETA.jar")
+        archiveFileName.set("Terra2-bukkit-7.0.16-BETA.jar")
         relocate("io.papermc.lib", "com.dfsek.terra.lib.paperlib")
         relocate("com.google.gson", "org.terra2.lib.gson")
         relocate("com.google.common", "com.dfsek.terra.lib.google.common")
