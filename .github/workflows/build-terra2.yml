@@ -124,7 +124,7 @@ jobs:
             if jar tf "$candidate" 2>/dev/null | grep -q '^net/minecraft/world/level/biome/Biome.class$'; then
               echo "Adapter API: $candidate"
               javap -private -classpath "$candidate" net.minecraft.world.level.biome.Biome net.minecraft.world.level.biome.Biome\$BiomeBuilder net.minecraft.world.level.biome.BiomeSpecialEffects net.minecraft.world.level.biome.BiomeSpecialEffects\$Builder net.minecraft.world.attribute.EnvironmentAttributes net.minecraft.world.attribute.EnvironmentAttributeMap net.minecraft.world.attribute.AmbientParticle net.minecraft.world.attribute.AmbientSounds net.minecraft.world.attribute.BackgroundMusic net.minecraft.resources.Identifier net.minecraft.core.MappedRegistry net.minecraft.core.component.DataComponentLookup net.minecraft.core.Holder\$Reference net.minecraft.server.ReloadableServerResources net.minecraft.world.level.chunk.status.WorldGenContext || true
-              javap -c -private -classpath "$candidate" net.minecraft.core.component.DataComponentLookup net.minecraft.server.ReloadableServerResources > /tmp/terra2-component-init.txt
+              javap -c -private -classpath "$candidate" net.minecraft.core.component.DataComponentLookup net.minecraft.core.component.DataComponentInitializers net.minecraft.core.component.DataComponentInitializers\$PendingComponents net.minecraft.server.ReloadableServerResources > /tmp/terra2-component-init.txt
               cat /tmp/terra2-component-init.txt
               break
             fi

@@ -28,7 +28,9 @@ class NativeResourceGraphTest {
         RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY).listRegistries().forEach(lookup -> lookups.put(lookup.key(), lookup));
         VanillaRegistries.createLookup().listRegistries().forEach(lookup -> lookups.put(lookup.key(), lookup));
         LootDataType.values().forEach(type -> { var lookup = emptyLoot(type); lookups.put(lookup.key(), lookup); });
-        return HolderLookup.Provider.create(lookups.values().stream());
+        var provider = HolderLookup.Provider.create(lookups.values().stream());
+        BuiltInRegistries.DATA_COMPONENT_INITIALIZERS.build(provider).forEach(net.minecraft.core.component.DataComponentInitializers.PendingComponents::apply);
+        return provider;
     }
     private void write(String path, String text) throws Exception {
         var file = directory.resolve(path); Files.createDirectories(file.getParent()); Files.writeString(file, text);
