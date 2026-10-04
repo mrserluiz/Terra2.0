@@ -4,6 +4,8 @@ repositories {
 
 dependencies {
     shadedApi(project(":common:implementation:terra2-core"))
+    shadedApi(project(":common:implementation:vanilla-adapter"))
+    shadedApi("com.google.code.gson", "gson", Versions.Libraries.Internal.gson)
     shadedApi(project(":common:implementation:base"))
 
     compileOnly("io.papermc.paper", "paper-api", Versions.Bukkit.paper)

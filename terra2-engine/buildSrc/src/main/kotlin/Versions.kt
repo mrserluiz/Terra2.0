@@ -22,6 +22,7 @@ object Versions {
             const val shadow = "8.3.9"
             const val apacheText = "1.14.0"
             const val apacheIO = "2.20.0"
+            const val gson = "2.13.2"
             const val guava = "33.5.0-jre"
             const val asm = "9.9"
             const val snakeYml = "2.5"

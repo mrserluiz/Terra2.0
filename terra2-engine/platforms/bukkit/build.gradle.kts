@@ -15,8 +15,9 @@ dependencies {
 
 tasks {
     shadowJar {
-        archiveFileName.set("Terra2-bukkit-7.0.12-BETA.jar")
+        archiveFileName.set("Terra2-bukkit-7.0.13-BETA.jar")
         relocate("io.papermc.lib", "com.dfsek.terra.lib.paperlib")
+        relocate("com.google.gson", "org.terra2.lib.gson")
         relocate("com.google.common", "com.dfsek.terra.lib.google.common")
         relocate("org.apache.logging.slf4j", "com.dfsek.terra.lib.slf4j-over-log4j")
         exclude("org/slf4j/**")

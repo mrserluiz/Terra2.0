@@ -7,6 +7,17 @@ import org.junit.jupiter.api.io.TempDir;
 import static org.junit.jupiter.api.Assertions.*;
 class GenerationSettingsTest {
     @TempDir Path folder;
+    @Test void acceptsExplicitDatapackAndRejectsAmbiguousSources() throws Exception {
+        Path file = folder.resolve("datapack-settings.yml");
+        String valid = "generation:\n  enabled: true\n  protected-worlds: [world]\nworlds:\n  dp_test:\n    datapack: example.zip\n    dimension: test:flat\n";
+        Files.writeString(file, valid);
+        assertEquals("example.zip", GenerationSettings.load(file.toFile()).getString("worlds.dp_test.datapack"));
+        for(String invalid : new String[]{valid.replace("example.zip", "../outside.zip"), valid + "    pack: OVERWORLD\n",
+            valid.replace("test:flat", "bad key"), valid.replace("test:flat", "123"), valid.replace("dp_test", "world.name")}) {
+            Files.writeString(file, invalid);
+            assertThrows(InvalidConfigurationException.class, () -> GenerationSettings.load(file.toFile()));
+        }
+    }
     @Test void loadsNewWorldAndRejectsMalformedOrMistypedSettings() throws Exception {
         Path file = folder.resolve("settings.yml");
         String valid = "generation:\n  enabled: true\n  protected-worlds: [world]\nworlds:\n  test:\n    pack: OVERWORLD\n";

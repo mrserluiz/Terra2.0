@@ -20,7 +20,14 @@ into a new intermediate representation. Terra decoration/population stages, pale
 biome registration and vanilla structures still use the existing platform path.
 The core facade blocks legacy pack hot swaps that would bypass immutable bindings.
 
-No vanilla datapack conversion is implemented in this build. Next stages are:
+7.0.13 adds the first executable vanilla datapack importer: isolated folder/ZIP
+reading and strict flat-definition compilation into neutral GenerationPlan contracts.
+The Paper flat adapter uses GenerationManager<BlockData, Bukkit Biome>; Terra uses
+GenerationManager<Terra BlockState, Terra Biome>. Both use the same standalone core
+implementation, with source-exclusive authorization at the plugin gate. No global
+vanilla registry/resource changes are made. See DATAPACK-ADAPTER.md for the narrow
+supported subset, manifest behavior and test commands. Noise/datapack structures
+are not yet supported. Next stages are:
 1. Move decoration and structure stages into an explicit core pipeline.
 2. Compile Terra noise/biome/palette definitions to neutral plan components, with parity tests.
 3. Add a vanilla worldgen parser and compiler with explicit supported-resource reporting.

@@ -4,5 +4,12 @@ generation:
   enabled: false
   protected-worlds: [world, world_nether, world_the_end]
 # Exact world name -> Community Pack ID. Empty by default.
-# This does not create or register dimensions; provisioning is under migration.
+# Vanilla importer (first release: flat terrain only, no features/structures):
+# worlds:
+#   terra2_dp_teste:
+#     datapack: terra2-flat-demo
+#     dimension: terra2_demo:flat
+# Source lives in plugins/Terra2/datapacks/; do not install it in world/datapacks.
+# Create with /mv create terra2_dp_teste normal --generator Terra2:DATAPACK
+# Inspect first: /terra2 datapack inspect terra2-flat-demo terra2_demo:flat
 worlds: {}

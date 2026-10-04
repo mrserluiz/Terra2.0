@@ -55,6 +55,7 @@ public class TerraBukkitPlugin extends JavaPlugin {
     private com.dfsek.terra.bukkit.util.ConsoleCapture consoleCapture;
     private io.papermc.paper.threadedregions.scheduler.ScheduledTask heartbeatTask;
     private PlatformImpl platform;
+    private org.terra2.adapter.vanilla.paper.DatapackRuntime datapacks;
     private org.terra2.core.GenerationManager<com.dfsek.terra.api.block.state.BlockState, com.dfsek.terra.api.world.biome.Biome> core;
     private volatile YamlConfiguration generationSettings;
     private String primaryWorldName;
@@ -86,6 +87,13 @@ public class TerraBukkitPlugin extends JavaPlugin {
             return;
         }
         core = new org.terra2.core.GenerationManager<>(java.util.Set.of(primaryWorldName, primaryWorldName + "_nether", primaryWorldName + "_the_end"));
+        try {
+            datapacks = new org.terra2.adapter.vanilla.paper.DatapackRuntime(getDataFolder().toPath().resolve("datapacks"),
+                java.util.Set.of(primaryWorldName, primaryWorldName + "_nether", primaryWorldName + "_the_end"));
+        } catch(java.io.IOException error) {
+            logger.error("Cannot initialize private datapack directory", error);
+            Bukkit.getPluginManager().disablePlugin(this); return;
+        }
         if(!doVersionCheck()) {
             return;
         }
@@ -94,6 +102,17 @@ public class TerraBukkitPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new org.bukkit.event.Listener() {
             @org.bukkit.event.EventHandler(priority = org.bukkit.event.EventPriority.LOWEST)
             public void bindWorld(org.bukkit.event.world.WorldInitEvent event) {
+                if(event.getWorld().getGenerator() instanceof org.terra2.adapter.vanilla.paper.FlatChunkGenerator flat) {
+                    try {
+                        assertGenerationAuthorized(event.getWorld().getName(), "DATAPACK");
+                        flat.bind(event.getWorld());
+                        logger.info("Terra2 datapack core bound {} to {} using {}", event.getWorld().getName(),
+                            event.getWorld().getKey(), flat.selection());
+                    } catch(Exception error) {
+                        com.dfsek.terra.bukkit.util.GenerationReport.failure("datapack-world-init", event.getWorld().getName(), flat.selection(), error);
+                        throw new IllegalStateException("Datapack world initialization refused", error);
+                    }
+                }
                 if(event.getWorld().getGenerator() instanceof BukkitChunkGeneratorWrapper)
                     bindCoreDimension(event.getWorld());
             }
@@ -253,6 +272,11 @@ public class TerraBukkitPlugin extends JavaPlugin {
         if(id == null || id.trim().isEmpty()) { return null; }
         try {
         assertGenerationAuthorized(worldName, id);
+        if(id.equals("DATAPACK")) {
+            if(generatorMap.containsKey(worldName)) throw new IllegalArgumentException("World already has a Terra generator: " + worldName);
+            try { return datapacks.prepare(worldName, generationSettings); }
+            catch(java.io.IOException error) { throw new IllegalArgumentException("Cannot read datapack for " + worldName, error); }
+        }
         if(platform == null) throw new IllegalStateException("Terra2 engine is not initialized");
         return new BukkitChunkGeneratorWrapper(generatorMap.computeIfAbsent(worldName, name -> {
             ConfigPack pack = platform.getConfigRegistry().getByID(id).orElseThrow(
@@ -298,8 +322,27 @@ public class TerraBukkitPlugin extends JavaPlugin {
             sender.sendMessage("Sem permissão: terra2.settings.reload");
             return true;
         }
+        if(args.length >= 1 && args[0].equalsIgnoreCase("datapack")) {
+            try {
+                if(args.length == 2 && args[1].equalsIgnoreCase("list")) {
+                    sender.sendMessage("Terra2 datapacks: " + datapacks.list());
+                } else if((args.length == 3 || args.length == 4) && args[1].equalsIgnoreCase("inspect")) {
+                    var reader = datapacks.read(args[2]); var inspection = reader.inspect();
+                    sender.sendMessage("Dimensões encontradas: " + inspection.dimensions());
+                    sender.sendMessage("Recursos não suportados: " + inspection.unsupported());
+                    if(args.length == 4) {
+                        var definition = reader.flat(args[3]);
+                        sender.sendMessage("Conversão flat validada: " + definition.dimension() + "; SHA-256: " + definition.fingerprint());
+                    } else sender.sendMessage("Para validar a conversão: /terra2 datapack inspect " + args[2] + " <namespace:dimension>");
+                } else sender.sendMessage("Uso: /terra2 datapack list | /terra2 datapack inspect <arquivo> [namespace:dimension]");
+            } catch(Exception error) {
+                sender.sendMessage("Datapack recusado: " + error.getMessage());
+                logger.warn("Datapack inspection refused: {}", error.getMessage());
+            }
+            return true;
+        }
         if(args.length != 1 || !args[0].equalsIgnoreCase("reload")) {
-            sender.sendMessage("Uso: /terra2 reload");
+            sender.sendMessage("Uso: /terra2 reload | /terra2 datapack list | /terra2 datapack inspect <arquivo> [dimensão]");
             return true;
         }
         try {
@@ -327,15 +370,18 @@ public class TerraBukkitPlugin extends JavaPlugin {
         var worlds = next.getConfigurationSection("worlds");
         for(String world : worlds.getKeys(false)) {
             String pack = next.getString("worlds." + world + ".pack");
-            if(platform.getConfigRegistry().getByID(pack).isEmpty())
+            if(pack != null && platform.getConfigRegistry().getByID(pack).isEmpty())
                 throw new IllegalArgumentException("Pack não carregado: " + pack);
         }
         for(String world : generatorMap.keySet()) {
             String oldPack = generatorPacks.get(world);
+            if(next.isString("worlds." + world + ".datapack"))
+                throw new IllegalArgumentException("Cannot replace an active Terra generator with a datapack: " + world);
             String newPack = next.getString("worlds." + world + ".pack");
             if(newPack != null && !java.util.Objects.equals(oldPack, newPack))
                 throw new IllegalArgumentException("Não é possível trocar o pack do gerador existente: " + world);
         }
+        datapacks.validateReload(next);
         generationSettings = next;
     }
 
@@ -344,7 +390,8 @@ public class TerraBukkitPlugin extends JavaPlugin {
         if(settings == null || !settings.getBoolean("generation.enabled", false)) {
             throw new IllegalStateException("Terra2 generation is disabled; refusing generator request for " + worldName);
         }
-        String authorizedPack = settings.getString("worlds." + worldName + ".pack");
+        String authorizedPack = settings.isString("worlds." + worldName + ".datapack") ? "DATAPACK"
+            : settings.getString("worlds." + worldName + ".pack");
         if(!id.equals(authorizedPack)) {
             throw new IllegalArgumentException("World/pack pair is not authorized: " + worldName + "/" + id);
         }
