@@ -1,4 +1,4 @@
-# TerraPacks and per-world compositions — 7.0.17-BETA
+# TerraPacks and per-world compositions — 7.0.18-BETA
 
 This build implements an immutable local pack format, an asynchronous conversion
 workspace and executable composition of one terrain base with additive supported
@@ -281,3 +281,27 @@ prevents reminting. Receipts cannot be reassigned to another world or server key
 This is a policy foundation, not an active item renderer, inventory-transfer ban
 or general duplication fix. The platform must persist a random server key and
 connect trusted loot creation before applying custom names/lore/item models.
+
+## Native loot checkpoint — 7.0.18-BETA
+
+The native test bootstrap now binds the game's item components with
+`BuiltInRegistries.DATA_COMPONENT_INITIALIZERS.build(provider)` before executing
+loot. A bootstrap-only registry leaves item holders unbound and fails when native
+loot creates an ItemStack; the live server performs this binding during resource
+loading. This fix changes test preparation, not the server's item registries.
+
+Native tests exercise real Minecraft loot execution with nested table references,
+count, item name, lore, client item-model IDs and private instrument tags. Client
+asset IDs keep their original namespace. Both qualified and unqualified vanilla
+enchantment function IDs are recognized when inlining scoped holder sets.
+
+The world executor's placement inventory contains only structure sets defined by
+its selected resource bundle. Inherited vanilla sets and sets belonging to other
+packs remain available for reference resolution, but are not implicitly activated.
+
+These checks do not finish the live world integration. Dungeons and Taverns remains
+**BLOCKED**: scoped templates and persistent registry aliases must still be installed,
+generation stages connected and verified in a real world across save/restart. Native
+processor/tag behavior must be tested in that context as well. Loot provenance is
+still a policy foundation; no active item-origin stamping or player-drop conversion
+is claimed by this release.

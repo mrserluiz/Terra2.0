@@ -17,6 +17,12 @@ while IFS= read -r candidate; do
       net.minecraft.core.HolderGetter\$Provider \
       net.minecraft.core.Holder\$Reference \
       net.minecraft.core.MappedRegistry \
+      net.minecraft.core.component.DataComponentInitializers \
+      net.minecraft.core.component.DataComponentInitializers\$PendingComponents \
+      net.minecraft.nbt.CompoundTag \
+      net.minecraft.nbt.NbtIo \
+      net.minecraft.world.level.levelgen.structure.Structure\$GenerationContext \
+      net.minecraft.world.level.levelgen.structure.Structure\$GenerationStub \
       net.minecraft.server.MinecraftServer \
       net.minecraft.server.ReloadableServerRegistries \
       net.minecraft.server.packs.resources.ResourceManager \
