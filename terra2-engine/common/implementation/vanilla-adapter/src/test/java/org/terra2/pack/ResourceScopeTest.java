@@ -21,7 +21,8 @@ class ResourceScopeTest {
         assertEquals("#" + scope.privateId("test:forest"), scope.tag("#test:forest"));
         var json = JsonParser.parseString("""
             {"type":"minecraft:jigsaw","start_pool":"test:rooms","start_jigsaw_name":"test:rooms",
-             "biomes":"#test:forest","loot":"test:chest","function":"test:chest","other":"minecraft:empty"}
+             "biomes":"#test:forest","loot":"test:chest","function":"test:chest","other":"minecraft:empty",
+             "components":{"minecraft:item_model":"test:chest"},"destination":"test:forest"}
             """);
         var result = scope.rewrite(json).getAsJsonObject();
         assertEquals("minecraft:jigsaw", result.get("type").getAsString());
@@ -31,6 +32,8 @@ class ResourceScopeTest {
         assertEquals(scope.privateId("test:chest"), result.get("loot").getAsString());
         assertEquals("test:chest", result.get("function").getAsString());
         assertEquals("minecraft:empty", result.get("other").getAsString());
+        assertEquals("test:chest", result.getAsJsonObject("components").get("minecraft:item_model").getAsString());
+        assertEquals(scope.privateId("test:forest"), result.get("destination").getAsString());
         assertEquals("test:game", scope.resource("test:game"));
         assertEquals("test:rooms", json.getAsJsonObject().get("start_pool").getAsString());
     }

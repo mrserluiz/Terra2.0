@@ -6,6 +6,7 @@ import java.util.*;
 import net.minecraft.SharedConstants;
 import net.minecraft.core.*;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.registries.VanillaRegistries;
 import net.minecraft.server.Bootstrap;
 import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadStructurePlacement;
@@ -24,6 +25,7 @@ class NativeResourceGraphTest {
     private HolderLookup.Provider vanilla() {
         SharedConstants.tryDetectVersion(); Bootstrap.bootStrap();
         var lookups = new LinkedHashMap<net.minecraft.resources.ResourceKey<? extends Registry<?>>, HolderLookup.RegistryLookup<?>>();
+        RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY).listRegistries().forEach(lookup -> lookups.put(lookup.key(), lookup));
         VanillaRegistries.createLookup().listRegistries().forEach(lookup -> lookups.put(lookup.key(), lookup));
         LootDataType.values().forEach(type -> { var lookup = emptyLoot(type); lookups.put(lookup.key(), lookup); });
         return HolderLookup.Provider.create(lookups.values().stream());
