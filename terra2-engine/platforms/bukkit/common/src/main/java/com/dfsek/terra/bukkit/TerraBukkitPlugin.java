@@ -404,6 +404,13 @@ public class TerraBukkitPlugin extends JavaPlugin {
                     sender.sendMessage("TerraPack " + args[2] + ": " + info.get("status").getAsString());
                     var compiled = info.getAsJsonObject("compiled");
                     sender.sendMessage("Recursos: " + compiled.get("resourceKinds"));
+                    if(info.has("structureMigration")) {
+                        var migration = info.getAsJsonObject("structureMigration");
+                        sender.sendMessage("Estruturas NBT lidas: " + migration.getAsJsonArray("pieces").size()
+                            + "; referências: " + migration.getAsJsonArray("references").size()
+                            + "; erros de migração: " + migration.getAsJsonArray("errors").size());
+                        sender.sendMessage("Etapas ainda sem execução: " + migration.get("pendingBackends"));
+                    }
                     var blockers = compiled.getAsJsonArray("blockers");
                     sender.sendMessage("Pendências (" + blockers.size() + "): " + java.util.stream.StreamSupport.stream(blockers.spliterator(), false).limit(8).toList());
                 } else sender.sendMessage("Uso: /terra2 packs list | /terra2 packs inspect <ID>");

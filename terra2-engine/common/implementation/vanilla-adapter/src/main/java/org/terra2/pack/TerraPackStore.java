@@ -29,10 +29,12 @@ public final class TerraPackStore {
         JsonArray provenance = new JsonArray();
         for(String name : sourceNames) {
             ResourceBundle.fileName(name);
-            var source = ResourceBundle.read(input.resolve(name)); sources.add(source);
+            var archive = ResourceBundle.read(input.resolve(name));
+            var source = archive.datapackRoot(); sources.add(source);
             if(sources.stream().mapToLong(ResourceBundle::sizeBytes).sum() > 128L * 1024 * 1024)
                 throw new IOException("Combined conversion inputs exceed 128 MiB");
             var entry = new JsonObject(); entry.addProperty("input", name); entry.addProperty("sha256", source.fingerprint());
+            entry.addProperty("archiveSha256", archive.fingerprint());
             if(source.contains("pack.mcmeta")) entry.add("originalMetadata", JsonParser.parseString(source.text("pack.mcmeta")));
             provenance.add(entry);
         }
@@ -51,7 +53,10 @@ public final class TerraPackStore {
         else if(dimension != null) manifest.addProperty("sourceDimension", dimension);
         manifest.addProperty("resourceSha256", merged.fingerprint()); manifest.add("sources", provenance);
         manifest.add("compiled", JSON.toJsonTree(compiled));
+        // Decoded structure inventory is diagnostic, not authorization to execute unfinished stages.
+        manifest.add("structureMigration", JSON.toJsonTree(StructureCatalog.audit(merged)));
         Path temp = Files.createTempFile(output, ".conversion-", ".tmp");
+        Path reportTemp = Files.createTempFile(reports, ".conversion-", ".tmp");
         try {
             try(var zip = new ZipOutputStream(Files.newOutputStream(temp))) {
                 write(zip, "terrapack.json", JSON.toJson(manifest).getBytes(StandardCharsets.UTF_8));
@@ -61,11 +66,14 @@ public final class TerraPackStore {
                         write(zip, "provenance/" + index + "/" + path, sources.get(index).bytes(path));
                 }
             }
-            // A complete temporary ZIP is published only after successful compilation/report construction.
-            Files.move(temp, destination);
-        } finally { Files.deleteIfExists(temp); }
+            // Report failure must not leave a pack that appears to have finished conversion.
+            Path report = reports.resolve(id + ".json");
+            Files.writeString(reportTemp, JSON.toJson(manifest) + "\n");
+            Files.move(reportTemp, report);
+            try { Files.move(temp, destination); }
+            catch(IOException error) { Files.deleteIfExists(report); throw error; }
+        } finally { Files.deleteIfExists(temp); Files.deleteIfExists(reportTemp); }
         Path report = reports.resolve(id + ".json");
-        Files.writeString(report, JSON.toJson(manifest) + "\n", StandardOpenOption.CREATE_NEW);
         return new Conversion(id, status, destination, report, compiled.blockers().size(), compiled.features().size(), compiled.terrain() != null);
     }
     private static void write(ZipOutputStream zip, String path, byte[] bytes) throws IOException {

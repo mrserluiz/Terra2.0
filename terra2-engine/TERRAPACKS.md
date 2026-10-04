@@ -1,4 +1,4 @@
-# TerraPacks and per-world compositions — 7.0.14-BETA
+# TerraPacks and per-world compositions — 7.0.15-BETA
 
 This build implements an immutable local pack format, an asynchronous conversion
 workspace and executable composition of one terrain base with additive supported
@@ -13,7 +13,8 @@ The plugin creates these directories, but never creates/authorizes a world by de
 - `plugins/Terra2/terrapacks/<ID>.terrapack`: converted pack ZIP container.
 - `plugins/Terra2/conversion/reports/<ID>.json`: conversion results and blockers.
 
-Every input must have `pack.mcmeta` at its root. Use simple filenames without spaces;
+Every input must have `pack.mcmeta` at its root, or inside exactly one enclosing
+folder containing all the input files. A collection of several datapacks is refused. Use simple filenames without spaces;
 rename only the input ZIP/folder, not namespaced IDs inside it. The uploaded
 `terrenos.zip` is a collection of separate packs under `terrenos/datas`; select each
 individual pack, rather than treating the entire collection as one datapack.
@@ -63,7 +64,7 @@ chunk across the composition. Conversion inputs are bounded (8 MiB per resource,
 128 MiB combined, 20000 entries); ZIPs are never extracted, symlinks/traversal refused.
 
 Still unsupported: noise/density/surface graphs, custom biome/dimension types,
-biome/tag placement filtering, jigsaw/templates/NBT structures, processor lists,
+biome/tag placement filtering, jigsaw/template execution, processor lists,
 loot integration, scheduled ticks, functions, recipes and non-worldgen gameplay.
 A pack containing any of these semantic resources becomes BLOCKED. They are not
 ignored or run globally. Most uploaded packs are therefore still conversion drafts.
@@ -174,3 +175,38 @@ Next work is actual noise/density/surface compilation, version-aware overlay/res
 resolution, custom biome/type provisioning and per-world structure stages (including
 jigsaw, NBT templates and loot). The uploaded Tectonic/Terralith/structure collections
 are compatibility targets, not packs supported by this release.
+
+
+## Structure migration diagnostics (7.0.15)
+
+Conversion now reads Java structure NBT (gzip or raw) into platform-independent
+palettes, positions, block state indices, block-entity NBT and entity compounds.
+It rejects invalid palettes, out-of-bounds or duplicate positions, truncated tags,
+trailing data, excessive nesting, oversized arrays and decompression bombs. Limits:
+16 MiB decompressed per piece, depth 64, a 1,000,000 node/array-element budget,
+64 alternative palettes and 512 per size axis (volume at most 1,000,000).
+
+`structureMigration` in each **new** conversion manifest/report records decoded
+pieces, source DataVersion, jigsaw and block/entity counts, pool and loot references,
+structure/pool/processor/placement types, and missing custom resources. References
+are `LOCAL`, `MISSING_CUSTOM`, or `VANILLA_EXTERNAL_UNVALIDATED`. The latter is
+not evidence that the current server registry supplies that ID. Older reports
+remain readable but need conversion under a new ID to include this inventory.
+
+`/terra2 packs inspect <ID>` shows the decoded-piece and dependency/error counts.
+The inventory is diagnostic; it does not make jigsaw structures READY or migrate
+old block/entity data. No commands/entities/loot are executed during inspection.
+Original NBT remains byte-for-byte preserved in `resources/`.
+
+The uploaded Dungeons and Taverns 5.1.0 contains 4,894 NBT pieces, 608 pools,
+113 jigsaw structures, 34 structure sets, 59 processor lists and 559 loot tables.
+It also contains 131 functions and gameplay resources. Its biggest decompressed
+piece is 4,240,801 bytes. Finishing that pack requires actual jigsaw assembly,
+rotations, both random-spread and concentric-ring placement, biome filters,
+processors, NBT data fixing, loot/trial-spawner migration, and a world-isolated
+execution bridge. Full compatibility is not implemented in 7.0.15. Functions
+must be accounted for rather than silently discarded or installed globally.
+
+Reports and pack archives are built in temporary files. A report-write failure
+cannot leave a published pack without its report; archive publication failure
+rolls back the newly published report. Existing IDs are never overwritten.

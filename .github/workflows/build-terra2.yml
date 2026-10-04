@@ -110,7 +110,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Terra2-engine-experimental-26.2
-          path: terra2-engine/platforms/bukkit/build/libs/Terra2-bukkit-7.0.14-BETA.jar
+          path: terra2-engine/platforms/bukkit/build/libs/Terra2-bukkit-7.0.15-BETA.jar
           if-no-files-found: error
 
       - name: Inspect current server adapter signatures after failure

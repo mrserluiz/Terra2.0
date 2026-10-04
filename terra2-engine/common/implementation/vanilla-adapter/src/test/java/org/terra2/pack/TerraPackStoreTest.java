@@ -88,4 +88,16 @@ class TerraPackStoreTest {
         assertThrows(IllegalArgumentException.class, () -> store.convert("Safe", List.of("../a"), null));
         assertThrows(IllegalArgumentException.class, () -> store.convert("Safe", List.of("a", "a"), null));
     }
+    @Test void normalizesSingleEnclosingFolderButRefusesCollectionsWithoutPublishingOutput() throws Exception {
+        var store = new TerraPackStore(directory);
+        Path enclosing = directory.resolve("conversion/input/enclosing");
+        Path pack = enclosing.resolve("downloaded-pack"); Files.createDirectories(pack); Files.writeString(pack.resolve("pack.mcmeta"), META); flat(pack);
+        assertEquals("READY", store.convert("Wrapped", List.of("enclosing"), "test:flat").status());
+        assertNotEquals(store.inspect("Wrapped").getAsJsonArray("sources").get(0).getAsJsonObject().get("sha256"),
+            store.inspect("Wrapped").getAsJsonArray("sources").get(0).getAsJsonObject().get("archiveSha256"));
+        Path second = enclosing.resolve("another"); Files.createDirectories(second); Files.writeString(second.resolve("pack.mcmeta"), META);
+        assertThrows(java.io.IOException.class, () -> store.convert("Collection", List.of("enclosing"), null));
+        assertFalse(Files.exists(directory.resolve("terrapacks/Collection.terrapack")));
+        assertFalse(Files.exists(directory.resolve("conversion/reports/Collection.json")));
+    }
 }

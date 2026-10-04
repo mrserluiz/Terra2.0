@@ -64,6 +64,16 @@ public final class ResourceBundle {
             result.add(entry.getKey().substring(prefix.length()), new ByteArrayInputStream(entry.getValue()));
         return result;
     }
+    /** Accept one enclosing ZIP folder, but never guess which pack in a collection should execute. */
+    public ResourceBundle datapackRoot() throws IOException {
+        if(contains("pack.mcmeta")) return this;
+        var roots = paths().stream().filter(path -> path.endsWith("/pack.mcmeta")).toList();
+        if(roots.size() != 1) throw new IOException("Select one datapack: found " + roots.size() + " nested pack.mcmeta files");
+        String prefix = roots.getFirst().substring(0, roots.getFirst().length() - "pack.mcmeta".length());
+        if(paths().stream().anyMatch(path -> !path.startsWith(prefix)))
+            throw new IOException("Files outside the datapack root; select the individual pack instead of a collection");
+        return subtree(prefix);
+    }
     public long sizeBytes() { return total; }
     public Set<String> paths() { return Collections.unmodifiableSet(files.keySet()); }
     public byte[] bytes(String path) {
