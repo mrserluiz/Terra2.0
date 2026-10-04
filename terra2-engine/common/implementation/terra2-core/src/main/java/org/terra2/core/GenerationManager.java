@@ -47,7 +47,8 @@ public final class GenerationManager<B, M> {
             throw new IllegalStateException("Unbound generation target: " + context.target());
         Shape shape = new Shape(context.seed(), context.minY(), context.maxY());
         Shape previous = shapes.putIfAbsent(context.target().worldName(), shape);
-        if(previous != null && !previous.equals(shape)) throw new IllegalStateException("Seed or height bounds changed for active world");
+        if(previous != null && !previous.equals(shape)) throw new IllegalStateException("Seed or height bounds changed for active world "
+            + context.target().worldName() + ": expected " + previous + ", received " + shape);
         return binding.plan().program();
     }
     public Binding<B, M> binding(String world) {

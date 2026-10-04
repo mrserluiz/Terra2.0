@@ -45,3 +45,13 @@ An abrupt process kill can lose lines written since the last poll, or console li
 not yet flushed by Paper. Commands invoked by another plugin via dispatchCommand
 may bypass Bukkit command events; manual start covers that case. No remote upload
 or global server reload is performed.
+
+## 7.0.11: correct NMS height-bound conversion
+
+The server crash report `crash-2026-10-04_01.26.41-server.txt` shows the core
+rejecting structure height queries with `Seed or height bounds changed for active
+world`, via `NMSChunkGeneratorDelegate.getBaseHeight`. The NMS adapter passed
+Minecraft's inclusive `getMaxY` as Terra's exclusive max height. It now computes
+`getMinY + getHeight`, matching Bukkit and core contracts, while retaining the
+seed/bounds protection. NMS tests verify Overworld and alternate dimension heights.
+Future mismatches include world name and expected/received values in the exception.

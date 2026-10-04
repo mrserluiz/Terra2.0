@@ -26,7 +26,8 @@ public class NMSWorldProperties implements WorldProperties {
 
     @Override
     public int getMaxHeight() {
-        return height.getMaxY();
+        // NMS max Y is inclusive; Terra/core and Bukkit use an exclusive upper bound.
+        return Math.addExact(height.getMinY(), height.getHeight());
     }
 
     @Override
