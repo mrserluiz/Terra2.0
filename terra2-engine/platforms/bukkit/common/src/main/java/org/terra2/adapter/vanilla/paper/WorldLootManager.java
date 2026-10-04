@@ -23,17 +23,36 @@ public final class WorldLootManager implements Listener {
     private final TerraBukkitPlugin plugin;
     private final LootOrigin origin;
     private final NamespacedKey marker;
-    private final Map<String, Binding> worlds = new ConcurrentHashMap<>();
+    private volatile Map<String, Binding> worlds = Map.of();
     private final Set<String> nativeTables = ConcurrentHashMap.newKeySet();
     private final AtomicLong issued = new AtomicLong();
     public WorldLootManager(TerraBukkitPlugin plugin, LootOrigin origin) {
         this.plugin = plugin; this.origin = origin; marker = new NamespacedKey(plugin, "loot_origin");
     }
     public void declareNativeTables(Collection<String> tables) { nativeTables.addAll(tables); }
-    public void bind(World world, Map<String, String> nativeOwners) {
+    public synchronized void bind(World world, Map<String, String> nativeOwners) {
         plugin.assertGenerationAuthorized(world.getName(), "PACKS");
+        var binding = binding(world, nativeOwners, plugin.generationSettings());
+        var previous = worlds.get(world.getName());
+        if(previous != null && !previous.target.equals(binding.target)) throw new IllegalStateException("Cannot rebind loot dimension: " + world.getName());
+        var next = new HashMap<>(worlds); next.put(world.getName(), binding); worlds = Map.copyOf(next);
+    }
+    public synchronized Runnable prepareReload(ConfigurationSection settings) {
+        Map<String, Binding> next = new HashMap<>();
+        if(settings.getBoolean("generation.enabled", false)) worlds.forEach((name, previous) -> {
+            var world = Bukkit.getWorld(name);
+            if(world == null || settings.getConfigurationSection("worlds." + name) == null) return;
+            Map<String, String> nativeOwners = new HashMap<>();
+            previous.owners.forEach((table, pack) -> { if(nativeTables.contains(table)) nativeOwners.put(table, pack); });
+            var binding = binding(world, nativeOwners, settings);
+            if(!previous.target.equals(binding.target)) throw new IllegalStateException("Loot dimension changed: " + name);
+            next.put(name, binding);
+        });
+        var prepared = Map.copyOf(next); return () -> worlds = prepared;
+    }
+    private Binding binding(World world, Map<String, String> nativeOwners, ConfigurationSection settings) {
         var target = new WorldTarget(world.getName(), world.getKey().toString());
-        var config = plugin.generationSettings().getConfigurationSection("worlds." + world.getName() + ".loot");
+        var config = settings.getConfigurationSection("worlds." + world.getName() + ".loot");
         boolean decorate = config != null && config.getBoolean("enabled", false);
         Map<String, Rule> rules = new HashMap<>();
         if(config != null && config.getConfigurationSection("tables") != null) {
@@ -65,11 +84,7 @@ public final class WorldLootManager implements Listener {
         grouped.forEach((pack, tables) -> {
             var policy = new WorldLootPolicy(Set.of(), origin); policy.authorize(target, pack, tables); policies.put(pack, policy);
         });
-        var binding = new Binding(target, decorate, Map.copyOf(owners), Map.copyOf(policies), Map.copyOf(rules));
-        worlds.compute(world.getName(), (key, previous) -> {
-            if(previous != null && !previous.target.equals(target)) throw new IllegalStateException("Cannot rebind loot dimension: " + key);
-            return binding;
-        });
+        return new Binding(target, decorate, Map.copyOf(owners), Map.copyOf(policies), Map.copyOf(rules));
     }
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void generate(LootGenerateEvent event) {
@@ -88,7 +103,7 @@ public final class WorldLootManager implements Listener {
         if(rule == null && nativeTable) rule = binding.rules.get(originalTable(table));
         var output = new ArrayList<ItemStack>();
         for(ItemStack input : event.getLoot()) {
-            if(input == null || input.getType().isAir()) { output.add(input); continue; }
+            if(input == null || input.getType().isAir()) continue;
             var meta = input.getItemMeta();
             if(meta.getPersistentDataContainer().has(marker)) { output.add(input); continue; }
             var receipt = binding.policies.get(pack).mint(WorldLootPolicy.Trigger.LOOT_TABLE, binding.target, pack, table, false).orElseThrow();
@@ -111,6 +126,7 @@ public final class WorldLootManager implements Listener {
         return parts.length == 3 ? parts[1] + ":" + parts[2] : alias;
     }
     public boolean authentic(ItemStack item) {
+        if(item == null || !item.hasItemMeta()) return false;
         String value = item.getItemMeta().getPersistentDataContainer().get(marker, PersistentDataType.STRING);
         try { return value != null && value.length() <= 16384 && origin.authentic(JSON.fromJson(value, LootOrigin.Receipt.class)); }
         catch(RuntimeException invalid) { return false; }

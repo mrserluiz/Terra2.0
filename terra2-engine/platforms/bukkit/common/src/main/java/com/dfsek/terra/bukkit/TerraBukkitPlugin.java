@@ -545,7 +545,9 @@ public class TerraBukkitPlugin extends JavaPlugin {
             if(datapacks.hasWorld(world)) datapacks.validatePackReload(world, selected.selection(), selected.packs());
         }
         datapacks.validateReload(next);
+        var applyLoot = lootManager == null ? null : lootManager.prepareReload(next);
         generationSettings = next;
+        if(applyLoot != null) applyLoot.run();
     }
     public void assertLegacyGenerationAuthorized(String worldName, String baseId) {
         var ids = com.dfsek.terra.bukkit.util.GenerationSettings.packIds(generationSettings, worldName);

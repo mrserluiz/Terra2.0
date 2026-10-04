@@ -36,8 +36,10 @@ public final class NativeTemplateScope {
     public static CompoundTag read(byte[] bytes) throws IOException {
         var input = new ByteArrayInputStream(bytes);
         return bytes.length >= 2 && (bytes[0] & 255) == 31 && (bytes[1] & 255) == 139
-            ? NbtIo.readCompressed(input, NbtAccounter.create(16L * 1024 * 1024))
-            : NbtIo.read(new DataInputStream(input), NbtAccounter.create(16L * 1024 * 1024));
+            // NbtAccounter includes heap/object overhead, not only serialized bytes.
+            // Large vanilla templates exceed 16 MiB of accounted memory despite bounded source files.
+            ? NbtIo.readCompressed(input, NbtAccounter.create(128L * 1024 * 1024))
+            : NbtIo.read(new DataInputStream(input), NbtAccounter.create(128L * 1024 * 1024));
     }
     public static byte[] write(CompoundTag template) throws IOException {
         var output = new ByteArrayOutputStream(); NbtIo.writeCompressed(template, output); return output.toByteArray();
