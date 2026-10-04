@@ -78,7 +78,10 @@ public final class TerraPackStore {
         Path reportTemp = Files.createTempFile(reports, ".conversion-", ".tmp");
         try {
             try(var zip = new ZipOutputStream(Files.newOutputStream(temp))) {
-                write(zip, "terrapack.json", JSON.toJson(manifest).getBytes(StandardCharsets.UTF_8));
+                // Machine manifest stays compact; the separate conversion report remains readable.
+                byte[] manifestBytes = new Gson().toJson(manifest).getBytes(StandardCharsets.UTF_8);
+                if(manifestBytes.length > 8 * 1024 * 1024) throw new IOException("Compact TerraPack manifest exceeds 8 MiB");
+                write(zip, "terrapack.json", manifestBytes);
                 for(String path : merged.paths()) write(zip, "resources/" + path, merged.bytes(path));
                 for(var entry : migration.templates().entrySet()) write(zip, "native-templates/" + entry.getKey(), entry.getValue());
                 for(int index = 0; index < sources.size(); index++) for(String path : sources.get(index).paths()) {

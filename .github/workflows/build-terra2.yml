@@ -109,6 +109,10 @@ jobs:
         if: success()
         run: bash tools/inspect-paper-worldgen.sh
 
+      - name: Validate native pack generation and save/restart on isolated Paper
+        if: success()
+        run: python3 tools/paper-native-smoke.py
+
       - name: Upload experimental engine JAR
         if: success()
         uses: actions/upload-artifact@v4
@@ -116,10 +120,6 @@ jobs:
           name: Terra2-engine-experimental-26.2
           path: terra2-engine/platforms/bukkit/build/libs/Terra2-bukkit-7.0.18-BETA.jar
           if-no-files-found: error
-
-      - name: Validate native pack generation and save/restart on isolated Paper
-        if: success()
-        run: python3 tools/paper-native-smoke.py
 
       - name: Upload native integration diagnostics
         if: always()

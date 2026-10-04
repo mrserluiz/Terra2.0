@@ -42,6 +42,9 @@ public final class NativeRegistryInstaller {
                 Holder.Reference canonical = (Holder.Reference) registry.get(source.key()).orElseGet(() -> registry.register(source.key(), source.value(), RegistrationInfo.BUILT_IN));
                 if(!canonical.areComponentsBound()) canonical.bindComponents(DataComponentMap.EMPTY);
                 if(!source.areComponentsBound()) source.bindComponents(DataComponentMap.EMPTY);
+                if(source.value() instanceof net.minecraft.world.level.storage.loot.LootTable table)
+                    table.craftLootTable = new org.bukkit.craftbukkit.CraftLootTable(
+                        org.bukkit.NamespacedKey.fromString(source.key().identifier().toString()), table);
             }
         } finally { Reflection.MAPPED_REGISTRY.setFrozen(registry, true); }
         Map<TagKey<Object>, List<Holder<Object>>> additions = new HashMap<>();
