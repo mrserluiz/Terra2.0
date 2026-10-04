@@ -425,7 +425,7 @@ public class TerraBukkitPlugin extends JavaPlugin {
             asyncScheduler.runNow(this, task -> {
                 String response;
                 try {
-                    var templateMigration = new org.terra2.adapter.vanilla.paper.PaperTemplateMigration();
+                    var templateMigration = platform.templateMigration();
                     var result = terraPacks.convert(outputId, java.util.Arrays.stream(inputs.split(";", -1)).map(String::trim).toList(), dimension, templateMigration,
                         org.terra2.pack.PackCompiler.Profile.GENERATION_AND_LOOT);
                     response = "TerraPack " + result.id() + ": " + result.status() + "; pendências: " + result.blockers()

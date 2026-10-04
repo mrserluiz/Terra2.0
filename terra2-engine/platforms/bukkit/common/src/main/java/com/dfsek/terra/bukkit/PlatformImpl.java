@@ -47,6 +47,7 @@ public class PlatformImpl extends AbstractPlatform {
     /** Whether world-init installs the native pack biome source before chunk generation. */
     public boolean usesNativeBiomeProvider() { return false; }
     public org.terra2.pack.NativePackBackend nativePackBackend() { return null; }
+    public org.terra2.pack.TemplateMigration.Backend templateMigration() { return new org.terra2.adapter.vanilla.paper.PaperTemplateMigration(); }
     public java.util.Map<String, String> nativeLootTables(String world) { return java.util.Map.of(); }
     public void prepareNativePacks(String world, java.util.List<org.terra2.pack.TerraPack> packs) throws java.io.IOException {
         if(packs.stream().anyMatch(pack -> pack.nativeResources() != null)) throw new IllegalStateException("Native runtime unavailable");

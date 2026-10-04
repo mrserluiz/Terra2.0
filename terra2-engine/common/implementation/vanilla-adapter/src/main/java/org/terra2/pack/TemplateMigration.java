@@ -8,6 +8,9 @@ public final class TemplateMigration {
     public interface Backend {
         int targetDataVersion();
         byte[] migrate(byte[] source) throws IOException;
+        default List<String> adaptations() { return List.of(); }
+        default boolean acceptsBlockEntityRemoval(StructureNbt.Block block, StructureNbt.Template before,
+                                                   StructureNbt.Block next, StructureNbt.Template after) { return false; }
     }
     public record Piece(String path, int sourceDataVersion, int targetDataVersion,
                         int blocks, int entities, int jigsaws) {}
@@ -69,7 +72,8 @@ public final class TemplateMigration {
                 for(String field : List.of("pool", "name", "target", "LootTable"))
                     if(block.nbt().containsKey(field) && !Objects.equals(block.nbt().get(field), next.nbt().get(field)))
                         throw new IOException("Native migration changed " + field + " at " + block.position());
-                if(!block.nbt().isEmpty() && next.nbt().isEmpty() && !removedEmptyBed(block, original, target))
+                if(!block.nbt().isEmpty() && next.nbt().isEmpty() && !removedEmptyBed(block, original, target)
+                        && !backend.acceptsBlockEntityRemoval(block, original, next, result))
                     throw new IOException("Native migration lost block entity NBT at " + block.position());
             }
             int jigsaws = jigsaws(original);

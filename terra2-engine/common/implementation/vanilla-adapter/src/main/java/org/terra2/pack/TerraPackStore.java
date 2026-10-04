@@ -68,6 +68,7 @@ public final class TerraPackStore {
         // Decoded structure inventory is diagnostic, not authorization to execute unfinished stages.
         manifest.add("structureMigration", JSON.toJsonTree(StructureCatalog.audit(merged)));
         manifest.add("nativeTemplateMigration", JSON.toJsonTree(migration.report()));
+        if(migrationBackend != null) manifest.add("nativeTemplateAdaptations", JSON.toJsonTree(migrationBackend.adaptations()));
         var templateHashes = new JsonObject();
         migration.templates().forEach((path, bytes) -> templateHashes.addProperty(path, sha256(bytes)));
         manifest.add("nativeTemplateHashes", templateHashes);
