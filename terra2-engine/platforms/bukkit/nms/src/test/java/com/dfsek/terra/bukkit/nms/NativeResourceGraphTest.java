@@ -70,6 +70,11 @@ class NativeResourceGraphTest {
         var placement = (RandomSpreadStructurePlacement) graph.resource(Registries.STRUCTURE_SET, "test:dungeons").value().placement();
         assertEquals(placement.getPotentialStructureChunk(42L, -100, 100), placement.getPotentialStructureChunk(42L, -100, 100));
         assertNotNull(graph.resource(Registries.LOOT_TABLE, "test:chest").value());
+        assertEquals(1, graph.sourceLookup(Registries.STRUCTURE_SET).listElements().count());
+        assertTrue(graph.sourceLookup(Registries.STRUCTURE_SET).listElements().allMatch(holder ->
+            holder.key().identifier().toString().startsWith("terra2:" + graph.scope().fingerprint() + "/")));
+        base.lookupOrThrow(Registries.STRUCTURE_SET).listElements().forEach(holder ->
+            assertTrue(graph.sourceLookup(Registries.STRUCTURE_SET).get(holder.key()).isEmpty()));
     }
     @Test void reportsMissingCustomDependenciesAndRefusesToExposeThePartialGraph() throws Exception {
         fixtures(); write("data/test/worldgen/template_pool/rooms.json", "{\"fallback\":\"test:missing\",\"elements\":[]}");

@@ -37,7 +37,7 @@ public final class NativeWorldExecutor {
     public ChunkGeneratorStructureState placementState(ServerLevel level, ChunkGenerator generator, RandomState random) {
         assertWorld(level);
         return ChunkGeneratorStructureState.createForNormal(random, level.getSeed(), generator.getBiomeSource(),
-            graph.lookup().lookupOrThrow(Registries.STRUCTURE_SET), level.spigotConfig);
+            graph.sourceLookup(Registries.STRUCTURE_SET), level.spigotConfig);
     }
     /** Structure.generate delegates jigsaw expansion, rotations, collision tests and start height to Minecraft. */
     public StructureStart assemble(ServerLevel level, String structureId, ChunkGenerator generator, RandomState random,

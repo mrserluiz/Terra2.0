@@ -84,6 +84,23 @@ public final class NativeResourceGraph {
         if(!report().valid()) throw new IllegalStateException("Native resource graph failed validation");
         return provider.lookupOrThrow(registry).getOrThrow(ResourceKey.create(registry, Identifier.parse(scope.resource(original))));
     }
+    /** Activation inventory excludes inherited vanilla sets and every other TerraPack. */
+    @SuppressWarnings("unchecked")
+    public <T> HolderLookup.RegistryLookup<T> sourceLookup(ResourceKey<? extends Registry<T>> registry) {
+        if(!report().valid()) throw new IllegalStateException("Native resource graph failed validation");
+        Node<T> node = (Node<T>) nodes.get(registry);
+        var inherited = provider.lookupOrThrow(registry);
+        Map<ResourceKey<T>, Holder.Reference<T>> entries = node == null ? Map.of() : Map.copyOf(node.holders);
+        return new HolderLookup.RegistryLookup<>() {
+            public ResourceKey<? extends Registry<T>> key() { return registry; }
+            public Lifecycle registryLifecycle() { return inherited.registryLifecycle(); }
+            public Stream<Holder.Reference<T>> listElements() { return entries.values().stream(); }
+            public Stream<HolderSet.Named<T>> listTags() { return Stream.empty(); }
+            public Optional<Holder.Reference<T>> get(ResourceKey<T> target) { return Optional.ofNullable(entries.get(target)); }
+            public Optional<HolderSet.Named<T>> get(TagKey<T> tag) { return Optional.empty(); }
+            public Optional<T> getValueForCopying(ResourceKey<T> target) { return get(target).map(Holder.Reference::value); }
+        };
+    }
     private <T> void declare(ResourceKey<? extends Registry<T>> key, Codec<T> codec) {
         var parent = base.lookup(key);
         if(parent.isEmpty()) { errors.add("Missing server registry " + key.identifier()); return; }
