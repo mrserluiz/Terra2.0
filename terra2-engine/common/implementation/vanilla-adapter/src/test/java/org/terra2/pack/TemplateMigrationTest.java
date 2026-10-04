@@ -30,6 +30,19 @@ class TemplateMigrationTest {
             public byte[] migrate(byte[] input) { return action.apply(input); }
         };
     }
+    private static byte[] replaceUtf(byte[] source, String before, String after) {
+        try {
+            var pattern = new ByteArrayOutputStream(); new DataOutputStream(pattern).writeUTF(before);
+            var replacement = new ByteArrayOutputStream(); new DataOutputStream(replacement).writeUTF(after);
+            byte[] needle = pattern.toByteArray();
+            for(int i = 0; i <= source.length - needle.length; i++) {
+                if(!Arrays.equals(Arrays.copyOfRange(source, i, i + needle.length), needle)) continue;
+                var output = new ByteArrayOutputStream(); output.write(source, 0, i); output.write(replacement.toByteArray());
+                output.write(source, i + needle.length, source.length - i - needle.length); return output.toByteArray();
+            }
+            throw new IllegalArgumentException("Fixture string not found");
+        } catch(IOException error) { throw new UncheckedIOException(error); }
+    }
     @Test void publishesSeparateMigratedTemplatesWithoutMakingStructuresReady() throws Exception {
         Path source = source(); byte[] original = Files.readAllBytes(source.resolve("data/test/structure/room.nbt"));
         var store = new TerraPackStore(directory);
@@ -59,6 +72,13 @@ class TemplateMigrationTest {
         var malformed = TemplateMigration.run(source, backend(5000, input -> new byte[]{0}));
         assertEquals("FAILED", malformed.report().status()); assertTrue(malformed.templates().isEmpty());
         assertEquals("PENDING", TemplateMigration.run(source, null).report().status());
+    }
+    @Test void rejectsAirFallbackAndLossOfPoolOrLootReferences() throws Exception {
+        var source = ResourceBundle.read(source());
+        for(var change : Map.of("minecraft:chest", "minecraft:air", "test:rooms", "test:other", "test:chests/dungeon", "test:chests/other").entrySet()) {
+            var result = TemplateMigration.run(source, backend(5000, input -> replaceUtf(version(input, 5000), change.getKey(), change.getValue())));
+            assertEquals("FAILED", result.report().status(), change.getKey()); assertTrue(result.templates().isEmpty());
+        }
     }
     @Test void gameplayExclusionsAreExplicitAndDoNotExcludeLootDependencies() throws Exception {
         Path path = source();

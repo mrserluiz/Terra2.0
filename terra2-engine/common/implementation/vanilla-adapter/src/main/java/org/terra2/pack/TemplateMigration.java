@@ -54,6 +54,23 @@ public final class TemplateMigration {
             original.blocks().forEach(block -> originalPositions.add(block.position()));
             result.blocks().forEach(block -> resultPositions.add(block.position()));
             if(!originalPositions.equals(resultPositions)) throw new IOException("Native migration changed block positions");
+            var migratedBlocks = new HashMap<StructureNbt.Position, StructureNbt.Block>();
+            result.blocks().forEach(block -> migratedBlocks.put(block.position(), block));
+            if(original.palettes().size() != result.palettes().size()) throw new IOException("Native migration lost alternative palettes");
+            for(var block : original.blocks()) {
+                var next = migratedBlocks.get(block.position());
+                for(int palette = 0; palette < original.palettes().size(); palette++) {
+                    String before = original.palettes().get(palette).get(block.state()).name();
+                    String after = result.palettes().get(palette).get(next.state()).name();
+                    if(!Set.of("minecraft:air", "minecraft:cave_air", "minecraft:void_air").contains(before)
+                        && Set.of("minecraft:air", "minecraft:cave_air", "minecraft:void_air").contains(after))
+                        throw new IOException("Native migration replaced a non-air block with air at " + block.position());
+                }
+                for(String field : List.of("pool", "name", "target", "LootTable"))
+                    if(block.nbt().containsKey(field) && !Objects.equals(block.nbt().get(field), next.nbt().get(field)))
+                        throw new IOException("Native migration changed " + field + " at " + block.position());
+                if(!block.nbt().isEmpty() && next.nbt().isEmpty()) throw new IOException("Native migration lost block entity NBT at " + block.position());
+            }
             int jigsaws = jigsaws(original);
             if(jigsaws != jigsaws(result)) throw new IOException("Native migration lost jigsaw connectors");
             migrated.put(path, bytes);
