@@ -23,6 +23,22 @@ while IFS= read -r candidate; do
       net.minecraft.server.packs.resources.Resource \
       net.minecraft.world.level.storage.loot.LootTable \
       net.minecraft.world.level.storage.loot.LootParams \
+      net.minecraft.world.level.storage.loot.LootContext \
+      net.minecraft.world.level.storage.loot.LootContext\$Builder \
+      net.minecraft.server.ReloadableServerRegistries\$Holder \
+      net.minecraft.resources.RegistryDataLoader\$RegistryData \
+      net.minecraft.resources.RegistryOps\$RegistryInfo \
+      net.minecraft.resources.RegistryOps\$RegistryInfoLookup \
+      net.minecraft.world.level.levelgen.structure.pieces.StructurePieceSerializationContext \
+      net.minecraft.world.level.levelgen.structure.placement.StructurePlacement \
+      net.minecraft.world.level.levelgen.structure.placement.RandomSpreadStructurePlacement \
+      net.minecraft.world.level.levelgen.structure.placement.ConcentricRingsStructurePlacement \
+      net.minecraft.world.level.StructureManager \
+      net.minecraft.server.level.ServerChunkCache \
+      net.minecraft.world.level.chunk.ChunkAccess \
+      net.minecraft.server.level.WorldGenRegion \
+      net.minecraft.server.packs.PackLocationInfo \
+      net.minecraft.world.level.storage.loot.LootDataType \
       net.minecraft.world.level.levelgen.structure.pools.JigsawPlacement
     exit 0
   fi
