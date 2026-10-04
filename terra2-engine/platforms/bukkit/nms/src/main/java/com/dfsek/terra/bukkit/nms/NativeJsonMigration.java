@@ -26,6 +26,12 @@ public final class NativeJsonMigration {
                 "minecraft:big_dripleaf_placeable", "minecraft:supports_big_dripleaf");
             String tag = object.get("tag").getAsString(); if(renamed.containsKey(tag)) object.addProperty("tag", renamed.get(tag));
         }
+        if(Set.of("minecraft:vegetation_patch", "minecraft:waterlogged_vegetation_patch").contains(id(object, "type")) && object.has("config")) {
+            var config = object.getAsJsonObject("config");
+            if(config.has("replaceable") && config.get("replaceable").isJsonPrimitive()
+                    && config.get("replaceable").getAsString().equals("#minecraft:small_dripleaf_placeable"))
+                config.addProperty("replaceable", "#minecraft:supports_small_dripleaf");
+        }
         var result = new JsonObject(); object.entrySet().forEach(entry -> result.add(entry.getKey(), visit(entry.getValue()))); return result;
     }
     private static JsonObject entity(JsonObject old) {

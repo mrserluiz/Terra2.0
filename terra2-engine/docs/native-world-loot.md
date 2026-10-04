@@ -12,6 +12,14 @@ Functions, recipes and advancements remain preserved source material and are not
 executed by this profile. A native overlay requires a terrain base such as
 `OVERWORLD`; it does not itself convert vanilla noise-based terrain.
 
+The bundled compatibility rules adapt legacy entity predicates, time-check
+clocks, removed patch features and renamed dripleaf support tags to 26.2. Empty
+bed block-entity metadata is removed by Minecraft's DataFixer because 26.2 no
+longer has bed block entities. Dungeons and Taverns contains a Waystones mod
+block: its empty deepslate waystone becomes a decorative vanilla lodestone.
+This adaptation is recorded in `nativeTemplateAdaptations`; it does not add mod
+teleportation. Nonempty mod inventories or unrecognized custom data are refused.
+
 ## World selection
 
 Generation is disabled by default, with no worlds selected. Example explicit
