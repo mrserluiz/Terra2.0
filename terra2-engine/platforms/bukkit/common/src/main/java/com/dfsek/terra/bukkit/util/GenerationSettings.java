@@ -25,8 +25,8 @@ public final class GenerationSettings {
             boolean terra = entry.contains("pack"), vanilla = entry.contains("datapack");
             if(terra == vanilla) throw new InvalidConfigurationException("Defina pack OU datapack para " + world);
             if(vanilla) {
-                Object file = entry.get("datapack"), dimension = entry.get("dimension");
-                if(!(file instanceof String name) || !name.matches("[A-Za-z0-9_-][A-Za-z0-9_.-]*")
+                Object sourceFile = entry.get("datapack"), dimension = entry.get("dimension");
+                if(!(sourceFile instanceof String name) || !name.matches("[A-Za-z0-9_-][A-Za-z0-9_.-]*")
                         || !(dimension instanceof String key) || !key.matches("[a-z0-9_.-]+:[a-z0-9_./-]+"))
                     throw new InvalidConfigurationException("Datapack/dimension inválidos para " + world);
                 continue;
