@@ -5,6 +5,7 @@ import com.mojang.serialization.*;
 import java.util.*;
 import java.util.stream.Stream;
 import net.minecraft.core.*;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.*;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.storage.loot.LootDataType;
@@ -32,6 +33,26 @@ public final class NativeResourceGraph {
         }
     };
     private final RegistryOps<JsonElement> ops;
+    /** Named.contains in 26.2 consults holder tags. Inline holder sets instead of mutating global tags. */
+    private JsonElement inlineHolderSets(JsonElement json, String field) {
+        if(json.isJsonObject()) {
+            var result = new JsonObject(); json.getAsJsonObject().entrySet().forEach(entry -> result.add(entry.getKey(), inlineHolderSets(entry.getValue(), entry.getKey()))); return result;
+        }
+        if(json.isJsonArray()) {
+            var result = new JsonArray(); json.getAsJsonArray().forEach(entry -> result.add(inlineHolderSets(entry, field))); return result;
+        }
+        if(!json.isJsonPrimitive() || !json.getAsJsonPrimitive().isString() || !json.getAsString().startsWith("#")) return json;
+        return switch(field) {
+            case "biomes", "preferred_biomes" -> tagEntries(Registries.BIOME, json.getAsString());
+            case "supported_items", "primary_items" -> tagEntries(Registries.ITEM, json.getAsString());
+            case "exclusive_set", "options" -> tagEntries(Registries.ENCHANTMENT, json.getAsString());
+            default -> json;
+        };
+    }
+    private <T> JsonArray tagEntries(ResourceKey<? extends Registry<T>> key, String tag) {
+        var contents = provider.lookupOrThrow(key).getOrThrow(TagKey.create(key, Identifier.parse(tag.substring(1))));
+        var result = new JsonArray(); contents.stream().map(holder -> holder.unwrapKey().orElseThrow().identifier().toString()).distinct().forEach(result::add); return result;
+    }
 
     public NativeResourceGraph(ResourceBundle source, HolderLookup.Provider base) {
         this.source = source; this.scope = new ResourceScope(source); this.base = base;
@@ -116,7 +137,7 @@ public final class NativeResourceGraph {
         RegistryOps.RegistryInfo<T> info() { return new RegistryOps.RegistryInfo<>(parent, lookup, parent.registryLifecycle()); }
         void decode() {
             for(var entry : paths.entrySet()) try {
-                JsonElement json = scope.rewrite(JsonParser.parseString(source.text(entry.getValue())));
+                JsonElement json = inlineHolderSets(scope.rewrite(JsonParser.parseString(source.text(entry.getValue()))), "");
                 T value = codec.parse(ops, json).getOrThrow();
                 Reflection.REFERENCE.invokeBindValue(holders.get(entry.getKey()), value);
                 decoded.merge(key.identifier().toString(), 1, Integer::sum);
