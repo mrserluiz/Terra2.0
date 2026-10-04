@@ -49,9 +49,10 @@ public class NMSInjectListener implements Listener {
                 new com.dfsek.terra.bukkit.world.BukkitWorldProperties(craftWorld));
             ChunkMap chunkMap = serverWorld.getChunkSource().chunkMap;
             WorldGenContext worldGenContext = Reflection.CHUNKMAP.getWorldGenContext(chunkMap);
+            NativeWorldExecutor nativeExecutor = ((NMSPlatform) plugin.platform()).nativeRuntime().bind(serverWorld, worldGenContext.structureManager());
             Reflection.CHUNKMAP.setWorldGenContext(chunkMap, new WorldGenContext(
                 worldGenContext.level(),
-                new NMSChunkGeneratorDelegate(vanilla, pack, provider, craftWorld.getSeed(), bukkitChunkGeneratorWrapper.getHandle()),
+                new NMSChunkGeneratorDelegate(vanilla, pack, provider, craftWorld.getSeed(), bukkitChunkGeneratorWrapper.getHandle(), nativeExecutor),
                 worldGenContext.structureManager(),
                 worldGenContext.lightEngine(),
                 worldGenContext.mainThreadExecutor(),

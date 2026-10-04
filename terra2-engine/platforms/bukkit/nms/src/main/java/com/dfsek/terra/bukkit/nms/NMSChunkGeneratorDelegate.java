@@ -40,12 +40,19 @@ public class NMSChunkGeneratorDelegate extends ChunkGenerator {
 
     private final ChunkGenerator vanilla;
     private final ConfigPack pack;
+    private final NativeWorldExecutor nativeExecutor;
+    private volatile net.minecraft.world.level.chunk.ChunkGeneratorStructureState nativeState;
 
     private final long seed;
 
     public NMSChunkGeneratorDelegate(ChunkGenerator vanilla, ConfigPack pack, NMSBiomeProvider biomeProvider, long seed,
                                      com.dfsek.terra.api.world.chunk.generation.ChunkGenerator generator) {
+        this(vanilla, pack, biomeProvider, seed, generator, null);
+    }
+    public NMSChunkGeneratorDelegate(ChunkGenerator vanilla, ConfigPack pack, NMSBiomeProvider biomeProvider, long seed,
+                                     com.dfsek.terra.api.world.chunk.generation.ChunkGenerator generator, NativeWorldExecutor nativeExecutor) {
         super(biomeProvider);
+        this.nativeExecutor = nativeExecutor;
         this.delegate = generator;
         this.vanilla = vanilla;
         this.pack = pack;
@@ -72,7 +79,22 @@ public class NMSChunkGeneratorDelegate extends ChunkGenerator {
     @Override
     public void applyBiomeDecoration(@NotNull WorldGenLevel world, @NotNull ChunkAccess chunk,
                                      @NotNull StructureManager structureAccessor) {
-        vanilla.applyBiomeDecoration(world, chunk, structureAccessor);
+        if(nativeExecutor == null) vanilla.applyBiomeDecoration(world, chunk, structureAccessor);
+        else { nativeExecutor.verify(world.getLevel()); super.applyBiomeDecoration(world, chunk, structureAccessor); }
+    }
+
+    @Override public void createStructures(net.minecraft.core.RegistryAccess registries,
+        net.minecraft.world.level.chunk.ChunkGeneratorStructureState original, StructureManager manager,
+        ChunkAccess chunk, net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager templates,
+        net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimension) {
+        if(nativeExecutor == null) { super.createStructures(registries, original, manager, chunk, templates, dimension); return; }
+        var level = manager.level.getMinecraftWorld(); nativeExecutor.verify(level);
+        var state = nativeState;
+        if(state == null) synchronized(this) {
+            state = nativeState;
+            if(state == null) nativeState = state = nativeExecutor.placementState(level, this, original.randomState());
+        }
+        super.createStructures(registries, state, manager, chunk, templates, dimension);
     }
 
     @Override

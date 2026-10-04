@@ -56,7 +56,8 @@ public final class TerraPackStore {
             if(!blockers.contains(issue)) blockers.add(message);
         }
         compiled = new PackCompiler.Result(compiled.terrain(), compiled.features(), blockers, compiled.notes(), compiled.resourceKinds());
-        String status = compiled.ready() ? "READY" : "BLOCKED";
+        boolean nativeExecutable = nativeBackend != null && nativeBackend.executableOverlay(merged, migration.report(), profile);
+        String status = compiled.ready() ? "READY" : nativeExecutable ? "READY_NATIVE" : "BLOCKED";
         var manifest = new JsonObject(); manifest.addProperty("schema", 1); manifest.addProperty("compiler", "terra2-vanilla-1");
         manifest.addProperty("id", id); manifest.addProperty("status", status); manifest.addProperty("target", "paper-26.2");
         manifest.addProperty("profile", profile.name());
@@ -67,6 +68,9 @@ public final class TerraPackStore {
         // Decoded structure inventory is diagnostic, not authorization to execute unfinished stages.
         manifest.add("structureMigration", JSON.toJsonTree(StructureCatalog.audit(merged)));
         manifest.add("nativeTemplateMigration", JSON.toJsonTree(migration.report()));
+        var templateHashes = new JsonObject();
+        migration.templates().forEach((path, bytes) -> templateHashes.addProperty(path, sha256(bytes)));
+        manifest.add("nativeTemplateHashes", templateHashes);
         if(nativeBackend != null) manifest.add("nativeResourceValidation", JSON.toJsonTree(nativeBackend.validate(merged)));
         // Readiness always comes from the executable compiler; MIGRATED only describes NBT.
         Path temp = Files.createTempFile(output, ".conversion-", ".tmp");
@@ -89,10 +93,14 @@ public final class TerraPackStore {
             catch(IOException error) { Files.deleteIfExists(report); throw error; }
         } finally { Files.deleteIfExists(temp); Files.deleteIfExists(reportTemp); }
         Path report = reports.resolve(id + ".json");
-        return new Conversion(id, status, destination, report, compiled.blockers().size(), compiled.features().size(), compiled.terrain() != null);
+        return new Conversion(id, status, destination, report, nativeExecutable ? 0 : compiled.blockers().size(), compiled.features().size(), compiled.terrain() != null);
     }
     private static void write(ZipOutputStream zip, String path, byte[] bytes) throws IOException {
         zip.putNextEntry(new ZipEntry(path)); zip.write(bytes); zip.closeEntry();
+    }
+    private static String sha256(byte[] bytes) {
+        try { return HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(bytes)); }
+        catch(java.security.NoSuchAlgorithmException impossible) { throw new AssertionError(impossible); }
     }
     public boolean contains(String id) {
         if(id == null || !id.matches("[A-Za-z0-9_-][A-Za-z0-9_.-]*")) return false;
@@ -130,12 +138,27 @@ public final class TerraPackStore {
     }
     public TerraPack load(String id) throws IOException {
         var preview = inspect(id);
-        if(!"READY".equals(PackCompiler.string(preview, "status")))
+        if(!Set.of("READY", "READY_NATIVE").contains(PackCompiler.string(preview, "status")))
             throw new IllegalArgumentException("TerraPack " + id + " is BLOCKED; inspect conversion/reports/" + id + ".json");
         var snapshot = snapshot(id); var manifest = snapshot.manifest;
         var source = snapshot.archive.subtree("resources/");
         if(!source.fingerprint().equals(PackCompiler.string(manifest, "resourceSha256"))) throw new IllegalArgumentException("TerraPack resources were modified: " + id);
         var profile = manifest.has("profile") ? PackCompiler.Profile.valueOf(PackCompiler.string(manifest, "profile")) : PackCompiler.Profile.FULL;
+        if("READY_NATIVE".equals(PackCompiler.string(manifest, "status"))) {
+            var migration = JSON.fromJson(manifest.get("nativeTemplateMigration"), TemplateMigration.Report.class);
+            if(nativeBackend == null || !nativeBackend.executableOverlay(source, migration, profile))
+                throw new IllegalArgumentException("Native overlay refused by current runtime: " + id);
+            Map<String, byte[]> templates = new TreeMap<>();
+            var hashes = manifest.getAsJsonObject("nativeTemplateHashes");
+            for(String path : source.paths()) if(path.matches("data/[^/]+/structure/.+\\.nbt")) {
+                byte[] bytes = snapshot.archive.bytes("native-templates/" + path);
+                if(!hashes.has(path) || !sha256(bytes).equals(hashes.get(path).getAsString())) throw new IllegalArgumentException("Native template hash mismatch: " + path);
+                if(StructureNbt.read(bytes).dataVersion() != migration.targetDataVersion()) throw new IllegalArgumentException("Native template version mismatch: " + path);
+                templates.put(path, bytes);
+            }
+            if(templates.size() != hashes.size() || templates.size() != migration.pieces().size()) throw new IllegalArgumentException("Incomplete native templates");
+            return new TerraPack(id, snapshot.archive.fingerprint(), null, List.of(), new NativeResources(source, templates, migration.targetDataVersion()));
+        }
         var compiled = PackCompiler.compile(source, manifest.has("sourceDimension") ? PackCompiler.string(manifest, "sourceDimension") : null, profile);
         if(!compiled.ready() || !JSON.toJsonTree(compiled).equals(manifest.get("compiled")))
             throw new IllegalArgumentException("TerraPack compiled IR failed validation: " + id);

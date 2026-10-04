@@ -9,4 +9,5 @@ public interface NativePackBackend {
         public boolean valid() { return errors.isEmpty(); }
     }
     Validation validate(ResourceBundle source);
+    default boolean executableOverlay(ResourceBundle source, TemplateMigration.Report migration, PackCompiler.Profile profile) { return false; }
 }

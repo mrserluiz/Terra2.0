@@ -160,6 +160,18 @@ public class AwfulBukkitHacks {
         Reflection.MAPPED_REGISTRY.setAllTags(registry, Reflection.MAPPED_REGISTRY_TAG_SET.invokeFromMap(map2));
     }
 
+    public static <T> void addPrivateTags(MappedRegistry<T> registry, Map<TagKey<T>, List<Holder<T>>> additions) {
+        Map<TagKey<T>, List<Holder<T>>> all = registry.getTags().collect(Collectors.toMap(Named::key,
+            tag -> new ArrayList<>(tag.stream().toList())));
+        additions.forEach((key, holders) -> {
+            if(!key.location().getNamespace().equals("terra2")) throw new IllegalArgumentException("Only private Terra2 tags may be installed");
+            List<Holder<T>> canonical = holders.stream().map(holder -> (Holder<T>) registry.get(holder.unwrapKey().orElseThrow()).orElseThrow()).toList();
+            var previous = all.putIfAbsent(key, canonical);
+            if(previous != null && !previous.equals(canonical)) throw new IllegalStateException("Conflicting private tag: " + key);
+        });
+        bindTags(registry, all);
+    }
+
     private static void resetTags(MappedRegistry<?> registry) {
         registry.getTags().forEach(entryList -> Reflection.HOLDER_SET.invokeBind(entryList, List.of()));
         Reflection.MAPPED_REGISTRY.getByKey(registry).values().forEach(

@@ -41,11 +41,18 @@ import com.dfsek.terra.bukkit.nms.config.VillagerTypeTemplate;
 
 
 public class NMSPlatform extends PlatformImpl {
+    private NativePackRuntime nativeRuntime;
+    public NativePackRuntime nativeRuntime() { return nativeRuntime; }
+    @Override public void prepareNativePacks(String world, java.util.List<org.terra2.pack.TerraPack> packs) throws java.io.IOException { nativeRuntime.prepare(world, packs); }
+    @Override public java.util.Map<String, String> nativeLootTables(String world) { return nativeRuntime.lootTables(world); }
 
     @Override
     public boolean usesNativeBiomeProvider() { return true; }
     @Override public org.terra2.pack.NativePackBackend nativePackBackend() {
-        return source -> {
+        return new org.terra2.pack.NativePackBackend() {
+        @Override public boolean executableOverlay(org.terra2.pack.ResourceBundle source, org.terra2.pack.TemplateMigration.Report migration,
+            org.terra2.pack.PackCompiler.Profile profile) { return NativePackRuntime.executable(source, migration, profile); }
+        @Override public org.terra2.pack.NativePackBackend.Validation validate(org.terra2.pack.ResourceBundle source) {
             var server = net.minecraft.server.MinecraftServer.getServer();
             var registries = new java.util.LinkedHashMap<net.minecraft.resources.ResourceKey<? extends net.minecraft.core.Registry<?>>, net.minecraft.core.HolderLookup.RegistryLookup<?>>();
             server.registryAccess().listRegistries().forEach(lookup -> registries.put(lookup.key(), lookup));
@@ -58,11 +65,13 @@ public class NMSPlatform extends PlatformImpl {
                 return new org.terra2.pack.NativePackBackend.Validation("paper-26.2-native-graph-1", source.fingerprint(), java.util.Map.of(),
                     java.util.List.of("Native graph initialization: " + error.getMessage()));
             }
+        }
         };
     }
 
     public NMSPlatform(TerraBukkitPlugin plugin) {
         super(plugin);
+        nativeRuntime = new NativePackRuntime(plugin);
 
         Bukkit.getPluginManager().registerEvents(new NMSInjectListener(plugin), plugin);
     }

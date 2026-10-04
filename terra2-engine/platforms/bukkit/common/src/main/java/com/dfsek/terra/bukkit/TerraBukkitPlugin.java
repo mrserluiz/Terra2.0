@@ -63,6 +63,11 @@ public class TerraBukkitPlugin extends JavaPlugin {
     private org.terra2.core.GenerationManager<com.dfsek.terra.api.block.state.BlockState, com.dfsek.terra.api.world.biome.Biome> core;
     private volatile YamlConfiguration generationSettings;
     private String primaryWorldName;
+    private org.terra2.adapter.vanilla.paper.WorldLootManager lootManager;
+    public YamlConfiguration generationSettings() { return generationSettings; }
+    public org.terra2.pack.TerraPackStore terraPackStore() { return terraPacks; }
+    public PlatformImpl platform() { return platform; }
+    public org.terra2.adapter.vanilla.paper.WorldLootManager lootManager() { return lootManager; }
     private AsyncScheduler asyncScheduler = this.getServer().getAsyncScheduler();
 
     private GlobalRegionScheduler globalRegionScheduler = this.getServer().getGlobalRegionScheduler();
@@ -139,6 +144,34 @@ public class TerraBukkitPlugin extends JavaPlugin {
         }
 
         platform.getEventManager().callEvent(new PlatformInitializationEvent());
+
+        try {
+            lootManager = new org.terra2.adapter.vanilla.paper.WorldLootManager(this,
+                org.terra2.core.LootOriginKeyStore.load(getDataFolder().toPath().resolve("loot/origin.key")));
+            Bukkit.getPluginManager().registerEvents(lootManager, this);
+            if(generationSettings.getBoolean("generation.enabled")) {
+                for(String world : generationSettings.getConfigurationSection("worlds").getKeys(false)) {
+                    if(generationSettings.isString("worlds." + world + ".datapack")) continue;
+                    try {
+                        assertGenerationAuthorized(world, "PACKS");
+                        platform.prepareNativePacks(world, composition(generationSettings, world).packs());
+                    } catch(Exception refused) {
+                        com.dfsek.terra.bukkit.util.GenerationReport.failure("native-startup-preflight", world,
+                            com.dfsek.terra.bukkit.util.GenerationSettings.packSelection(generationSettings, world), refused);
+                    }
+                }
+            }
+            Bukkit.getPluginManager().registerEvents(new org.bukkit.event.Listener() {
+                @org.bukkit.event.EventHandler(priority = org.bukkit.event.EventPriority.MONITOR)
+                public void bindLoot(org.bukkit.event.world.WorldInitEvent event) {
+                    if(event.getWorld().getGenerator() instanceof BukkitChunkGeneratorWrapper)
+                        lootManager.bind(event.getWorld(), platform.nativeLootTables(event.getWorld().getName()));
+                }
+            }, this);
+        } catch(Exception error) {
+            logger.error("Cannot initialize persistent loot manager", error);
+            Bukkit.getPluginManager().disablePlugin(this); return;
+        }
 
         try {
             PaperCommandManager<CommandSender> commandManager = getCommandSenderPaperCommandManager();
@@ -314,6 +347,8 @@ public class TerraBukkitPlugin extends JavaPlugin {
         if(datapacks.hasWorld(worldName)) throw new IllegalArgumentException("World already has a vanilla/TerraPack generator: " + worldName);
         ConfigPack pack = composition.legacy();
         String selected = composition.selection();
+        try { platform.prepareNativePacks(worldName, composition.packs()); }
+        catch(java.io.IOException error) { throw new IllegalArgumentException("Cannot restore native pack resources", error); }
         var delegate = generatorMap.computeIfAbsent(worldName, name -> {
             var legacy = pack.getGeneratorProvider().newInstance(pack);
             var plan = org.terra2.adapter.terra.TerraPlanCompiler.compile(pack, legacy);
@@ -349,6 +384,10 @@ public class TerraBukkitPlugin extends JavaPlugin {
     @Override
     public boolean onCommand(org.bukkit.command.CommandSender sender, org.bukkit.command.Command command,
                              String label, String[] args) {
+        if(command.getName().equalsIgnoreCase("terra2") && args.length == 2 && args[0].equalsIgnoreCase("loot") && args[1].equalsIgnoreCase("status")) {
+            if(!sender.hasPermission("terra2.settings.reload")) { sender.sendMessage("Sem permissão"); return true; }
+            sender.sendMessage(lootManager == null ? "Loot indisponível" : lootManager.status()); return true;
+        }
         if(command.getName().equalsIgnoreCase("terra2reportlog")) {
             if(!sender.hasPermission("terra2.diagnostics.capture")) {
                 sender.sendMessage("Sem permissão: terra2.diagnostics.capture"); return true;

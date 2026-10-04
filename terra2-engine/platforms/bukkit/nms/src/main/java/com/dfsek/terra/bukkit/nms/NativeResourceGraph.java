@@ -79,6 +79,11 @@ public final class NativeResourceGraph {
     }
     public ResourceScope scope() { return scope; }
     public HolderLookup.Provider lookup() { return provider; }
+    public Set<String> handledPaths() {
+        var paths = new HashSet<String>();
+        nodes.values().forEach(node -> { paths.addAll(node.paths.values()); paths.addAll(node.tagPaths.values()); });
+        return Set.copyOf(paths);
+    }
     public Report report() { return new Report(scope.fingerprint(), decoded, errors); }
     public <T> Holder.Reference<T> resource(ResourceKey<? extends Registry<T>> registry, String original) {
         if(!report().valid()) throw new IllegalStateException("Native resource graph failed validation");
