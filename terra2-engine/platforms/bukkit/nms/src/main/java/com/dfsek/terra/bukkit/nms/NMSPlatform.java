@@ -44,6 +44,10 @@ public class NMSPlatform extends PlatformImpl {
     private NativePackRuntime nativeRuntime;
     public NativePackRuntime nativeRuntime() { return nativeRuntime; }
     @Override public org.terra2.pack.TemplateMigration.Backend templateMigration() { return new NativePaperTemplateMigration(); }
+    @Override public void initializeLootManager(org.terra2.adapter.vanilla.paper.WorldLootManager manager) {
+        NativePackRuntime.registries().lookupOrThrow(net.minecraft.core.registries.Registries.LOOT_TABLE).listElements()
+            .forEach(holder -> NativeEntityLootBridge.wrap(holder.value(), holder.key().identifier().toString(), manager));
+    }
     @Override public void prepareNativePacks(String world, java.util.List<org.terra2.pack.TerraPack> packs) throws java.io.IOException { nativeRuntime.prepare(world, packs); }
     @Override public java.util.Map<String, String> nativeLootTables(String world) { return nativeRuntime.lootTables(world); }
 

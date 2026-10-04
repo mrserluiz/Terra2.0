@@ -57,6 +57,20 @@ public final class NativeIntegrationProbe extends JavaPlugin {
                 if(starts < 1) throw new IllegalStateException("Native structure-start record missing");
                 data.setProperty("starts", Long.toString(starts));
                 if(nativeStarts(getServer().getWorld("world"), 8, 8) != 0) throw new IllegalStateException("Native structures activated in primary world");
+                String table = engine.platform().nativeLootTables(world.getName()).keySet().stream()
+                    .filter(key -> key.endsWith("/smoke/mob")).findFirst().orElseThrow();
+                var mob = world.spawn(new Location(world, 8, 110, 8), org.bukkit.entity.Zombie.class);
+                mob.setCanPickupItems(false); mob.setLootTable(Bukkit.getLootTable(NamespacedKey.fromString(table))); mob.setHealth(0);
+                var drop = world.getEntitiesByClass(org.bukkit.entity.Item.class).stream()
+                    .filter(entity -> engine.lootManager().authentic(entity.getItemStack()))
+                    .filter(entity -> "Smoke drop".equals(net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText()
+                        .serialize(entity.getItemStack().getItemMeta().displayName()))).findFirst().orElseThrow();
+                var stack = drop.getItemStack().clone();
+                var transfer = getServer().getWorld("world").dropItem(new Location(getServer().getWorld("world"), 8, 100, 8), stack.clone());
+                if(!transfer.getItemStack().isSimilar(stack)) throw new IllegalStateException("Cross-world item drop was rewritten");
+                transfer.remove(); drop.remove();
+                var savedChest = Arrays.stream(data.getProperty("chest").split(",")).mapToInt(Integer::parseInt).toArray();
+                ((Chest) world.getBlockAt(savedChest[0], savedChest[1], savedChest[2]).getState()).getBlockInventory().addItem(stack);
                 data.setProperty("gold", Long.toString(gold)); data.setProperty("world", world.getUID().toString()); data.setProperty("dimension", world.getKey().toString());
                 try(var output = Files.newOutputStream(checkpoint)) { data.store(output, "Native save/restart checkpoint"); }
                 world.save(); getServer().savePlayers();
@@ -71,6 +85,10 @@ public final class NativeIntegrationProbe extends JavaPlugin {
                 var chest = (Chest) world.getBlockAt(xyz[0], xyz[1], xyz[2]).getState();
                 var item = Arrays.stream(chest.getBlockInventory().getContents()).filter(Objects::nonNull).findFirst().orElseThrow();
                 if(!engine.lootManager().authentic(item)) throw new IllegalStateException("Saved loot provenance failed after restart");
+                boolean mobLoot = Arrays.stream(chest.getBlockInventory().getContents()).filter(Objects::nonNull)
+                    .filter(engine.lootManager()::authentic).anyMatch(stack -> "Smoke drop".equals(
+                        net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText().serialize(stack.getItemMeta().displayName())));
+                if(!mobLoot) throw new IllegalStateException("Saved entity-table loot provenance missing after restart");
                 // Force additional generation after restored registry/template aliases are installed.
                 world.getChunkAt(2, 0); world.getChunkAt(2, 1); world.save();
                 sender.sendMessage("TERRA2_NATIVE_SMOKE_RESTART_OK");

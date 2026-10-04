@@ -80,6 +80,8 @@ public final class NativePackRuntime {
                 });
             }
             NativeRegistryInstaller.install(graph, live);
+            graph.sourceLookup(Registries.LOOT_TABLE).listElements().forEach(holder ->
+                NativeEntityLootBridge.wrap(holder.value(), holder.key().identifier().toString(), plugin.lootManager()));
             installed = new Installed(graph, Map.copyOf(templates), Map.copyOf(owners)); resources.put(source.fingerprint(), installed);
             plugin.lootManager().declareNativeTables(installed.lootOwners.keySet());
         }

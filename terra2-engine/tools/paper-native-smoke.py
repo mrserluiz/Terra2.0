@@ -79,6 +79,8 @@ def fixture():
         files[f'data/smoke/worldgen/template_pool/{name}.json'] = {'name': 'smoke:' + name, 'fallback': 'minecraft:empty',
             'elements': [{'weight': 1, 'element': {'element_type': 'minecraft:single_pool_element', 'location': 'smoke:' + name,
                 'processors': 'smoke:gold', 'projection': 'rigid'}}]}
+    files['data/smoke/loot_table/mob.json'] = {'type': 'minecraft:entity', 'pools': [{'rolls': 1,
+        'entries': [{'type': 'minecraft:item', 'name': 'minecraft:stone'}]}]}
     with zipfile.ZipFile(INPUT / 'smoke-pack.zip', 'w', zipfile.ZIP_DEFLATED) as z:
         for path, data in files.items(): z.writestr(path, json.dumps(data))
         for name in ('root', 'child'): z.writestr(f'data/smoke/structure/{name}.nbt', template(name == 'child'))
@@ -164,6 +166,8 @@ def main():
     (SERVER / 'eula.txt').write_text('eula=true\n')
     (SERVER / 'server.properties').write_text('online-mode=false\nview-distance=2\nsimulation-distance=2\nmax-players=2\nspawn-protection=0\n')
     (PLUGIN / 'terra2-settings.yml').write_text('generation:\n  enabled: true\n  protected-worlds: [world, world_nether, world_the_end]\nworlds:\n  terra2_native_smoke:\n    packs: [OVERWORLD, SmokeNative, DNTNative]\n    loot:\n      enabled: true\n      tables:\n        "smoke:chest":\n          name: "Smoke relic"\n          lore: ["Origin: {world}", "{dimension}"]\n          item-model: smoke:relic\n')
+    with (PLUGIN / 'terra2-settings.yml').open('a') as settings:
+        settings.write('        "smoke:mob":\n          name: "Smoke drop"\n          item-model: smoke:relic\n')
     run_server('create'); run_server('restart')
     (SERVER / 'result.json').write_text(json.dumps({'status': 'PASSED', 'paper': '26.2', 'jigsaw': True, 'processors': True, 'nativeLoot': True, 'saveRestart': True}, indent=2))
 

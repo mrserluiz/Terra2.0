@@ -48,6 +48,7 @@ public class PlatformImpl extends AbstractPlatform {
     public boolean usesNativeBiomeProvider() { return false; }
     public org.terra2.pack.NativePackBackend nativePackBackend() { return null; }
     public org.terra2.pack.TemplateMigration.Backend templateMigration() { return new org.terra2.adapter.vanilla.paper.PaperTemplateMigration(); }
+    public void initializeLootManager(org.terra2.adapter.vanilla.paper.WorldLootManager manager) {}
     public java.util.Map<String, String> nativeLootTables(String world) { return java.util.Map.of(); }
     public void prepareNativePacks(String world, java.util.List<org.terra2.pack.TerraPack> packs) throws java.io.IOException {
         if(packs.stream().anyMatch(pack -> pack.nativeResources() != null)) throw new IllegalStateException("Native runtime unavailable");

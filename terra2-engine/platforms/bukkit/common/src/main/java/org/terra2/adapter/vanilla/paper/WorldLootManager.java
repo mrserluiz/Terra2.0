@@ -104,19 +104,35 @@ public final class WorldLootManager implements Listener {
         var output = new ArrayList<ItemStack>();
         for(ItemStack input : event.getLoot()) {
             if(input == null || input.getType().isAir()) continue;
-            var meta = input.getItemMeta();
-            if(meta.getPersistentDataContainer().has(marker)) { output.add(input); continue; }
-            var receipt = binding.policies.get(pack).mint(WorldLootPolicy.Trigger.LOOT_TABLE, binding.target, pack, table, false).orElseThrow();
-            var item = input.clone(); meta = item.getItemMeta();
-            meta.getPersistentDataContainer().set(marker, PersistentDataType.STRING, JSON.toJson(receipt));
-            if(binding.decorate && rule != null && (rule.items.isEmpty() || rule.items.contains(item.getType()))) {
-                if(rule.name != null) meta.displayName(Component.text(format(rule.name, binding.target)));
-                if(!rule.lore.isEmpty()) meta.lore(rule.lore.stream().map(line -> Component.text(format(line, binding.target))).toList());
-                if(rule.model != null) meta.setItemModel(rule.model);
-            }
-            item.setItemMeta(meta); issued.incrementAndGet(); output.add(item);
+            output.add(decorate(binding, pack, table, rule, input));
         }
         event.setLoot(output);
+    }
+    /** Platform hook for newly produced entity-table loot, before equipment/player items join the drop list. */
+    public ItemStack freshEntityLoot(World world, String table, ItemStack input) {
+        var binding = worlds.get(world.getName()); boolean nativeTable = nativeTables.contains(table);
+        if(binding == null || !binding.target.dimensionKey().equals(world.getKey().toString()) || !binding.owners.containsKey(table))
+            return nativeTable ? null : input;
+        try { plugin.assertGenerationAuthorized(world.getName(), "PACKS"); }
+        catch(RuntimeException denied) { return nativeTable ? null : input; }
+        if(!nativeTable && !binding.decorate) return input;
+        var rule = binding.rules.get(table);
+        if(rule == null && nativeTable) rule = binding.rules.get(originalTable(table));
+        return decorate(binding, binding.owners.get(table), table, rule, input);
+    }
+    private ItemStack decorate(Binding binding, String pack, String table, Rule rule, ItemStack input) {
+        if(input == null || input.getType().isAir()) return input;
+        var meta = input.getItemMeta();
+        if(meta.getPersistentDataContainer().has(marker)) return input;
+        var receipt = binding.policies.get(pack).mint(WorldLootPolicy.Trigger.LOOT_TABLE, binding.target, pack, table, false).orElseThrow();
+        var item = input.clone(); meta = item.getItemMeta();
+        meta.getPersistentDataContainer().set(marker, PersistentDataType.STRING, JSON.toJson(receipt));
+        if(binding.decorate && rule != null && (rule.items.isEmpty() || rule.items.contains(item.getType()))) {
+            if(rule.name != null) meta.displayName(Component.text(format(rule.name, binding.target)));
+            if(!rule.lore.isEmpty()) meta.lore(rule.lore.stream().map(line -> Component.text(format(line, binding.target))).toList());
+            if(rule.model != null) meta.setItemModel(rule.model);
+        }
+        item.setItemMeta(meta); issued.incrementAndGet(); return item;
     }
     private static String format(String text, WorldTarget target) {
         return text.replace("{world}", target.worldName()).replace("{dimension}", target.dimensionKey());

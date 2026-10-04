@@ -149,6 +149,7 @@ public class TerraBukkitPlugin extends JavaPlugin {
             lootManager = new org.terra2.adapter.vanilla.paper.WorldLootManager(this,
                 org.terra2.core.LootOriginKeyStore.load(getDataFolder().toPath().resolve("loot/origin.key")));
             Bukkit.getPluginManager().registerEvents(lootManager, this);
+            platform.initializeLootManager(lootManager);
             if(generationSettings.getBoolean("generation.enabled")) {
                 for(String world : generationSettings.getConfigurationSection("worlds").getKeys(false)) {
                     if(generationSettings.isString("worlds." + world + ".datapack")) continue;
