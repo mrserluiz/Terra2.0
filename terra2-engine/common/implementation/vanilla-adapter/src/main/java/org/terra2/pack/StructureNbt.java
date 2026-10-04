@@ -6,7 +6,7 @@ import java.util.zip.GZIPInputStream;
 
 /** Bounded, platform-independent reader. Decoding a template never places blocks or executes its NBT. */
 public final class StructureNbt {
-    private static final int MAX_BYTES = 16 * 1024 * 1024, MAX_NODES = 1000000;
+    private static final int MAX_BYTES = 16 * 1024 * 1024, MAX_NODES = 2000000, MAX_ELEMENTS = 1000000;
     public record Position(int x, int y, int z) {}
     public record State(String name, Map<String, String> properties) {}
     public record Block(Position position, int state, Map<String, Object> nbt) {}
@@ -60,7 +60,7 @@ public final class StructureNbt {
     }
     private int length(int width) throws IOException {
         int n = input.readInt();
-        if(n < 0 || n > MAX_NODES - nodes || (long) n * width > input.available()) throw new IOException("Invalid/oversized NBT array or list");
+        if(n < 0 || n > MAX_ELEMENTS || n > MAX_NODES - nodes || (long) n * width > input.available()) throw new IOException("Invalid/oversized NBT array or list");
         nodes += n; return n;
     }
     @SuppressWarnings("unchecked")
@@ -82,7 +82,7 @@ public final class StructureNbt {
         int version = integer(root.get("DataVersion")); if(version < 0) throw new IllegalArgumentException("Negative DataVersion");
         Position size = position(root.get("size"));
         if(size.x < 1 || size.y < 1 || size.z < 1 || size.x > 512 || size.y > 512 || size.z > 512
-                || (long) size.x * size.y * size.z > MAX_NODES) throw new IllegalArgumentException("Template size exceeds budget");
+                || (long) size.x * size.y * size.z > MAX_ELEMENTS) throw new IllegalArgumentException("Template size exceeds budget");
         List<List<State>> palettes = new ArrayList<>();
         if(root.containsKey("palette") == root.containsKey("palettes")) throw new IllegalArgumentException("Requires exactly one palette or palettes");
         var rawPalettes = root.containsKey("palette") ? List.of(root.get("palette")) : list(root.get("palettes"));

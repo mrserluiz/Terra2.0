@@ -50,6 +50,14 @@ class StructureNbtTest {
         try(var zip = new GZIPOutputStream(bytes)) { byte[] chunk = new byte[1024 * 1024]; for(int i = 0; i < 17; i++) zip.write(chunk); }
         assertThrows(IOException.class, () -> StructureNbt.read(bytes.toByteArray()));
     }
+    @Test void accommodatesLargeLegitimateNbtWithinSeparateNodeAndArrayBudgets() throws Exception {
+        byte[] raw = fixture(false, false, false); var bytes = new ByteArrayOutputStream();
+        bytes.write(raw, 0, raw.length - 1);
+        try(var out = new DataOutputStream(bytes)) {
+            tag(out, 7, "extra_source_data"); out.writeInt(1000000); out.write(new byte[1000000]); out.writeByte(0);
+        }
+        assertEquals(2, StructureNbt.read(bytes.toByteArray()).blocks().size());
+    }
     @Test void tracksLocalMissingAndUnvalidatedVanillaDependenciesWithoutMarkingStructuresReady() throws Exception {
         Path input = directory.resolve("conversion/input/source"); Files.createDirectories(input);
         Files.writeString(input.resolve("pack.mcmeta"), "{\"pack\":{\"description\":\"Structure fixture\",\"pack_format\":88}}");

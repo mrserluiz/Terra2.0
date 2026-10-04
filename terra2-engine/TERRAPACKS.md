@@ -183,7 +183,8 @@ Conversion now reads Java structure NBT (gzip or raw) into platform-independent
 palettes, positions, block state indices, block-entity NBT and entity compounds.
 It rejects invalid palettes, out-of-bounds or duplicate positions, truncated tags,
 trailing data, excessive nesting, oversized arrays and decompression bombs. Limits:
-16 MiB decompressed per piece, depth 64, a 1,000,000 node/array-element budget,
+16 MiB decompressed per piece, depth 64, a 2,000,000 total node/element budget
+and at most 1,000,000 elements in any single array/list,
 64 alternative palettes and 512 per size axis (volume at most 1,000,000).
 
 `structureMigration` in each **new** conversion manifest/report records decoded
