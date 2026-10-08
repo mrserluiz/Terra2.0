@@ -1,4 +1,6 @@
-# TerraPacks and per-world compositions — 7.0.18-BETA
+# TerraPacks and per-world compositions
+
+> **Reference server build: 7.0.14-BETA.** The base TerraPack conversion/composition workflow documented below is the 7.0.14 reference behavior. Sections explicitly labeled 7.0.15–7.0.18 describe later development checkpoints and must not be read as capabilities of the 7.0.14 reference JAR.
 
 This build implements an immutable local pack format, an asynchronous conversion
 workspace and executable composition of one terrain base with additive supported
