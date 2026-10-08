@@ -1,44 +1,77 @@
-# Recovered engine build status
+# Terra2 build status
 
-The engine distribution uses the recovered Terra API, addon system, and native
-Community Pack loader. It does not depend on an installed Terra plugin.
+## Current reference build
 
-`PackSourceAdapter` is wired into the core pack registry through explicit registration
-and Java service providers. Ambiguous adapters fail before loading; adapter failures
-are reported with the source path. Native Community Packs retain their original loader.
-There is no vanilla datapack translator yet. An adapter must produce a native
-`ConfigPack` and must not create dimensions or change save data; the world
-controller remains responsible for authorization and attachment.
+**Terra2-bukkit-7.0.14-BETA.jar**
 
-The recovered Paper plugin now requires `terra2-settings.yml` authorization
-for every world/pack pair. The default configuration disables generation and
-contains no authorized worlds. Requested generators fail explicitly rather
-than silently creating vanilla terrain on rejection.
+This document describes the capabilities of the current reference JAR. Source files and development notes in the repository may contain work targeting later experimental milestones; those later notes are not automatically part of 7.0.14.
 
-The recovered engine compiles on Paper 26.2. The internal adapter has been ported:
-Identifier/resource keys, villager package, record chunk coordinates, biome effect
-records, ambient types, and environment attributes. Legacy biome configuration
-fields are translated to the current model; unconfigured vanilla attributes are
-inherited. Dry foliage colors and the temperature modifier loader are also preserved.
-Tests bootstrap the vanilla runtime, resolve reflection bindings, and verify biome
-attribute/climate preservation and explicit legacy color overrides.
+## Operational state
 
-Generation authorization is checked both when providing a Bukkit generator and
-when injecting the NMS delegate. The primary level-name from server.properties
-and loaded minecraft:* dimensions are denied. Injection locks are released even
-on failure and a world is marked injected only after success.
+7.0.14 is beyond the original recovery scaffold. It contains an executable standalone generation core and can route authorized worlds through either:
 
-The scaffold and recovered engine are separate experimental artifacts and must
-not be installed together (both use plugin name Terra2). Full server startup,
-Community Pack chunk generation, restart/save integrity, safe dimension provisioning
-and merged manifests still require integration validation. Only the scaffold has
-been compiled against 26.3; the recovered engine targets 26.2.
+1. the recovered Terra Community Pack compatibility backend; or
+2. the supported neutral Terra2 plan/TerraPack path.
 
-CI uses Gradle 9.7.1, matching the minimum Gradle plugin variant declared by
-Paperweight 2.0.0-beta.24. The imported wrapper still targets 8.14.1 and cannot
-build this engine; until its verified upgrade, use installed Gradle 9.7.1.
+Generation remains **disabled by default**. No world is automatically authorized and the primary vanilla worlds remain protected.
 
-A successful scaffold build does not mean the recovered engine is operational.
-No production engine release, complete datapack translation, or new dimension
-creation is claimed at this milestone. Engine artifacts are available from the
-successful GitHub Actions runs under Terra2-engine-experimental-26.2.
+## Implemented by 7.0.14
+
+- Recovered Terra API, addon system, Community Pack loader and Paper generation backend.
+- Java 25 / modern Paper migration work for the recovered engine.
+- Explicit per-world authorization through Terra2 settings.
+- Immutable generation bindings keyed to world, dimension, seed and height bounds.
+- Core routing through `GenerationManager`.
+- Terra compatibility plans that preserve the existing noise generator and biome provider.
+- Native terrain, column sampling and biome-query routing through the core facade.
+- Compatibility bridge for legacy Terra noise capabilities used by decoration.
+- First executable vanilla datapack importer for the supported flat-world subset.
+- Local immutable `.terrapack` conversion output.
+- `READY` versus `BLOCKED` semantic conversion status.
+- Asynchronous conversion workspace with provenance/source preservation.
+- Composition of one terrain base with supported additive simple-block feature stages.
+- Per-world generation manifests/fingerprints.
+- Diagnostics for generation exceptions, stalls and console capture.
+- `/terra2 reload` for authorization/settings changes.
+- `/terra2reportlog` diagnostic capture.
+
+## TerraPack workspace
+
+The plugin uses:
+
+```text
+plugins/Terra2/conversion/input/
+plugins/Terra2/conversion/reports/
+plugins/Terra2/terrapacks/
+```
+
+Relevant commands:
+
+```text
+/terra2 convert <ID> <input.zip> [namespace:dimension]
+/terra2 convert <ID> <input-a.zip;input-b.zip> [namespace:dimension]
+/terra2 packs list
+/terra2 packs inspect <ID>
+/terra2 reload
+/terra2reportlog start
+```
+
+See `terra2-engine/TERRAPACKS.md` for conversion rules and the 7.0.14 test recipe.
+
+## What 7.0.14 does not claim
+
+The reference build does not claim universal vanilla datapack compatibility. In particular, complete noise/density/surface compilation, arbitrary custom dimensions/biomes, jigsaw/template execution, processor lists, full structure placement, world-scoped native loot execution, gameplay functions/recipes, or complete datapack registry virtualization are not production capabilities of 7.0.14.
+
+Unsupported semantic resources must fail closed or produce `BLOCKED` conversion output; they must not be silently treated as successfully converted.
+
+## Community Packs
+
+Community Packs remain executable through the Terra compatibility backend rather than being converted to the narrow vanilla TerraPack subset. This distinction is important: failure to convert a complex vanilla datapack does not imply that a compatible Terra Community Pack cannot run.
+
+Known working Community Pack configurations are the practical compatibility baseline for ongoing pack-recovery work.
+
+## Validation rule
+
+A successful Gradle/CI build proves compilation and automated contracts only. Real server validation still requires world creation, chunk exploration, save/restart testing and inspection of Terra2 diagnostics.
+
+Do not hot-swap the Terra2 JAR. Replace it while the server is stopped and perform a complete restart.
