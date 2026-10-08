@@ -1,5 +1,7 @@
 # Terra 2.0
 
+**Languages:** English | [Português (Brasil)](README.pt-BR.md)
+
 Terra 2.0 is an independent continuation and modernization of the Terra world-generation engine for Paper, focused on **per-world generation**, **Community Pack compatibility**, safe world isolation, and a path toward native Minecraft datapack support.
 
 > **Current reference build:** `Terra2-bukkit-7.0.14-BETA.jar`
