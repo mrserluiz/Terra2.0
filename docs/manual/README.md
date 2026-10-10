@@ -16,3 +16,19 @@ Este manual documenta o comportamento confirmado na documentação da build de r
 **Regras fundamentais:** geração desativada por padrão; autorize cada mundo; preserve `world`, `world_nether` e `world_the_end`; teste sempre em mundos novos; não troque o JAR com o servidor ligado; não altere o plano de geração de mundos existentes.
 
 Referências técnicas: [BUILD-STATUS](../../BUILD-STATUS.md) · [TERRAPACKS](../../terra2-engine/TERRAPACKS.md) · [Diagnósticos](../../terra2-engine/DIAGNOSTICS.md).
+
+## Idiomas / Languages
+
+- [English (en_US)](en_US/README.md)
+- [Español (es_ES)](es_ES/README.md)
+- [Bahasa Indonesia (id_ID)](id_ID/README.md)
+- [Italiano (it_IT)](it_IT/README.md)
+- [Français (fr_FR)](fr_FR/README.md)
+- [Deutsch (de_DE)](de_DE/README.md)
+- [Português (Brasil) (pt_BR)](README.md)
+- [Русский (ru_RU)](ru_RU/README.md)
+- [Polski (pl_PL)](pl_PL/README.md)
+- [Tiếng Việt (vi_VN)](vi_VN/README.md)
+- [Türkçe (tr_TR)](tr_TR/README.md)
+- [简体中文 (zh_CN)](zh_CN/README.md)
+- [日本語 (ja_JP)](ja_JP/README.md)
