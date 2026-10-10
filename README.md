@@ -98,6 +98,42 @@ Terra Community Packs and vanilla datapack conversion are separate paths: Commun
 
 Development notes for post-7.0.14 structure/NBT/loot work may already exist in the repository, but they must not be interpreted as capabilities of the 7.0.14 reference JAR until integrated and server-validated.
 
+## Planned: world-scoped loot and item provenance
+
+> **Design proposal — not implemented in the 7.0.14 reference JAR.** These examples are conceptual and are not accepted configuration keys or executable commands.
+
+Terra2 aims to allow each authorized world or dimension to define its own loot rules, unique resources and item identities, while keeping generation isolated. This feature must not be confused with the currently supported Terra Community Pack runtime or the limited vanilla TerraPack converter.
+
+Proposed responsibilities:
+
+- **World Loot Router:** resolve loot using the authorized world, source pack, structure identity and original loot table. Policies may allow, replace or block a loot source.
+- **Trusted container identity:** mark containers created by registered generated structures. Placing or moving an ordinary chest into another world must never grant it special loot.
+- **Item provenance:** attach persistent namespaced identity and trusted acquisition source when loot is legitimately created (natural block, structure chest, mob drop, fishing or an explicitly authorized reward). Merely dropping an imported item in another dimension must not upgrade it.
+- **Natural-block protection:** distinguish generated blocks from player-placed or modified blocks. A durable, per-chunk change ledger is one possible approach, but requires save/restart, rollback, explosion, piston, fluid and world-editing integration tests before adoption.
+- **Usage and transfer policies:** distinguish where an item may be obtained from where it may be used. Prefer disabling restricted behavior outside its world over deleting player items.
+- **Vanilla datapack adapter integration:** eventually preserve structure, processor and loot-table references and route them through world-scoped execution without globally registering arbitrary datapack resources.
+
+### Example behavior (illustrative only)
+
+| Source | World | Intended result |
+| --- | --- | --- |
+| Naturally generated Aether ore | Aether | Aether-specific resource with persistent provenance |
+| Overworld ore placed and mined in Aether | Aether | Ordinary ore; no Aether identity |
+| Terra2-generated dungeon chest | Aether | Aether dungeon loot table |
+| Player-placed chest | Aether | No automatic dungeon loot |
+| Aether-only key transported to Overworld | Overworld | Item preserved; restricted use disabled |
+
+### Acceptance criteria before calling this feature supported
+
+1. Provenance cannot be forged through dropping, placing, breaking, inventory transfers or moving containers.
+2. Identity persists across chunk unloads, restarts, death, hoppers, shulker boxes and portals.
+3. Loot is deterministic where required, cannot be repeatedly rerolled by reloading a container and does not silently erase vanilla loot.
+4. Policies fail safely when a world/pack is missing, invalid or changed.
+5. Cross-world restrictions are tested against actual Paper events and supported plugin integrations.
+6. Tests cover natural and player-modified blocks, structure chests, datapack loot tables and conversion reports.
+
+See [BUILD-STATUS.md](BUILD-STATUS.md) for what is actually included in the reference JAR.
+
 ## Development direction
 
 The long-term goal is to make Terra2 a world-generation platform where each world can independently define terrain, biomes, structures, features and eventually world-scoped loot/item behavior, while retaining compatibility with the Terra pack ecosystem.
