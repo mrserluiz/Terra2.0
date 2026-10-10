@@ -10,6 +10,8 @@ Chương này áp dụng cho 7.0.22-BETA; các chương trước giữ phiên b�
 /terra2 unlock terra2_mix OVERWORLD;Debris
 ```
 
+Đang kiểm tra các gói của thế giới terra2_teste trong nền. Không tạo hoặc thay đổi thế giới nào.
+
 Community Pack đã đăng ký: OVERWORLD, TARTARUS, HYDRAXIA
 
 Thế giới terra2_teste được phép dùng OVERWORLD. Đã lưu cấu hình; bật tạo địa hình cho các thế giới được phép.

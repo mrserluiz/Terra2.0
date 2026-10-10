@@ -10,6 +10,8 @@
 /terra2 unlock terra2_mix OVERWORLD;Debris
 ```
 
+ワールド terra2_teste のパックをバックグラウンドで検証中です。ワールドの作成や変更は行いません。
+
 登録済み Community Packs：OVERWORLD, TARTARUS, HYDRAXIA
 
 ワールド terra2_teste に OVERWORLD の使用を許可しました。設定を保存し、許可済みワールドの生成を有効にしました。

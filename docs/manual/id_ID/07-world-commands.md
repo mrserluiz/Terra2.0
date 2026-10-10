@@ -10,6 +10,8 @@ Bab ini berlaku untuk 7.0.22-BETA; bab sebelumnya tetap menggunakan versi acuan 
 /terra2 unlock terra2_mix OVERWORLD;Debris
 ```
 
+Memvalidasi paket untuk dunia terra2_teste di latar belakang. Tidak ada dunia yang dibuat atau diubah.
+
 Community Pack terdaftar: OVERWORLD, TARTARUS, HYDRAXIA
 
 Dunia terra2_teste diizinkan menggunakan OVERWORLD. Pengaturan disimpan; generasi diaktifkan untuk dunia yang diizinkan.

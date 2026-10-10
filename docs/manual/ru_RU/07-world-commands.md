@@ -10,6 +10,8 @@
 /terra2 unlock terra2_mix OVERWORLD;Debris
 ```
 
+Паки для мира terra2_teste проверяются в фоне. Миры не создаются и не изменяются.
+
 Зарегистрированные Community Packs: OVERWORLD, TARTARUS, HYDRAXIA
 
 Для мира terra2_teste разрешён пак OVERWORLD. Настройки сохранены; генерация включена для разрешённых миров.

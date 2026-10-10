@@ -10,6 +10,8 @@ Bu bölüm 7.0.22-BETA için geçerlidir; önceki bölümler belirtilen referans
 /terra2 unlock terra2_mix OVERWORLD;Debris
 ```
 
+terra2_teste dünyasının paketleri arka planda doğrulanıyor. Hiçbir dünya oluşturulmuyor veya değiştirilmiyor.
+
 Kayıtlı Community Pack paketleri: OVERWORLD, TARTARUS, HYDRAXIA
 
 terra2_teste dünyası için OVERWORLD yetkilendirildi. Ayarlar kaydedildi; yetkili dünyalarda üretim etkinleştirildi.
