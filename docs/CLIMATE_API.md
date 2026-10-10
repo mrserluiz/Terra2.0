@@ -69,3 +69,9 @@ Os metadados não incluem loot, drops, texturas ou regras de itens. Esses sistem
 Os testes de descoberta verificam receptores públicos no plugin/objeto interno e rejeitam consumidores sem contrato. A CI inspeciona o JAR oficial 4.7, fixado ao commit `c0cfd8b7c0093c9b7ff15d8112a1c26b7be584ed`, para registrar assinaturas públicas e capacidades. Essa inspeção não equivale a um teste de clima no servidor oficial.
 
 O teste Paper/HYDRAXIA anterior usa um **fork experimental como fixture de receptor**, e valida o protocolo, reload, biomas preservados, salvamento/reinício e remoção da ponte. Seus resultados não comprovam compatibilidade do Aeternum oficial. O fork não integra o download normal da ponte. As notas históricas estão em [CLIMATE_INTEGRATION_7.0.24.md](testing/CLIMATE_INTEGRATION_7.0.24.md).
+
+### Resultado da ponte 1.0.1
+
+[CI 38085545220](https://github.com/mrserluiz/Terra2.0/actions/runs/38085545220): compilação, 3 testes de descoberta e teste Paper com receptor experimental aprovados. No JAR **oficial 4.7**, SHA-256 `0a3c9f1ecfa85343fd96c00002fb88e987510f7ab9b66c95e329cb25eb4677f2`, os métodos de registro/remoção do contrato não foram encontrados. Essa versão não recebe o override por esta ponte. Os métodos públicos de estação encontrados operam por calendário compartilhado; não foram usados como substituto de um perfil isolado por mundo.
+
+[Download da ponte isolada](https://github.com/mrserluiz/Terra2.0/actions/runs/38085545220/artifacts/11682820702). SHA-256 do JAR 1.0.1: `527b1dab1407b7488998987bb7470e191c1c752a48a2792699bb3a511030c3ce`. Não inclui nem exige um Aeternum modificado.

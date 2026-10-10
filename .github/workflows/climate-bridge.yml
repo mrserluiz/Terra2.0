@@ -82,7 +82,11 @@ jobs:
 
           terra2-engine/build/climate-smoke/*.json
 
-          terra2-engine/build/official-climate/*
+          terra2-engine/build/official-climate/*.txt
+
+          terra2-engine/build/official-climate/*.json
+
+          terra2-engine/build/official-climate/*.yml
 
           '
         if-no-files-found: warn
