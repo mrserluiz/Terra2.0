@@ -1,0 +1,17 @@
+{
+  "permission": "Brak uprawnienia: {0}",
+  "help": "Polecenia: /terra2 help | /terra2 lis Cpack | /terra2 lis Tpack | /terra2 unlock <world> <pack[;pack]> | /terra2 reload | /terra2 packs list | /terra2 packs inspect <ID> | /terra2 convert <ID> <sources> [dimension] | /terra2 datapack list | /terra2 datapack inspect <file> [dimension] | /terra2 loot status",
+  "list-usage": "Użycie: /terra2 lis <Cpack|Tpack|all> (list)",
+  "community-list": "Zarejestrowane Community Packs: {0}",
+  "community-source": "Community Pack {0}: {1}. {2}",
+  "converted-list": "Lokalne TerraPacks: {0}",
+  "failed": "Terra2: operacja odrzucona; zachowano poprzednie ustawienia. {0}",
+  "unlock-usage": "Użycie: /terra2 unlock <world> <pack[;pack]>",
+  "unlock-success": "Świat {0} dopuszczony do użycia {1}. Ustawienia zapisane; generowanie włączone dla dozwolonych światów.",
+  "unlock-next": "Żaden świat nie został utworzony ani wygenerowany ponownie. Dla nowego świata: /mv create {0} normal -g Terra2:PACKS",
+  "unlock-protected": "Świat {0} jest chroniony. To polecenie nie usuwa ochrony. Sprawdź YAML ręcznie; główne światy vanilla pozostają zablokowane przez silnik.",
+  "unlock-loaded": "Świat {0} jest załadowany. Nie można zastąpić jego generatora podczas pracy; najpierw bezpiecznie wyładuj świat.",
+  "unlock-name": "Nieprawidłowa nazwa świata lub konflikt wielkości liter: {0}. Użyj liter, cyfr, podkreślenia lub łącznika.",
+  "restart-packs": "Wykryto Community Packs; uruchom serwer ponownie, aby je zarejestrować: {0}",
+  "reloaded": "Terra2: uprawnienia światów przeładowane. Załadowane światy zachowują generatory."
+}

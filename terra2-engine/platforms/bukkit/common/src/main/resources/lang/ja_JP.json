@@ -1,0 +1,17 @@
+{
+  "permission": "権限がありません：{0}",
+  "help": "コマンド：/terra2 help | /terra2 lis Cpack | /terra2 lis Tpack | /terra2 unlock <world> <pack[;pack]> | /terra2 reload | /terra2 packs list | /terra2 packs inspect <ID> | /terra2 convert <ID> <sources> [dimension] | /terra2 datapack list | /terra2 datapack inspect <file> [dimension] | /terra2 loot status",
+  "list-usage": "使い方：/terra2 lis <Cpack|Tpack|all> (list)",
+  "community-list": "登録済み Community Packs：{0}",
+  "community-source": "Community Pack {0}：{1}。{2}",
+  "converted-list": "ローカル TerraPacks：{0}",
+  "failed": "Terra2：操作を拒否し、以前の設定を維持しました。{0}",
+  "unlock-usage": "使い方：/terra2 unlock <world> <pack[;pack]>",
+  "unlock-success": "ワールド {0} に {1} の使用を許可しました。設定を保存し、許可済みワールドの生成を有効にしました。",
+  "unlock-next": "ワールドの作成や再生成は行っていません。新しいワールドには：/mv create {0} normal -g Terra2:PACKS",
+  "unlock-protected": "ワールド {0} は保護されています。このコマンドでは保護を解除できません。YAML を手動で確認してください。主要なバニラワールドは引き続きエンジンがブロックします。",
+  "unlock-loaded": "ワールド {0} は読み込み中です。稼働中に生成器を変更できません。先に安全にワールドをアンロードしてください。",
+  "unlock-name": "無効なワールド名、または大文字・小文字の競合：{0}。英字、数字、アンダースコア、ハイフンを使用してください。",
+  "restart-packs": "Community Packs を検出しました。登録するにはサーバーを再起動してください：{0}",
+  "reloaded": "Terra2：ワールドの許可設定を再読み込みしました。読み込み済みワールドの生成器は維持されます。"
+}

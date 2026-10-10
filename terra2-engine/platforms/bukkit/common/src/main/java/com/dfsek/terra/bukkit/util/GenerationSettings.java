@@ -26,7 +26,11 @@ public final class GenerationSettings {
     private GenerationSettings() {}
     public static YamlConfiguration load(File file) throws IOException, InvalidConfigurationException {
         var settings = new YamlConfiguration();
+        settings.options().parseComments(true);
         settings.load(file);
+        if(settings.contains("language") && (!(settings.get("language") instanceof String locale)
+                || CommandMessages.LANGUAGES.stream().noneMatch(code -> code.equalsIgnoreCase(locale.replace('-', '_')))))
+            throw new InvalidConfigurationException("Unsupported language; use: " + CommandMessages.LANGUAGES);
         if(!settings.isBoolean("generation.enabled"))
             throw new InvalidConfigurationException("generation.enabled deve ser true ou false");
         if(!settings.isList("generation.protected-worlds") || settings.getList("generation.protected-worlds").stream()

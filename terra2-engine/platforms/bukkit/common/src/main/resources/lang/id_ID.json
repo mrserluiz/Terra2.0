@@ -1,0 +1,17 @@
+{
+  "permission": "Tidak memiliki izin: {0}",
+  "help": "Perintah: /terra2 help | /terra2 lis Cpack | /terra2 lis Tpack | /terra2 unlock <world> <pack[;pack]> | /terra2 reload | /terra2 packs list | /terra2 packs inspect <ID> | /terra2 convert <ID> <sources> [dimension] | /terra2 datapack list | /terra2 datapack inspect <file> [dimension] | /terra2 loot status",
+  "list-usage": "Penggunaan: /terra2 lis <Cpack|Tpack|all> (list)",
+  "community-list": "Community Pack terdaftar: {0}",
+  "community-source": "Community Pack {0}: {1}. {2}",
+  "converted-list": "TerraPack lokal: {0}",
+  "failed": "Terra2: operasi ditolak; pengaturan sebelumnya dipertahankan. {0}",
+  "unlock-usage": "Penggunaan: /terra2 unlock <world> <pack[;pack]>",
+  "unlock-success": "Dunia {0} diizinkan menggunakan {1}. Pengaturan disimpan; generasi diaktifkan untuk dunia yang diizinkan.",
+  "unlock-next": "Tidak ada dunia yang dibuat atau dibuat ulang. Untuk dunia baru: /mv create {0} normal -g Terra2:PACKS",
+  "unlock-protected": "Dunia {0} dilindungi. Perintah ini tidak menghapus perlindungan. Periksa YAML secara manual; dunia vanilla utama tetap diblokir oleh mesin.",
+  "unlock-loaded": "Dunia {0} sedang dimuat. Generatornya tidak dapat diganti saat aktif; keluarkan dunia dari memori dengan aman terlebih dahulu.",
+  "unlock-name": "Nama dunia tidak valid atau konflik huruf besar/kecil: {0}. Gunakan huruf, angka, garis bawah atau tanda hubung.",
+  "restart-packs": "Community Pack ditemukan; mulai ulang server untuk mendaftarkan: {0}",
+  "reloaded": "Terra2: izin dunia dimuat ulang. Dunia yang aktif mempertahankan generatornya."
+}

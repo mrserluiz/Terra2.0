@@ -1,0 +1,17 @@
+{
+  "permission": "Eksik izin: {0}",
+  "help": "Komutlar: /terra2 help | /terra2 lis Cpack | /terra2 lis Tpack | /terra2 unlock <world> <pack[;pack]> | /terra2 reload | /terra2 packs list | /terra2 packs inspect <ID> | /terra2 convert <ID> <sources> [dimension] | /terra2 datapack list | /terra2 datapack inspect <file> [dimension] | /terra2 loot status",
+  "list-usage": "Kullanım: /terra2 lis <Cpack|Tpack|all> (list)",
+  "community-list": "Kayıtlı Community Pack paketleri: {0}",
+  "community-source": "Community Pack {0}: {1}. {2}",
+  "converted-list": "Yerel TerraPack paketleri: {0}",
+  "failed": "Terra2: işlem reddedildi; önceki ayarlar korundu. {0}",
+  "unlock-usage": "Kullanım: /terra2 unlock <world> <pack[;pack]>",
+  "unlock-success": "{0} dünyası için {1} yetkilendirildi. Ayarlar kaydedildi; yetkili dünyalarda üretim etkinleştirildi.",
+  "unlock-next": "Hiçbir dünya oluşturulmadı veya yeniden üretilmedi. Yeni bir dünya için: /mv create {0} normal -g Terra2:PACKS",
+  "unlock-protected": "{0} dünyası korunuyor. Bu komut korumayı kaldırmaz. YAML dosyasını elle inceleyin; ana vanilla dünyaları motor tarafından engellenmeye devam eder.",
+  "unlock-loaded": "{0} dünyası yüklü. Çalışırken üreticisi değiştirilemez; önce dünyayı güvenli şekilde bellekten çıkarın.",
+  "unlock-name": "Geçersiz dünya adı veya büyük/küçük harf çakışması: {0}. Harf, rakam, alt çizgi veya kısa çizgi kullanın.",
+  "restart-packs": "Community Pack paketleri bulundu; kaydetmek için sunucuyu yeniden başlatın: {0}",
+  "reloaded": "Terra2: dünya yetkileri yeniden yüklendi. Yüklü dünyalar üreticilerini korur."
+}

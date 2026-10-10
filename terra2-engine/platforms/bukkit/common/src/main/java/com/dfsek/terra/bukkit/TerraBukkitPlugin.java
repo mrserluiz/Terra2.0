@@ -383,16 +383,70 @@ public class TerraBukkitPlugin extends JavaPlugin {
         }
     }
 
+    private String message(String key, Object... values) {
+        return com.dfsek.terra.bukkit.util.CommandMessages.text(
+            generationSettings == null ? "pt_BR" : generationSettings.getString("language", "pt_BR"), key, values);
+    }
+
+    private java.util.List<String> communityPackIds() {
+        if(platform == null) return java.util.List.of();
+        return platform.getConfigRegistry().entries().stream().map(ConfigPack::getID).distinct().sorted().toList();
+    }
+
+    public synchronized void unlockGenerationWorld(String world, String selection) throws Exception {
+        File file = new File(getDataFolder(), "terra2-settings.yml");
+        var current = com.dfsek.terra.bukkit.util.GenerationSettings.load(file);
+        var loaded = Bukkit.getWorlds().stream().filter(value -> value.getName().equalsIgnoreCase(world)).findFirst().orElse(null);
+        if(loaded != null && !loaded.getName().equals(world)) throw new IllegalArgumentException("world-name");
+        var next = com.dfsek.terra.bukkit.util.WorldSettingsEditor.select(current, primaryWorldName, world,
+            loaded == null ? null : loaded.getKey().toString(), loaded != null, generatorPacks.get(world), selection);
+        // Entire configuration is preflighted before either disk or live authorization changes.
+        var applyLoot = validateGenerationSettings(next);
+        com.dfsek.terra.bukkit.util.WorldSettingsEditor.persist(file.toPath(), next);
+        generationSettings = next;
+        if(applyLoot != null) applyLoot.run();
+    }
+
+    @Override
+    public java.util.List<String> onTabComplete(org.bukkit.command.CommandSender sender, org.bukkit.command.Command command,
+                                              String alias, String[] args) {
+        boolean allowed = sender.hasPermission(command.getName().equalsIgnoreCase("terra2reportlog")
+            ? "terra2.diagnostics.capture" : "terra2.settings.reload");
+        if(!allowed || generationSettings == null || platform == null) return java.util.List.of();
+        var worlds = new java.util.TreeSet<String>();
+        worlds.addAll(generationSettings.getConfigurationSection("worlds").getKeys(false));
+        Bukkit.getWorlds().forEach(world -> worlds.add(world.getName()));
+        worlds.removeIf(world -> {
+            var loaded = Bukkit.getWorld(world);
+            return com.dfsek.terra.bukkit.util.WorldSettingsEditor.blocked(generationSettings, primaryWorldName, world,
+                loaded == null ? null : loaded.getKey().toString());
+        });
+        try {
+            java.util.List<String> sources;
+            var input = getDataFolder().toPath().resolve("conversion/input");
+            try(var paths = java.nio.file.Files.list(input)) {
+                sources = paths.filter(path -> !java.nio.file.Files.isSymbolicLink(path))
+                    .filter(path -> java.nio.file.Files.isDirectory(path) || path.getFileName().toString().endsWith(".zip"))
+                    .map(path -> path.getFileName().toString()).toList();
+            }
+            return com.dfsek.terra.bukkit.util.CommandCompletion.suggest(command.getName(), args, true, worlds,
+                communityPackIds(), terraPacks.list(), datapacks.list(), sources);
+        } catch(java.io.IOException error) {
+            return com.dfsek.terra.bukkit.util.CommandCompletion.suggest(command.getName(), args, true, worlds,
+                communityPackIds(), java.util.List.of(), java.util.List.of(), java.util.List.of());
+        }
+    }
+
     @Override
     public boolean onCommand(org.bukkit.command.CommandSender sender, org.bukkit.command.Command command,
                              String label, String[] args) {
         if(command.getName().equalsIgnoreCase("terra2") && args.length == 2 && args[0].equalsIgnoreCase("loot") && args[1].equalsIgnoreCase("status")) {
-            if(!sender.hasPermission("terra2.settings.reload")) { sender.sendMessage("Sem permissão"); return true; }
+            if(!sender.hasPermission("terra2.settings.reload")) { sender.sendMessage(message("permission", "terra2.settings.reload")); return true; }
             sender.sendMessage(lootManager == null ? "Loot indisponível" : lootManager.status()); return true;
         }
         if(command.getName().equalsIgnoreCase("terra2reportlog")) {
             if(!sender.hasPermission("terra2.diagnostics.capture")) {
-                sender.sendMessage("Sem permissão: terra2.diagnostics.capture"); return true;
+                sender.sendMessage(message("permission", "terra2.diagnostics.capture")); return true;
             }
             String action = args.length == 0 ? "start" : args[0].toLowerCase(java.util.Locale.ROOT);
             if(args.length > 1 || !java.util.Set.of("start", "stop", "status").contains(action)) {
@@ -412,7 +466,43 @@ public class TerraBukkitPlugin extends JavaPlugin {
         }
         if(!command.getName().equalsIgnoreCase("terra2")) return false;
         if(!sender.hasPermission("terra2.settings.reload")) {
-            sender.sendMessage("Sem permissão: terra2.settings.reload");
+            sender.sendMessage(message("permission", "terra2.settings.reload"));
+            return true;
+        }
+        if(args.length == 0 || (args.length == 1 && args[0].equalsIgnoreCase("help"))) {
+            sender.sendMessage(message("help")); return true;
+        }
+        if(args[0].equalsIgnoreCase("lis") || args[0].equalsIgnoreCase("list")) {
+            if(args.length != 2 || !java.util.Set.of("cpack", "tpack", "all").contains(args[1].toLowerCase(java.util.Locale.ROOT))) {
+                sender.sendMessage(message("list-usage")); return true;
+            }
+            try {
+                if(!args[1].equalsIgnoreCase("Tpack")) {
+                    sender.sendMessage(message("community-list", communityPackIds()));
+                    platform.getRawConfigRegistry().discoveredSources().stream()
+                        .filter(source -> !source.status().equals("REGISTERED"))
+                        .forEach(source -> sender.sendMessage(message("community-source", source.manifestId(), source.status(), source.diagnostic())));
+                }
+                if(!args[1].equalsIgnoreCase("Cpack")) sender.sendMessage(message("converted-list", terraPacks.list()));
+            } catch(Exception error) { sender.sendMessage(message("failed", error.getMessage())); }
+            return true;
+        }
+        if(args[0].equalsIgnoreCase("unlock")) {
+            if(args.length != 3) { sender.sendMessage(message("unlock-usage")); return true; }
+            try {
+                unlockGenerationWorld(args[1], args[2]);
+                sender.sendMessage(message("unlock-success", args[1], args[2]));
+                sender.sendMessage(message("unlock-next", args[1]));
+            } catch(Exception error) {
+                String key = switch(java.util.Objects.toString(error.getMessage(), "")) {
+                    case "protected" -> "unlock-protected";
+                    case "loaded" -> "unlock-loaded";
+                    case "world-name" -> "unlock-name";
+                    default -> "failed";
+                };
+                sender.sendMessage(message(key, key.equals("failed") ? error.getMessage() : args[1]));
+                logger.warn("World authorization command refused for {}: {}", args[1], error.toString());
+            }
             return true;
         }
         if(args.length >= 1 && args[0].equalsIgnoreCase("convert")) {
@@ -443,8 +533,8 @@ public class TerraBukkitPlugin extends JavaPlugin {
         if(args.length >= 1 && args[0].equalsIgnoreCase("packs")) {
             try {
                 if(args.length == 2 && args[1].equalsIgnoreCase("list")) {
-                    sender.sendMessage("Community Packs registrados: " + platform.getConfigRegistry().keys());
-                    sender.sendMessage("TerraPacks locais: " + terraPacks.list());
+                    sender.sendMessage(message("community-list", communityPackIds()));
+                    sender.sendMessage(message("converted-list", terraPacks.list()));
                     platform.getRawConfigRegistry().discoveredSources().stream().filter(source -> !source.status().equals("REGISTERED"))
                         .forEach(source -> sender.sendMessage(source.diagnostic()));
                 }
@@ -493,17 +583,17 @@ public class TerraBukkitPlugin extends JavaPlugin {
             return true;
         }
         if(args.length != 1 || !args[0].equalsIgnoreCase("reload")) {
-            sender.sendMessage("Uso: /terra2 reload | /terra2 datapack list | /terra2 datapack inspect <arquivo> [dimensão]");
+            sender.sendMessage(message("help"));
             return true;
         }
         try {
             reloadGenerationSettings();
             var pending = platform.getRawConfigRegistry().discoveredSources().stream()
                 .filter(source -> source.status().equals("RESTART_REQUIRED")).map(source -> source.manifestId()).toList();
-            if(!pending.isEmpty()) sender.sendMessage("Community Packs descobertos; reinicie o servidor para registrar: " + pending);
-            sender.sendMessage("Terra2: autorizações recarregadas. Mundos já carregados mantêm seus geradores.");
+            if(!pending.isEmpty()) sender.sendMessage(message("restart-packs", pending));
+            sender.sendMessage(message("reloaded"));
         } catch(Exception e) {
-            sender.sendMessage("Terra2: configuração recusada; autorizações anteriores mantidas. " + e.getMessage());
+            sender.sendMessage(message("failed", e.getMessage()));
             logger.error("Could not reload Terra2 generation settings", e);
         }
         return true;
@@ -558,6 +648,11 @@ public class TerraBukkitPlugin extends JavaPlugin {
         var discovery = platform.getRawConfigRegistry().discoverForReload(platform);
         for(var source : discovery) if(source.status().equals("RESTART_REQUIRED"))
             logger.warn("Community Pack discovered: {}; server restart required: {}", source.manifestId(), source.path());
+        var applyLoot = validateGenerationSettings(next);
+        generationSettings = next;
+        if(applyLoot != null) applyLoot.run();
+    }
+    private Runnable validateGenerationSettings(YamlConfiguration next) throws Exception {
         var worlds = next.getConfigurationSection("worlds");
         for(String world : worlds.getKeys(false)) {
             if(next.isString("worlds." + world + ".datapack")) {
@@ -571,9 +666,7 @@ public class TerraBukkitPlugin extends JavaPlugin {
             if(datapacks.hasWorld(world)) datapacks.validatePackReload(world, selected.selection(), selected.packs());
         }
         datapacks.validateReload(next);
-        var applyLoot = lootManager == null ? null : lootManager.prepareReload(next);
-        generationSettings = next;
-        if(applyLoot != null) applyLoot.run();
+        return lootManager == null ? null : lootManager.prepareReload(next);
     }
     public void assertLegacyGenerationAuthorized(String worldName, String baseId) {
         var ids = com.dfsek.terra.bukkit.util.GenerationSettings.packIds(generationSettings, worldName);

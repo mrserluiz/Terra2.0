@@ -15,7 +15,7 @@ commands:
     permission: terra2.diagnostics.capture
   terra2:
     description: Gerencia mundos, conversões e TerraPacks
-    usage: /terra2 reload | /terra2 convert <ID> <fontes> [dimensão] | /terra2 packs list | /terra2 packs inspect <ID>
+    usage: /terra2 help | /terra2 lis Cpack | /terra2 unlock <world> <pack> | /terra2 reload | /terra2 packs list
     permission: terra2.settings.reload
 permissions:
   terra2.diagnostics.capture:

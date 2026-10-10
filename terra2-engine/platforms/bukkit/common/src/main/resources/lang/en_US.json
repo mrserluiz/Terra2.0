@@ -1,0 +1,17 @@
+{
+  "permission": "Missing permission: {0}",
+  "help": "Commands: /terra2 help | /terra2 lis Cpack | /terra2 lis Tpack | /terra2 unlock <world> <pack[;pack]> | /terra2 reload | /terra2 packs list | /terra2 packs inspect <ID> | /terra2 convert <ID> <sources> [dimension] | /terra2 datapack list | /terra2 datapack inspect <file> [dimension] | /terra2 loot status",
+  "list-usage": "Usage: /terra2 lis <Cpack|Tpack|all> (list)",
+  "community-list": "Registered Community Packs: {0}",
+  "community-source": "Community Pack {0}: {1}. {2}",
+  "converted-list": "Local TerraPacks: {0}",
+  "failed": "Terra2: refused; previous settings preserved. {0}",
+  "unlock-usage": "Usage: /terra2 unlock <world> <pack[;pack]>",
+  "unlock-success": "World {0} authorized with {1}. Settings saved; generation enabled for authorized worlds.",
+  "unlock-next": "No world was created or regenerated. For a new world: /mv create {0} normal -g Terra2:PACKS",
+  "unlock-protected": "World {0} is protected. This command cannot remove protection. Review YAML manually; primary vanilla worlds remain blocked by the engine.",
+  "unlock-loaded": "World {0} is loaded. Its generator cannot be replaced live; unload it safely first.",
+  "unlock-name": "Invalid world name or case conflict: {0}. Use letters, digits, underscore or hyphen.",
+  "restart-packs": "Community Packs discovered; restart the server to register: {0}",
+  "reloaded": "Terra2: authorizations reloaded. Loaded worlds retain their generators."
+}

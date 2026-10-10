@@ -1,0 +1,17 @@
+{
+  "permission": "Thiếu quyền: {0}",
+  "help": "Lệnh: /terra2 help | /terra2 lis Cpack | /terra2 lis Tpack | /terra2 unlock <world> <pack[;pack]> | /terra2 reload | /terra2 packs list | /terra2 packs inspect <ID> | /terra2 convert <ID> <sources> [dimension] | /terra2 datapack list | /terra2 datapack inspect <file> [dimension] | /terra2 loot status",
+  "list-usage": "Cách dùng: /terra2 lis <Cpack|Tpack|all> (list)",
+  "community-list": "Community Pack đã đăng ký: {0}",
+  "community-source": "Community Pack {0}: {1}. {2}",
+  "converted-list": "TerraPack cục bộ: {0}",
+  "failed": "Terra2: thao tác bị từ chối; giữ nguyên cấu hình trước đó. {0}",
+  "unlock-usage": "Cách dùng: /terra2 unlock <world> <pack[;pack]>",
+  "unlock-success": "Thế giới {0} được phép dùng {1}. Đã lưu cấu hình; bật tạo địa hình cho các thế giới được phép.",
+  "unlock-next": "Không tạo mới hoặc tạo lại thế giới nào. Với thế giới mới: /mv create {0} normal -g Terra2:PACKS",
+  "unlock-protected": "Thế giới {0} được bảo vệ. Lệnh này không gỡ bảo vệ. Hãy kiểm tra YAML thủ công; các thế giới vanilla chính vẫn bị bộ máy chặn.",
+  "unlock-loaded": "Thế giới {0} đang được tải. Không thể thay bộ tạo địa hình khi đang hoạt động; hãy dỡ tải thế giới an toàn trước.",
+  "unlock-name": "Tên thế giới không hợp lệ hoặc xung đột chữ hoa/thường: {0}. Dùng chữ cái, chữ số, gạch dưới hoặc gạch nối.",
+  "restart-packs": "Đã phát hiện Community Pack; khởi động lại máy chủ để đăng ký: {0}",
+  "reloaded": "Terra2: đã tải lại quyền thế giới. Các thế giới đang tải giữ nguyên bộ tạo địa hình."
+}

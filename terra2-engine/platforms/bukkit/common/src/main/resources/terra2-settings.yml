@@ -1,5 +1,8 @@
 # This file controls the recovered Terra2 engine, independently of upstream config.yml.
 # Installing the plugin never authorizes a world or changes its generator.
+# Command help and world-authorization messages; existing technical diagnostics retain their original causes.
+# en_US, es_ES, id_ID, it_IT, fr_FR, de_DE, pt_BR, ru_RU, pl_PL, vi_VN, tr_TR, zh_CN, ja_JP
+language: pt_BR
 generation:
   enabled: false
   protected-worlds: [world, world_nether, world_the_end]

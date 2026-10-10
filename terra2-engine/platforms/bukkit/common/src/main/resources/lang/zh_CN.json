@@ -1,0 +1,17 @@
+{
+  "permission": "缺少权限：{0}",
+  "help": "命令：/terra2 help | /terra2 lis Cpack | /terra2 lis Tpack | /terra2 unlock <world> <pack[;pack]> | /terra2 reload | /terra2 packs list | /terra2 packs inspect <ID> | /terra2 convert <ID> <sources> [dimension] | /terra2 datapack list | /terra2 datapack inspect <file> [dimension] | /terra2 loot status",
+  "list-usage": "用法：/terra2 lis <Cpack|Tpack|all> (list)",
+  "community-list": "已注册的 Community Packs：{0}",
+  "community-source": "Community Pack {0}：{1}。{2}",
+  "converted-list": "本地 TerraPacks：{0}",
+  "failed": "Terra2：操作已拒绝，保留原有设置。{0}",
+  "unlock-usage": "用法：/terra2 unlock <world> <pack[;pack]>",
+  "unlock-success": "已授权世界 {0} 使用 {1}。设置已保存，并已为获准世界启用生成。",
+  "unlock-next": "未创建或重新生成任何世界。新建世界请使用：/mv create {0} normal -g Terra2:PACKS",
+  "unlock-protected": "世界 {0} 受到保护。此命令不能移除保护。请手动检查 YAML；引擎仍会阻止在主要原版世界中生成。",
+  "unlock-loaded": "世界 {0} 已加载。无法在运行时更换其生成器；请先安全卸载该世界。",
+  "unlock-name": "世界名称无效或存在大小写冲突：{0}。请使用英文字母、数字、下划线或连字符。",
+  "restart-packs": "发现 Community Packs；请重启服务器以注册：{0}",
+  "reloaded": "Terra2：世界授权已重新加载。已加载的世界保留原有生成器。"
+}

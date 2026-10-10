@@ -103,3 +103,23 @@ Development notes for post-7.0.14 structure/NBT/loot work may already exist in t
 The long-term goal is to make Terra2 a world-generation platform where each world can independently define terrain, biomes, structures, features and eventually world-scoped loot/item behavior, while retaining compatibility with the Terra pack ecosystem.
 
 Terra2 is a successor project and is not an official release of the original Terra project.
+
+## 7.0.22-BETA: world authorization commands
+
+`/terra2 lis Cpack` lists registered Community Packs and rejected/pending sources. `/terra2 unlock <world> <pack>` validates and saves authorization without creating a world. Base worlds, configured protections and live generator replacement remain blocked. Tab completion covers command literals, worlds, pack IDs and input files. New command help and authorization responses support 13 languages through `language` in `terra2-settings.yml`; existing detailed diagnostics retain their original language and causes.
+
+## User manual languages
+
+- [Português (Brasil) (pt_BR)](docs/manual/README.md)
+- [English (en_US)](docs/manual/en_US/README.md)
+- [Español (es_ES)](docs/manual/es_ES/README.md)
+- [Bahasa Indonesia (id_ID)](docs/manual/id_ID/README.md)
+- [Italiano (it_IT)](docs/manual/it_IT/README.md)
+- [Français (fr_FR)](docs/manual/fr_FR/README.md)
+- [Deutsch (de_DE)](docs/manual/de_DE/README.md)
+- [Русский (ru_RU)](docs/manual/ru_RU/README.md)
+- [Polski (pl_PL)](docs/manual/pl_PL/README.md)
+- [Tiếng Việt (vi_VN)](docs/manual/vi_VN/README.md)
+- [Türkçe (tr_TR)](docs/manual/tr_TR/README.md)
+- [简体中文 (zh_CN)](docs/manual/zh_CN/README.md)
+- [日本語 (ja_JP)](docs/manual/ja_JP/README.md)

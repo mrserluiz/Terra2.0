@@ -35,6 +35,32 @@ public final class NativeIntegrationProbe extends JavaPlugin {
                 // Remove metadata-only fixture before the restart phase's real pack loader runs.
                 Files.delete(future.resolve("pack.yml")); Files.delete(future);
             }
+            if(args[0].equals("create")) {
+                var settingsPath = engine.getDataFolder().toPath().resolve("terra2-settings.yml");
+                String originalSettings = Files.readString(settingsPath);
+                for(String forbidden : List.of("world", "world_nether", "world_the_end", "nether", "end", "WORLD")) {
+                    boolean rejected = false;
+                    try { engine.unlockGenerationWorld(forbidden, "OVERWORLD"); }
+                    catch(Exception expected) { rejected = true; }
+                    if(!rejected) throw new IllegalStateException("unlock allowed base world: " + forbidden);
+                }
+                boolean unknownRejected = false;
+                try { engine.unlockGenerationWorld("terra2_command_invalid", "MISSING_TERRA2_PROBE_ID"); }
+                catch(Exception expected) { unknownRejected = true; }
+                if(!unknownRejected || !originalSettings.equals(Files.readString(settingsPath)))
+                    throw new IllegalStateException("Refused unlock modified settings");
+                if(!Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "terra2 unlock terra2_command_smoke OVERWORLD"))
+                    throw new IllegalStateException("unlock command did not dispatch");
+                if(!"OVERWORLD".equals(engine.generationSettings().getString("worlds.terra2_command_smoke.pack")))
+                    throw new IllegalStateException("unlock command failed to persist authorization");
+                var suggestions = engine.onTabComplete(Bukkit.getConsoleSender(), engine.getCommand("terra2"), "terra2",
+                    new String[]{"unlock", "terra2_command_smoke", "OVER"});
+                if(!suggestions.contains("OVERWORLD")) throw new IllegalStateException("Pack completion missing");
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "terra2 lis Cpack");
+                getLogger().info("TERRA2_COMMANDS_UNLOCK_AND_COMPLETION_OK");
+            } else if(!"OVERWORLD".equals(engine.generationSettings().getString("worlds.terra2_command_smoke.pack"))) {
+                throw new IllegalStateException("Command authorization missing after restart");
+            }
             boolean protectedWorld = false;
             try { engine.assertGenerationAuthorized("world", "PACKS"); }
             catch(RuntimeException expected) { protectedWorld = true; }
@@ -43,6 +69,15 @@ public final class NativeIntegrationProbe extends JavaPlugin {
                 .generator("Terra2:PACKS").createWorld();
             if(world == null) throw new IllegalStateException("World creation failed");
             world.getChunkAt(0, 0); world.getChunkAt(1, 0); world.getChunkAt(0, 1);
+            if(args[0].equals("create")) {
+                String before = Files.readString(engine.getDataFolder().toPath().resolve("terra2-settings.yml"));
+                boolean rejected = false;
+                try { engine.unlockGenerationWorld(world.getName(), "TARTARUS"); }
+                catch(Exception expected) { rejected = true; }
+                if(!rejected || !before.equals(Files.readString(engine.getDataFolder().toPath().resolve("terra2-settings.yml"))))
+                    throw new IllegalStateException("Live generator replacement was not refused transactionally");
+            }
+
             var hydraxia = WorldCreator.name("terra2_hydraxia_smoke").seed(42).environment(World.Environment.NORMAL)
                 .generator("Terra2:HYDRAXIA").createWorld();
             if(hydraxia == null) throw new IllegalStateException("HYDRAXIA world creation failed");

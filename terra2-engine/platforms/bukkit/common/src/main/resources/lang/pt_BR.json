@@ -1,0 +1,17 @@
+{
+  "permission": "Sem permissão: {0}",
+  "help": "Comandos: /terra2 help | /terra2 lis Cpack | /terra2 lis Tpack | /terra2 unlock <world> <pack[;pack]> | /terra2 reload | /terra2 packs list | /terra2 packs inspect <ID> | /terra2 convert <ID> <sources> [dimension] | /terra2 datapack list | /terra2 datapack inspect <file> [dimension] | /terra2 loot status",
+  "list-usage": "Uso: /terra2 lis <Cpack|Tpack|all> (list)",
+  "community-list": "Community Packs registrados: {0}",
+  "community-source": "Community Pack {0}: {1}. {2}",
+  "converted-list": "TerraPacks locais: {0}",
+  "failed": "Terra2: operação recusada; configuração anterior mantida. {0}",
+  "unlock-usage": "Uso: /terra2 unlock <world> <pack[;pack]>",
+  "unlock-success": "Mundo {0} autorizado com {1}. Configuração salva; geração ativada para os mundos autorizados.",
+  "unlock-next": "Nenhum mundo foi criado ou regenerado. Para um mundo novo: /mv create {0} normal -g Terra2:PACKS",
+  "unlock-protected": "O mundo {0} está protegido. Este comando não remove proteções. Revise o YAML manualmente; os mundos vanilla principais continuam bloqueados pelo motor.",
+  "unlock-loaded": "O mundo {0} está carregado. Não é possível trocar seu gerador em execução; descarregue-o com segurança primeiro.",
+  "unlock-name": "Nome de mundo inválido ou conflito de maiúsculas/minúsculas: {0}. Use letras, números, sublinhado ou hífen.",
+  "restart-packs": "Community Packs descobertos; reinicie o servidor para registrar: {0}",
+  "reloaded": "Terra2: autorizações recarregadas. Mundos carregados mantêm seus geradores."
+}

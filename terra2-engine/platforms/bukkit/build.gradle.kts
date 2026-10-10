@@ -15,7 +15,7 @@ dependencies {
 
 tasks {
     shadowJar {
-        archiveFileName.set("Terra2-bukkit-7.0.21-BETA.jar")
+        archiveFileName.set("Terra2-bukkit-7.0.22-BETA.jar")
         relocate("io.papermc.lib", "com.dfsek.terra.lib.paperlib")
         // Native Minecraft codecs use JsonOps with the server's Gson JsonElement identity.
         // Relocating these call sites produces incompatible JSON objects in the shaded runtime.
