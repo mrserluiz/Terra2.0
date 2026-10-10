@@ -1,0 +1,88 @@
+name: Optional climate bridge validation
+'on':
+  push:
+    paths:
+    - integrations/aeternum/**
+    - terra2-engine/tools/climate-probe/**
+    - terra2-engine/tools/paper-climate-smoke.py
+    - .github/workflows/climate-bridge.yml
+  workflow_dispatch: {}
+permissions:
+  contents: read
+  actions: read
+jobs:
+  climate:
+    name: Optional Terra2 to Aeternum climate integration
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Checkout compatible generic consumer
+      uses: actions/checkout@v4
+      with:
+        repository: mrserluiz/AeternumSeasons-CustomETHER
+        ref: ff141a727767f43c8c31171b07ce13b2c91790f9
+        path: integration-aeternum
+    - uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: '25'
+        cache: maven
+        cache-dependency-path: 'integration-aeternum/aeternum-build/pom.xml
+
+          integrations/aeternum/pom.xml
+
+          '
+    - name: Find the latest independently tested engine artifact
+      id: engine
+      uses: actions/github-script@v7
+      with:
+        script: 'const result = await github.rest.actions.listArtifactsForRepo({owner:
+          context.repo.owner, repo: context.repo.repo, name: ''Terra2-engine-experimental-26.2'',
+          per_page: 100});
+
+          const artifact = result.data.artifacts.find(a => !a.expired && a.workflow_run);
+
+          if (!artifact) throw new Error(''No tested Terra2 engine artifact is available;
+          run Build Terra 2.0 first'');
+
+          core.setOutput(''run_id'', artifact.workflow_run.id);
+
+          '
+    - name: Download independently tested Terra2 engine
+      uses: actions/download-artifact@v4
+      with:
+        name: Terra2-engine-experimental-26.2
+        path: terra2-engine/platforms/bukkit/build/libs
+        run-id: ${{ steps.engine.outputs.run_id }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Build generic consumer and separate addon
+      run: 'mvn --batch-mode --no-transfer-progress --file integration-aeternum/aeternum-build/pom.xml
+        clean verify dependency:build-classpath -Dmdep.outputFile=target/compile-classpath.txt
+
+        mvn --batch-mode --no-transfer-progress --file integrations/aeternum/pom.xml
+        clean verify
+
+        '
+    - name: Verify climate source, reload, save/restart and optional removal
+      run: python3 terra2-engine/tools/paper-climate-smoke.py
+    - name: Upload optional integration JARs
+      uses: actions/upload-artifact@v4
+      with:
+        name: Terra2-Aeternum-optional-integration-26.2
+        path: 'integrations/aeternum/target/Terra2AeternumBridge-1.0.0-BETA.jar
+
+          integration-aeternum/aeternum-build/target/AeternumSeasons-4.5.2-CLIMATE-API-BETA.jar
+
+          '
+        if-no-files-found: error
+    - name: Upload climate integration diagnostics
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: Terra2-climate-integration-diagnostics
+        path: 'terra2-engine/build/climate-smoke/*.log
+
+          terra2-engine/build/climate-smoke/*.json
+
+          '
+        if-no-files-found: warn

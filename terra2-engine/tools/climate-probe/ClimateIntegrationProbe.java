@@ -61,9 +61,9 @@ public final class ClimateIntegrationProbe extends JavaPlugin {
                 refused = false; try { terra.reloadGenerationSettings(); } catch(Exception expected) { refused = true; }
                 require(refused && api.profile(main).isEmpty(), "Protected world climate refused");
             } finally { Files.writeString(settings, original); terra.reloadGenerationSettings(); }
-            Bukkit.getPluginManager().disablePlugin(bridge);
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "terra2climatebridge disconnect");
             require(seasons.climateProfile(world) == null && seasons.getStateCopy(world).season == Season.SUMMER, "Bridge removal releases external profile");
-            Bukkit.getPluginManager().enablePlugin(bridge);
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "terra2climatebridge connect");
             require(seasons.getStateCopy(world).season == Season.WINTER, "Bridge reconnects independently");
             Bukkit.getScheduler().runTaskLater(this, () -> {
                 try {

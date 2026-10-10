@@ -18,6 +18,7 @@ public final class Terra2AeternumBridge extends JavaPlugin implements Listener {
     private Object source;
     private Method unregister;
     private String lastStatus;
+    private boolean paused;
 
     public void onEnable() { Bukkit.getPluginManager().registerEvents(this, this); connect(); }
     public void onDisable() { disconnect(); }
@@ -35,6 +36,7 @@ public final class Terra2AeternumBridge extends JavaPlugin implements Listener {
     }
     @SuppressWarnings("unchecked")
     private void connect() {
+        if(paused) { disconnect(); status("Paused: climate metadata is disconnected."); return; }
         var provided = registration();
         Plugin target = Bukkit.getPluginManager().getPlugin("AeternumSeasons");
         if(provided == null || target == null || !target.isEnabled()) {
@@ -76,6 +78,23 @@ public final class Terra2AeternumBridge extends JavaPlugin implements Listener {
             catch(ReflectiveOperationException ignored) { /* Target may already be unloading. */ }
         }
         seasons = null; source = null; unregister = null;
+    }
+    @Override public boolean onCommand(org.bukkit.command.CommandSender sender, org.bukkit.command.Command command, String label, String[] args) {
+        if(!sender.hasPermission("terra2.climate.bridge.manage")) { sender.sendMessage("Permission: terra2.climate.bridge.manage"); return true; }
+        if(args.length != 1) return false;
+        switch(args[0].toLowerCase(java.util.Locale.ROOT)) {
+            case "disconnect" -> { paused = true; disconnect(); status("Paused: climate metadata is disconnected."); }
+            case "connect" -> { paused = false; connect(); }
+            case "status" -> { }
+            default -> { return false; }
+        }
+        sender.sendMessage("Terra2 climate bridge: " + (paused ? "PAUSED" : source != null ? "CONNECTED" : "INACTIVE"));
+        return true;
+    }
+    @Override public java.util.List<String> onTabComplete(org.bukkit.command.CommandSender sender, org.bukkit.command.Command command, String alias, String[] args) {
+        if(!sender.hasPermission("terra2.climate.bridge.manage") || args.length != 1) return java.util.List.of();
+        return java.util.List.of("connect", "disconnect", "status").stream()
+            .filter(value -> value.startsWith(args[0].toLowerCase(java.util.Locale.ROOT))).toList();
     }
     @EventHandler public void pluginEnabled(PluginEnableEvent event) {
         if(event.getPlugin().getName().equals("Terra2") || event.getPlugin().getName().equals("AeternumSeasons")) connect();

@@ -34,6 +34,8 @@ Não é necessário recriar um mundo que já usa Terra2. A configuração não c
 
 O addon é outro plugin, não outro gerador. Nenhum dos plugins principais depende dele. Não instale simultaneamente duas versões do Terra2 ou do Aeternum.
 
+Controle da integração (OP por padrão): `/terra2climatebridge status`, `/terra2climatebridge disconnect` e `/terra2climatebridge connect`. Os comandos pausam/restabelecem o fluxo sem descarregar plugins. Reload de perfis usa `/terra2 reload`; troca de JAR requer reinício. Não use desativação/reativação de plugins como substituto de reload no Paper moderno.
+
 A ponte lê o serviço publicado pelo Terra2 e fornece ao Aeternum somente o perfil do mundo solicitado. Não copia YAML, não escreve biomas, não altera JARs e não exporta configurações do Aeternum para o Terra2. Sem um dos plugins, a ponte fica inativa. Sem a ponte, os dois funcionam separadamente. Aeternum antigo sem API de consumo não é modificado por reflexão: a ponte fica inativa e informa a incompatibilidade uma vez.
 
 O Aeternum usa o perfil como referência de temperatura, estação e classificação de neve. Preserva os IDs reais dos biomas, bloqueando o spoof/restauro sazonal naquele mundo. Isso não transforma visualmente chuva em neve em um bioma quente nem converte regras de agricultura/fauna.

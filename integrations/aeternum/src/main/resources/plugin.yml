@@ -5,3 +5,11 @@ api-version: '26.2'
 softdepend: [Terra2, AeternumSeasons]
 description: Optional read-only Terra2 climate metadata adapter for AeternumSeasons
 authors: [mrserluiz]
+commands:
+  terra2climatebridge:
+    description: Connect or pause the optional metadata integration without unloading plugins
+    usage: /terra2climatebridge <connect|disconnect|status>
+    permission: terra2.climate.bridge.manage
+permissions:
+  terra2.climate.bridge.manage:
+    default: op
