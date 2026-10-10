@@ -12,3 +12,5 @@
 [All languages](../README.md)
 
 7. [Nowe polecenia (7.0.22-BETA)](07-world-commands.md)
+
+8. [Identyfikowanie i wyszukiwanie biomów i struktur (7.0.23-BETA)](08-discovery.md)

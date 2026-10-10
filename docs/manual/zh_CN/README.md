@@ -12,3 +12,5 @@
 [All languages](../README.md)
 
 7. [新命令（7.0.22-BETA）](07-world-commands.md)
+
+8. [识别和定位生物群系与结构 (7.0.23-BETA)](08-discovery.md)

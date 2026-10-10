@@ -12,3 +12,5 @@
 [All languages](../README.md)
 
 7. [Nuevos comandos (7.0.22-BETA)](07-world-commands.md)
+
+8. [Identificar y localizar biomas y estructuras (7.0.23-BETA)](08-discovery.md)
