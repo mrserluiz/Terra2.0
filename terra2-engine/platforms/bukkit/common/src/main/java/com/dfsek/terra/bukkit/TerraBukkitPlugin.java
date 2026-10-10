@@ -120,6 +120,7 @@ public class TerraBukkitPlugin extends JavaPlugin {
 
         platform = NMSInitializer.init(this);
         if(platform != null && platform.nativePackBackend() != null) terraPacks.nativeBackend(platform.nativePackBackend());
+        com.dfsek.terra.bukkit.util.GenerationReport.packDiagnostics(this::packResolutionDiagnostics);
         Bukkit.getPluginManager().registerEvents(new org.bukkit.event.Listener() {
             @org.bukkit.event.EventHandler(priority = org.bukkit.event.EventPriority.LOWEST)
             public void bindWorld(org.bukkit.event.world.WorldInitEvent event) {
@@ -441,7 +442,12 @@ public class TerraBukkitPlugin extends JavaPlugin {
         }
         if(args.length >= 1 && args[0].equalsIgnoreCase("packs")) {
             try {
-                if(args.length == 2 && args[1].equalsIgnoreCase("list")) sender.sendMessage("TerraPacks locais: " + terraPacks.list());
+                if(args.length == 2 && args[1].equalsIgnoreCase("list")) {
+                    sender.sendMessage("Community Packs registrados: " + platform.getConfigRegistry().keys());
+                    sender.sendMessage("TerraPacks locais: " + terraPacks.list());
+                    platform.getRawConfigRegistry().discoveredSources().stream().filter(source -> !source.status().equals("REGISTERED"))
+                        .forEach(source -> sender.sendMessage(source.diagnostic()));
+                }
                 else if(args.length == 3 && args[1].equalsIgnoreCase("inspect")) {
                     var info = terraPacks.inspect(args[2]);
                     sender.sendMessage("TerraPack " + args[2] + ": " + info.get("status").getAsString());
@@ -492,6 +498,9 @@ public class TerraBukkitPlugin extends JavaPlugin {
         }
         try {
             reloadGenerationSettings();
+            var pending = platform.getRawConfigRegistry().discoveredSources().stream()
+                .filter(source -> source.status().equals("RESTART_REQUIRED")).map(source -> source.manifestId()).toList();
+            if(!pending.isEmpty()) sender.sendMessage("Community Packs descobertos; reinicie o servidor para registrar: " + pending);
             sender.sendMessage("Terra2: autorizações recarregadas. Mundos já carregados mantêm seus geradores.");
         } catch(Exception e) {
             sender.sendMessage("Terra2: configuração recusada; autorizações anteriores mantidas. " + e.getMessage());
@@ -510,6 +519,19 @@ public class TerraBukkitPlugin extends JavaPlugin {
         catch(java.io.IOException error) { logger.error("Could not capture Multiverse command", error); }
     }
 
+    private String packResolutionDiagnostics() {
+        String converted;
+        try { converted = terraPacks.list().toString(); } catch(java.io.IOException error) { converted = error.toString(); }
+        return "Searched Community Packs: " + getDataFolder().toPath().resolve("packs")
+            + "\nSearched TerraPacks: " + getDataFolder().toPath().resolve("terrapacks")
+            + "\nAvailable Community Packs: " + platform.getConfigRegistry().keys()
+            + "\nAvailable TerraPacks: " + converted
+            + "\n" + platform.getRawConfigRegistry().discoveryDiagnostics();
+    }
+    private org.terra2.pack.PackResolver<ConfigPack, org.terra2.pack.TerraPack> packResolver() {
+        return new org.terra2.pack.PackResolver<>(platform.getConfigRegistry()::getByID,
+            platform.getRawConfigRegistry()::assertSourceAvailable, terraPacks::contains, terraPacks::load, this::packResolutionDiagnostics);
+    }
     private record Composition(String selection, ConfigPack legacy, java.util.List<org.terra2.pack.TerraPack> packs, String version) {}
     private Composition composition(YamlConfiguration settings, String world) throws java.io.IOException {
         var ids = com.dfsek.terra.bukkit.util.GenerationSettings.packIds(settings, world);
@@ -517,12 +539,12 @@ public class TerraBukkitPlugin extends JavaPlugin {
         ConfigPack legacy = null; var converted = new java.util.ArrayList<org.terra2.pack.TerraPack>();
         for(int index = 0; index < ids.size(); index++) {
             String selected = ids.get(index);
-            var original = platform.getConfigRegistry().getByID(selected);
-            if(original.isPresent()) {
-                if(terraPacks.contains(selected)) throw new IllegalArgumentException("Ambiguous legacy/TerraPack ID: " + selected);
+            var resolved = packResolver().resolve(selected);
+            logger.info("Requested Pack ID: {}; Resolution Backend: {}", selected, resolved.backend());
+            if(resolved.backend() == org.terra2.pack.PackResolver.Backend.COMMUNITY) {
                 if(index != 0 || legacy != null) throw new IllegalArgumentException("Only the first pack can be a legacy terrain base: " + selected);
-                legacy = original.get();
-            } else converted.add(terraPacks.load(selected));
+                legacy = resolved.community();
+            } else converted.add(resolved.terraPack());
         }
         org.terra2.pack.TerraPackStore.validateComposition(converted, legacy != null);
         if(legacy == null && (converted.isEmpty() || converted.getFirst().terrain() == null))
@@ -533,6 +555,9 @@ public class TerraBukkitPlugin extends JavaPlugin {
     }
     public synchronized void reloadGenerationSettings() throws Exception {
         var next = com.dfsek.terra.bukkit.util.GenerationSettings.load(new File(getDataFolder(), "terra2-settings.yml"));
+        var discovery = platform.getRawConfigRegistry().discoverForReload(platform);
+        for(var source : discovery) if(source.status().equals("RESTART_REQUIRED"))
+            logger.warn("Community Pack discovered: {}; server restart required: {}", source.manifestId(), source.path());
         var worlds = next.getConfigurationSection("worlds");
         for(String world : worlds.getKeys(false)) {
             if(next.isString("worlds." + world + ".datapack")) {

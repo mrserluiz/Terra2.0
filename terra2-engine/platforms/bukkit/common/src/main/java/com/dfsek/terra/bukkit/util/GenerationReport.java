@@ -13,6 +13,8 @@ public final class GenerationReport {
     private static volatile Path directory;
     private static volatile String environment;
     private static final AtomicInteger count = new AtomicInteger();
+    private static volatile java.util.function.Supplier<String> packDiagnostics = () -> "Pack discovery unavailable";
+    public static void packDiagnostics(java.util.function.Supplier<String> supplier) { packDiagnostics = supplier; }
     private GenerationReport() {}
     public static void initialize(Path dataFolder, String details) {
         directory = dataFolder.resolve("reports");
@@ -85,7 +87,9 @@ public final class GenerationReport {
             writer.println(environment);
             writer.println("Stage: " + stage);
             writer.println("World: " + world);
-            writer.println("Pack: " + pack);
+            writer.println("Requested Pack ID: " + pack);
+            try { writer.println(packDiagnostics.get()); }
+            catch(Exception diagnosticFailure) { writer.println("Resolution diagnostics unavailable: " + diagnosticFailure); }
             writer.println("Thread: " + Thread.currentThread().getName());
             error.printStackTrace(writer);
             Path file = Files.createTempFile(directory, "generation-", ".txt");

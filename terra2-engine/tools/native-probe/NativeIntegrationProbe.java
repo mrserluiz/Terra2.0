@@ -19,6 +19,22 @@ public final class NativeIntegrationProbe extends JavaPlugin {
         try {
             var engine = (TerraBukkitPlugin) getServer().getPluginManager().getPlugin("Terra2");
             if(engine == null || !engine.isEnabled()) throw new IllegalStateException("Engine did not enable");
+            // Community IDs must come from manifests, including an archive renamed in CI.
+            for(String id : List.of("OVERWORLD", "TARTARUS")) {
+                engine.platform().getRawConfigRegistry().assertSourceAvailable(id);
+                if(engine.platform().getConfigRegistry().getByID(id).isEmpty()) throw new IllegalStateException("Community regression: " + id);
+            }
+            if(args[0].equals("create")) {
+                var future = engine.getDataFolder().toPath().resolve("packs/new-after-start");
+                Files.createDirectories(future); Files.writeString(future.resolve("pack.yml"), "id: FUTURE_COMMUNITY\nversion: 1.0.0\n");
+                engine.reloadGenerationSettings();
+                boolean restartRequired = false;
+                try { engine.platform().getRawConfigRegistry().assertSourceAvailable("FUTURE_COMMUNITY"); }
+                catch(IllegalArgumentException expected) { restartRequired = expected.getMessage().contains("server restart required"); }
+                if(!restartRequired) throw new IllegalStateException("Reload falsely activated new Community Pack");
+                // Remove metadata-only fixture before the restart phase's real pack loader runs.
+                Files.delete(future.resolve("pack.yml")); Files.delete(future);
+            }
             boolean protectedWorld = false;
             try { engine.assertGenerationAuthorized("world", "PACKS"); }
             catch(RuntimeException expected) { protectedWorld = true; }

@@ -154,6 +154,8 @@ def main():
     # Pinned official release content: avoid unauthenticated GitHub API rate limits.
     download('https://github.com/PolyhedralDev/TerraOverworldConfig/releases/download/latest/Overworld.zip',
         PLUGIN / 'packs/Overworld.zip', 'sha256', '64e715bc1e591f59d5835650a76fd638c1615772187d91e74eb0255e922afd27')
+    download('https://github.com/PolyhedralDev/Tartarus/releases/download/latest/Tartarus.zip',
+        PLUGIN / 'packs/filename-does-not-select-id.zip', 'sha256', 'e964ac8a9017aeab4dca7ae843e274421e82f3be7b6aa0351e6a7084eadf3412')
     fixture(); dnt()
     cp = os.pathsep.join([str(jars[0])] + [str(p) for p in (pathlib.Path.home() / '.gradle/caches').rglob('*.jar')])
     classes = SERVER / 'probe-classes'; classes.mkdir(exist_ok=True)

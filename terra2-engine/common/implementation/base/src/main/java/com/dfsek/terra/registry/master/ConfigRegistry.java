@@ -40,6 +40,34 @@ import com.dfsek.terra.registry.OpenRegistryImpl;
  */
 public class ConfigRegistry extends OpenRegistryImpl<ConfigPack> {
     private final List<PackSourceAdapter> sourceAdapters = new ArrayList<>();
+    private static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger(ConfigRegistry.class);
+    private volatile List<CommunityPackDiscovery.Source> discovered = List.of();
+    public List<CommunityPackDiscovery.Source> discoveredSources() { return discovered; }
+    public synchronized List<CommunityPackDiscovery.Source> discoverForReload(Platform platform) throws IOException {
+        var scanned = CommunityPackDiscovery.scan(platform.getDataFolder().toPath().resolve("packs"));
+        List<CommunityPackDiscovery.Source> refreshed = new ArrayList<>();
+        for(var source : scanned) {
+            var previous = discovered.stream().filter(old -> old.path().equals(source.path()) &&
+                java.util.Objects.equals(old.manifestId(), source.manifestId()) && old.version().equals(source.version())).findFirst();
+            var next = source.failure() == null && previous.isPresent() && !previous.get().status().equals("RESTART_REQUIRED")
+                ? previous.get() : source.failure() == null ? source.state("RESTART_REQUIRED", null) : source;
+            refreshed.add(next);
+            LOGGER.info("{}", next.diagnostic());
+        }
+        discovered = List.copyOf(refreshed);
+        return discovered;
+    }
+    public String discoveryDiagnostics() {
+        return discovered.stream().map(CommunityPackDiscovery.Source::diagnostic).collect(java.util.stream.Collectors.joining("\n"));
+    }
+    public void assertSourceAvailable(String id) {
+        var matches = discovered.stream().filter(source -> source.matches(id) || id.equals(source.manifestId())).toList();
+        if(matches.size() > 1) throw new IllegalArgumentException("Ambiguous Community Pack ID: " + id + "\n" + discoveryDiagnostics());
+        if(!matches.isEmpty() && !matches.getFirst().status().equals("REGISTERED")) {
+            var source = matches.getFirst();
+            throw new IllegalArgumentException("Community Pack '" + id + "' was found but is not registered; server restart required after repairing any loader failure. " + source.diagnostic(), source.failure());
+        }
+    }
 
     public ConfigRegistry() {
         super(TypeKey.of(ConfigPack.class));
@@ -67,22 +95,31 @@ public class ConfigRegistry extends OpenRegistryImpl<ConfigPack> {
 
     public synchronized void loadAll(Platform platform) throws IOException, PackLoadFailuresException {
         Path packsDirectory = platform.getDataFolder().toPath().resolve("packs");
-        Files.createDirectories(packsDirectory);
-        List<Exception> failedLoads = new CopyOnWriteArrayList<>();
+        var scanned = CommunityPackDiscovery.scan(packsDirectory);
+        List<Exception> failedLoads = new ArrayList<>();
+        List<CommunityPackDiscovery.Source> results = new ArrayList<>();
         List<PackSourceAdapter> adapters = List.copyOf(sourceAdapters);
-        try(Stream<Path> packs = Files.list(packsDirectory)) {
-            packs.parallel().forEach(path -> {
-                try {
-                    ConfigPack pack = loadSource(path, platform, adapters);
-                    registerChecked(pack.getRegistryKey(), pack);
-                } catch(Exception e) {
-                    failedLoads.add(new IOException("Failed to load pack source " + path, e));
-                }
-            });
+        // Registration is sequential: duplicate checking and insertion must be deterministic.
+        for(var source : scanned) {
+            LOGGER.info("Community Pack discovered: {} ({})", source.manifestId(), source.path());
+            try {
+                boolean adapted = adapters.stream().anyMatch(adapter -> adapter.supports(source.path()));
+                if(source.status().equals("DUPLICATE") || source.failure() != null && !adapted) throw new IOException(source.diagnostic(), source.failure());
+                ConfigPack pack = loadSource(source.path(), platform, adapters);
+                if(source.key() != null && !source.key().equals(pack.getRegistryKey()))
+                    throw new IOException("Loaded pack ID differs from pack.yml: " + source.manifestId());
+                registerChecked(pack.getRegistryKey(), pack);
+                results.add(new CommunityPackDiscovery.Source(source.path(), source.manifestId() == null ? pack.getRegistryKey().toString() : source.manifestId(), pack.getRegistryKey(),
+                    source.version(), "REGISTERED", null));
+                LOGGER.info("Community Pack registered: {} ({})", pack.getRegistryKey(), source.path());
+            } catch(Exception error) {
+                var failed = source.state("LOAD_FAILED", error); results.add(failed);
+                LOGGER.error("Community Pack rejected: {}", failed.diagnostic(), error);
+                failedLoads.add(new IOException("Failed to load pack source " + source.path(), error));
+            }
         }
-        if(!failedLoads.isEmpty()) {
-            throw new PackLoadFailuresException(failedLoads);
-        }
+        discovered = List.copyOf(results);
+        if(!failedLoads.isEmpty()) throw new PackLoadFailuresException(failedLoads);
     }
 
     public static class PackLoadFailuresException extends Exception {
