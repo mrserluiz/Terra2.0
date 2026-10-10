@@ -343,6 +343,19 @@ public abstract class AbstractPlatform implements Platform {
                     if(resource.exists())
                         return; // dont overwrite
 
+                    if(dir.equals("packs") && entry.endsWith(".zip")) {
+                        try(InputStream bundled = getClass().getResourceAsStream("/" + resourceClassPath)) {
+                            if(com.dfsek.terra.registry.master.CommunityPackDiscovery.alreadyInstalled(bundled,
+                                getDataFolder().toPath().resolve("packs"))) {
+                                logger.info("Not dumping bundled pack {}: its manifest ID is already installed", resourceClassPath);
+                                return;
+                            }
+                        } catch(IOException error) {
+                            logger.error("Cannot inspect bundled pack {}", resourceClassPath, error);
+                            return;
+                        }
+                    }
+
                     try(InputStream is = getClass().getResourceAsStream("/" + resourceClassPath)) {
                         if(is == null) {
                             logger.error("Resource {} doesn't exist on the classpath!", resourcePath);

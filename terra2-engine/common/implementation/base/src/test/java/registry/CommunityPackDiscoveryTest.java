@@ -20,6 +20,18 @@ class CommunityPackDiscoveryTest {
         assertEquals("ARBITRARY", source.manifestId()); assertTrue(source.matches("ARBITRARY"));
         assertTrue(source.matches("ARBITRARY:ARBITRARY")); assertNull(source.failure());
     }
+    @Test void bundledArchiveIsSkippedByManifestIdRatherThanItsFilename() throws Exception {
+        zip("renamed.zip", "pack.yml", "id: EXISTING\nversion: 1.0.0\n");
+        try(var input = Files.newInputStream(directory.resolve("renamed.zip"))) {
+            assertTrue(CommunityPackDiscovery.alreadyInstalled(input, directory));
+        }
+        var bytes = new java.io.ByteArrayOutputStream();
+        try(var zip = new ZipOutputStream(bytes)) {
+            zip.putNextEntry(new ZipEntry("pack.yml")); zip.write("id: DIFFERENT\n".getBytes()); zip.closeEntry();
+        }
+        assertFalse(CommunityPackDiscovery.alreadyInstalled(new java.io.ByteArrayInputStream(bytes.toByteArray()), directory));
+    }
+
     @Test void unpackedPackAndNewPackAreDiscovered() throws Exception {
         var path = Files.createDirectories(directory.resolve("arbitrary-folder"));
         Files.writeString(path.resolve("pack.yml"), "id: FIRST\nversion: 1.0.0\n");

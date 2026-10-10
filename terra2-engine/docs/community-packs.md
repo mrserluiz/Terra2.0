@@ -6,7 +6,8 @@ Community Packs use the recovered Terra backend directly. They do not need a
 by the legacy loader. GitHub repository wrapper ZIPs must be unpacked first.
 
 The manifest `id`, including its case, selects the pack; the archive filename
-never selects it. Addons, version constraints, YAML references, blocks and pack
+never selects it. Bundled defaults are not extracted when an installed source
+already has the same manifest ID, even under a different filename. Addons, version constraints, YAML references, blocks and pack
 content still have to pass the original ConfigPack loader. Discovery is not
 registration: rejected sources retain their manifest ID, path and loader cause.
 No production code contains special handling for HYDRAXIA or a list of known

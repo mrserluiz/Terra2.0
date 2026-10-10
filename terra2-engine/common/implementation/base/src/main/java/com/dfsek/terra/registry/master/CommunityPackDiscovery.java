@@ -42,13 +42,8 @@ public final class CommunityPackDiscovery {
                         if(entry == null) throw new IOException("No root pack.yml; install the Community Pack archive, not a repository wrapper ZIP");
                         try(var input = zip.getInputStream(entry)) { bytes = manifest(input); }
                     }
-                    LoaderOptions options = new LoaderOptions();
-                    options.setAllowDuplicateKeys(false); options.setMaxAliasesForCollections(50); options.setCodePointLimit(262144);
-                    Object document = new Yaml(new SafeConstructor(options)).load(new ByteArrayInputStream(bytes));
-                    if(!(document instanceof Map<?, ?> map)) throw new IOException("pack.yml must be a mapping");
-                    if(!(map.get("id") instanceof String value)) throw new IOException("pack.yml requires a string id");
-                    id = value;
-                    if(!id.matches("[A-Za-z0-9_-]+(:[A-Za-z0-9_-]+)?")) throw new IOException("Invalid manifest ID: " + id);
+                    Map<?, ?> map = document(bytes);
+                    id = manifestId(map);
                     var key = id.contains(":") ? RegistryKey.parse(id) : RegistryKey.of(id, id);
                     sources.add(new Source(path, id, key, Objects.toString(map.get("version"), "unknown"), "DISCOVERED", null));
                 } catch(Exception failure) { sources.add(new Source(path, id, null, "unknown", "INVALID", failure)); }
@@ -63,5 +58,32 @@ public final class CommunityPackDiscovery {
         byte[] bytes = input.readNBytes(262145);
         if(bytes.length > 262144) throw new IOException("pack.yml exceeds 256 KiB");
         return bytes;
+    }
+    private static Map<?, ?> document(byte[] bytes) throws IOException {
+        LoaderOptions options = new LoaderOptions();
+        options.setAllowDuplicateKeys(false); options.setMaxAliasesForCollections(50); options.setCodePointLimit(262144);
+        Object document = new Yaml(new SafeConstructor(options)).load(new ByteArrayInputStream(bytes));
+        if(!(document instanceof Map<?, ?> map)) throw new IOException("pack.yml must be a mapping");
+        return map;
+    }
+    private static String manifestId(Map<?, ?> map) throws IOException {
+        if(!(map.get("id") instanceof String id)) throw new IOException("pack.yml requires a string id");
+        if(!id.matches("[A-Za-z0-9_-]+(:[A-Za-z0-9_-]+)?")) throw new IOException("Invalid manifest ID: " + id);
+        return id;
+    }
+    /** Prevent bundled archives from creating duplicates of a user's renamed source. */
+    public static boolean alreadyInstalled(InputStream bundledArchive, Path directory) throws IOException {
+        if(bundledArchive == null) return false;
+        try(var zip = new java.util.zip.ZipInputStream(bundledArchive)) {
+            int entries = 0;
+            for(var entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
+                if(++entries > 20000) throw new IOException("Too many entries in bundled pack");
+                if(!entry.getName().equals("pack.yml")) continue;
+                String id = manifestId(document(manifest(zip)));
+                var key = id.contains(":") ? RegistryKey.parse(id) : RegistryKey.of(id, id);
+                return scan(directory).stream().anyMatch(source -> key.equals(source.key()));
+            }
+        }
+        return false;
     }
 }
