@@ -12,3 +12,5 @@
 [All languages](../README.md)
 
 7. [Lệnh mới (7.0.22-BETA)](07-world-commands.md)
+
+8. [Nhận diện và tìm biome và cấu trúc (7.0.23-BETA)](08-discovery.md)

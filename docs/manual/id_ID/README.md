@@ -12,3 +12,5 @@
 [All languages](../README.md)
 
 7. [Perintah baru (7.0.22-BETA)](07-world-commands.md)
+
+8. [Mengidentifikasi dan menemukan bioma dan struktur (7.0.23-BETA)](08-discovery.md)

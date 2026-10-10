@@ -12,3 +12,5 @@
 [All languages](../README.md)
 
 7. [新しいコマンド（7.0.22-BETA）](07-world-commands.md)
+
+8. [バイオームと構造物の識別・検索 (7.0.23-BETA)](08-discovery.md)
