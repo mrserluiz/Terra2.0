@@ -4,6 +4,9 @@
 
 Terra 2.0 é uma continuação independente e modernização do motor de geração de mundos Terra para Paper, com foco em **geração independente por mundo**, **compatibilidade com Community Packs**, isolamento seguro dos mundos e um caminho para suporte nativo a datapacks do Minecraft.
 
+
+📖 **[Manual do Usuário (PT-BR)](docs/manual/README.md)** — instalação, Community Packs, Multiverse, conversão de datapacks, comandos e roadmap de loot por mundo.
+
 > **Build de referência atual:** `Terra2-bukkit-7.0.14-BETA.jar`
 
 O Terra 2.0 não é mais apenas uma estrutura de recuperação. A linha 7.0.14 já possui um núcleo de geração executável, backend de compatibilidade com Terra Community Packs, um primeiro importador de datapacks vanilla, TerraPacks locais e composição de packs por mundo.
