@@ -36,3 +36,4 @@ Referências técnicas: [BUILD-STATUS](../../BUILD-STATUS.md) · [TERRAPACKS](..
 7. [Novos comandos (7.0.22-BETA)](07-world-commands.md)
 
 8. [Identificar e localizar biomas e estruturas (7.0.23-BETA)](08-discovery.md)
+9. [API de clima por mundo e integração opcional com Aeternum (7.0.24-BETA)](../CLIMATE_API.md)

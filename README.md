@@ -24,6 +24,10 @@ Terra 2.0 is no longer only a recovery scaffold. The 7.0.14 line has an executab
 
 ## Community Packs
 
+### Optional climate metadata API (7.0.24-BETA)
+
+Terra2 publishes read-only climate profiles per authorized world. The separate **Terra2AeternumBridge** addon delivers them to AeternumSeasons' optional generic consumer API; neither plugin requires the other. Profiles live in Terra2 settings, keep real biome IDs, and can be reloaded without unloading plugins. See [configuration, API and downloads](docs/CLIMATE_API.md) and the [Paper integration verification](docs/testing/CLIMATE_INTEGRATION_7.0.24.md).
+
 Known Terra-style packs remain the primary compatibility path. A world may select a single legacy pack directly:
 
 ```yaml

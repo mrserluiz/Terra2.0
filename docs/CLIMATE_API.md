@@ -63,3 +63,7 @@ Os metadados não incluem loot, drops, texturas ou regras de itens. Esses sistem
 ## Testes
 
 CI verifica a geração Terra2 independente, depois Terra2 + ponte + Aeternum em um servidor Paper 26.2 isolado usando HYDRAXIA. A prova inclui bioma customizado preservado, reload válido/inválido, mundo principal protegido, desconexão/reconexão da ponte, salvamento/reinício e inicialização sem addon. Logs e JARs são publicados em artifacts separados para distinguir o motor da integração opcional.
+
+Validação concluída: [teste da integração opcional](https://github.com/mrserluiz/Terra2.0/actions/runs/38083807981). [JAR do motor](https://github.com/mrserluiz/Terra2.0/actions/runs/38083190306/artifacts/11680524585) e [JARs da ponte + consumidor](https://github.com/mrserluiz/Terra2.0/actions/runs/38083807981/artifacts/11680779738). O ZIP do motor contém um único gerador; o ZIP opcional contém dois plugins diferentes, com as funções descritas acima.
+
+As notas completas e os limites do teste estão em [CLIMATE_INTEGRATION_7.0.24.md](testing/CLIMATE_INTEGRATION_7.0.24.md).
