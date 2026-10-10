@@ -1,6 +1,6 @@
 {
   "permission": "Permesso mancante: {0}",
-  "help": "Comandi: /terra2 help | /terra2 lis Cpack | /terra2 lis Tpack | /terra2 unlock <world> <pack[;pack]> | /terra2 reload | /terra2 packs list | /terra2 packs inspect <ID> | /terra2 convert <ID> <sources> [dimension] | /terra2 datapack list | /terra2 datapack inspect <file> [dimension] | /terra2 loot status",
+  "help": "Comandi: /terra2 help | /terra2 lis Cpack | /terra2 lis Tpack | /terra2 unlock <world> <pack[;pack]> | /terra2 reload | /terra2 packs list | /terra2 packs inspect <ID> | /terra2 convert <ID> <sources> [dimension] | /terra2 datapack list | /terra2 datapack inspect <file> [dimension] | /terra2 loot status | /terra2 biome | /terra2 structures [radius] | /terra2 locate biome <ID> [radius] | /terra2 locate structure <ID> [radius]",
   "list-usage": "Uso: /terra2 lis <Cpack|Tpack|all> (list)",
   "community-list": "Community Pack registrati: {0}",
   "community-source": "Community Pack {0}: {1}. {2}",
@@ -15,5 +15,18 @@
   "restart-packs": "Community Pack rilevati; riavvia il server per registrarli: {0}",
   "reloaded": "Terra2: autorizzazioni ricaricate. I mondi caricati mantengono i propri generatori.",
   "unlock-start": "Validazione dei pack per il mondo {0} in background. Nessun mondo viene creato o modificato.",
-  "unlock-busy": "È in corso un’altra autorizzazione di mondo. Attendi."
+  "unlock-busy": "È in corso un’altra autorizzazione di mondo. Attendi.",
+  "discover-player": "Usa nel gioco per consultare il tuo mondo e la posizione.",
+  "discover-usage": "/terra2 biome | /terra2 structures [radius] | /terra2 locate biome <ID> [radius] | /terra2 locate structure <ID> [radius]",
+  "discover-radius": "Raggio: 32..8192 blocchi.",
+  "discover-provider": "Questo mondo non ha un provider di biomi Terra per la ricerca limitata.",
+  "discover-index": "Indice non disponibile/in caricamento. Solo strutture generate e indicizzate sono individuabili.",
+  "discover-id": "ID del bioma sconosciuto in questo mondo: {0}",
+  "discover-busy": "Una ricerca è già in corso.",
+  "discover-search": "Ricerca senza caricare chunk…",
+  "discover-biome": "Mondo {0}: bioma {1}; bioma Minecraft {2}.",
+  "discover-found-biome": "Campione trovato: {0} [{1}, {2}, {3}]. Alla tua Y; griglia di 32 blocchi, senza garanzia del più vicino.",
+  "discover-notfound-biome": "Nessun campione prima del limite di raggio/tempo/query ({0} campioni). Non dimostra assenza.",
+  "discover-structures": "Ancore indicizzate: {0}. Limite raggiunto: {1}. Solo posizioni generate/indicizzate; non dimostra di essere dentro.",
+  "discover-error": "Ricerca fallita: {0}"
 }

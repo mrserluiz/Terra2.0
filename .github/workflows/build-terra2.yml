@@ -118,7 +118,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Terra2-engine-experimental-26.2
-          path: terra2-engine/platforms/bukkit/build/libs/Terra2-bukkit-7.0.22-BETA.jar
+          path: terra2-engine/platforms/bukkit/build/libs/Terra2-bukkit-7.0.23-BETA.jar
           if-no-files-found: error
 
       - name: Upload native integration diagnostics
@@ -131,6 +131,7 @@ jobs:
             terra2-engine/build/native-smoke/*.json
             terra2-engine/build/native-smoke/plugins/Terra2/conversion/reports/*.json
             terra2-engine/build/native-smoke/plugins/Terra2/reports/**
+            terra2-engine/build/native-smoke/plugins/Terra2/structure-index/*.json
             terra2-engine/build/native-smoke/plugins/Terra2NativeProbe/checkpoint.properties
           if-no-files-found: warn
 

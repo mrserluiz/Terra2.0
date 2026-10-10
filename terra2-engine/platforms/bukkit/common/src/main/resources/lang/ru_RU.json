@@ -1,6 +1,6 @@
 {
   "permission": "Нет разрешения: {0}",
-  "help": "Команды: /terra2 help | /terra2 lis Cpack | /terra2 lis Tpack | /terra2 unlock <world> <pack[;pack]> | /terra2 reload | /terra2 packs list | /terra2 packs inspect <ID> | /terra2 convert <ID> <sources> [dimension] | /terra2 datapack list | /terra2 datapack inspect <file> [dimension] | /terra2 loot status",
+  "help": "Команды: /terra2 help | /terra2 lis Cpack | /terra2 lis Tpack | /terra2 unlock <world> <pack[;pack]> | /terra2 reload | /terra2 packs list | /terra2 packs inspect <ID> | /terra2 convert <ID> <sources> [dimension] | /terra2 datapack list | /terra2 datapack inspect <file> [dimension] | /terra2 loot status | /terra2 biome | /terra2 structures [radius] | /terra2 locate biome <ID> [radius] | /terra2 locate structure <ID> [radius]",
   "list-usage": "Использование: /terra2 lis <Cpack|Tpack|all> (list)",
   "community-list": "Зарегистрированные Community Packs: {0}",
   "community-source": "Community Pack {0}: {1}. {2}",
@@ -15,5 +15,18 @@
   "restart-packs": "Обнаружены Community Packs; перезапустите сервер для регистрации: {0}",
   "reloaded": "Terra2: разрешения перезагружены. Загруженные миры сохраняют свои генераторы.",
   "unlock-start": "Паки для мира {0} проверяются в фоне. Миры не создаются и не изменяются.",
-  "unlock-busy": "Другое разрешение мира обрабатывается. Подождите."
+  "unlock-busy": "Другое разрешение мира обрабатывается. Подождите.",
+  "discover-player": "Используйте в игре для проверки своего мира и позиции.",
+  "discover-usage": "/terra2 biome | /terra2 structures [radius] | /terra2 locate biome <ID> [radius] | /terra2 locate structure <ID> [radius]",
+  "discover-radius": "Радиус: 32..8192 блоков.",
+  "discover-provider": "В этом мире нет поставщика биомов Terra для ограниченного поиска.",
+  "discover-index": "Индекс структур недоступен/загружается. Находятся только созданные и индексированные структуры.",
+  "discover-id": "Неизвестный ID биома в этом мире: {0}",
+  "discover-busy": "Поиск уже выполняется.",
+  "discover-search": "Поиск без загрузки чанков…",
+  "discover-biome": "Мир {0}: биом {1}; биом Minecraft {2}.",
+  "discover-found-biome": "Образец найден: {0} [{1}, {2}, {3}]. На вашем Y; сетка 32 блока, ближайший не гарантирован.",
+  "discover-notfound-biome": "Образец не найден до лимита радиуса/времени/запросов ({0} образцов). Это не доказывает отсутствие.",
+  "discover-structures": "Индексированные опорные точки: {0}. Лимит индекса достигнут: {1}. Только созданные/индексированные позиции; не доказывает нахождение внутри.",
+  "discover-error": "Ошибка поиска: {0}"
 }

@@ -31,6 +31,10 @@ import com.dfsek.terra.api.tectonic.LoaderRegistrar;
 public interface Platform extends LoaderRegistrar {
     boolean reload();
 
+    /** Observer for successful structure feature placements; no world reads or blocking I/O. */
+    default void recordStructurePlacement(com.dfsek.terra.api.world.chunk.generation.ProtoWorld world,
+                                         String stage, String feature, int x, int y, int z) {}
+
     @NotNull
     @Contract(pure = true)
     String platformName();

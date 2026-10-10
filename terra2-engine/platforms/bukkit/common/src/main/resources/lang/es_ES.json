@@ -1,6 +1,6 @@
 {
   "permission": "Sin permiso: {0}",
-  "help": "Comandos: /terra2 help | /terra2 lis Cpack | /terra2 lis Tpack | /terra2 unlock <world> <pack[;pack]> | /terra2 reload | /terra2 packs list | /terra2 packs inspect <ID> | /terra2 convert <ID> <sources> [dimension] | /terra2 datapack list | /terra2 datapack inspect <file> [dimension] | /terra2 loot status",
+  "help": "Comandos: /terra2 help | /terra2 lis Cpack | /terra2 lis Tpack | /terra2 unlock <world> <pack[;pack]> | /terra2 reload | /terra2 packs list | /terra2 packs inspect <ID> | /terra2 convert <ID> <sources> [dimension] | /terra2 datapack list | /terra2 datapack inspect <file> [dimension] | /terra2 loot status | /terra2 biome | /terra2 structures [radius] | /terra2 locate biome <ID> [radius] | /terra2 locate structure <ID> [radius]",
   "list-usage": "Uso: /terra2 lis <Cpack|Tpack|all> (list)",
   "community-list": "Community Packs registrados: {0}",
   "community-source": "Community Pack {0}: {1}. {2}",
@@ -15,5 +15,18 @@
   "restart-packs": "Community Packs detectados; reinicia el servidor para registrarlos: {0}",
   "reloaded": "Terra2: autorizaciones recargadas. Los mundos cargados conservan sus generadores.",
   "unlock-start": "Validando los packs del mundo {0} en segundo plano. No se crea ni modifica ningún mundo.",
-  "unlock-busy": "Hay otra autorización de mundo en curso. Espera."
+  "unlock-busy": "Hay otra autorización de mundo en curso. Espera.",
+  "discover-player": "Úsalo dentro del juego para consultar tu mundo y posición.",
+  "discover-usage": "/terra2 biome | /terra2 structures [radius] | /terra2 locate biome <ID> [radius] | /terra2 locate structure <ID> [radius]",
+  "discover-radius": "Radio: 32..8192 bloques.",
+  "discover-provider": "Este mundo no tiene proveedor de biomas Terra para búsqueda limitada.",
+  "discover-index": "Índice de estructuras no disponible/cargando. Solo se encuentran estructuras generadas e indexadas.",
+  "discover-id": "ID de bioma desconocido en este mundo: {0}",
+  "discover-busy": "Ya hay una búsqueda en curso.",
+  "discover-search": "Buscando sin cargar chunks…",
+  "discover-biome": "Mundo {0}: bioma {1}; bioma Minecraft {2}.",
+  "discover-found-biome": "Muestra encontrada: {0} [{1}, {2}, {3}]. A tu Y; cuadrícula de 32 bloques, sin garantizar el más cercano.",
+  "discover-notfound-biome": "Sin muestra antes del límite de radio/tiempo/consultas ({0} muestras). No demuestra ausencia.",
+  "discover-structures": "Anclas de estructuras indexadas: {0}. Límite del índice alcanzado: {1}. Solo posiciones generadas/indexadas; no demuestra estar dentro.",
+  "discover-error": "Consulta fallida: {0}"
 }

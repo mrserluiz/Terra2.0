@@ -2,7 +2,7 @@ preRelease(true)
 
 versionProjects(":common:api", version("7.0.0"))
 versionProjects(":common:implementation", version("7.0.0"))
-versionProjects(":platforms", "7.0.22-BETA")
+versionProjects(":platforms", "7.0.23-BETA")
 
 
 allprojects {

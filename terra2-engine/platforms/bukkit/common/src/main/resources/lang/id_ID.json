@@ -1,6 +1,6 @@
 {
   "permission": "Tidak memiliki izin: {0}",
-  "help": "Perintah: /terra2 help | /terra2 lis Cpack | /terra2 lis Tpack | /terra2 unlock <world> <pack[;pack]> | /terra2 reload | /terra2 packs list | /terra2 packs inspect <ID> | /terra2 convert <ID> <sources> [dimension] | /terra2 datapack list | /terra2 datapack inspect <file> [dimension] | /terra2 loot status",
+  "help": "Perintah: /terra2 help | /terra2 lis Cpack | /terra2 lis Tpack | /terra2 unlock <world> <pack[;pack]> | /terra2 reload | /terra2 packs list | /terra2 packs inspect <ID> | /terra2 convert <ID> <sources> [dimension] | /terra2 datapack list | /terra2 datapack inspect <file> [dimension] | /terra2 loot status | /terra2 biome | /terra2 structures [radius] | /terra2 locate biome <ID> [radius] | /terra2 locate structure <ID> [radius]",
   "list-usage": "Penggunaan: /terra2 lis <Cpack|Tpack|all> (list)",
   "community-list": "Community Pack terdaftar: {0}",
   "community-source": "Community Pack {0}: {1}. {2}",
@@ -15,5 +15,18 @@
   "restart-packs": "Community Pack ditemukan; mulai ulang server untuk mendaftarkan: {0}",
   "reloaded": "Terra2: izin dunia dimuat ulang. Dunia yang aktif mempertahankan generatornya.",
   "unlock-start": "Memvalidasi paket untuk dunia {0} di latar belakang. Tidak ada dunia yang dibuat atau diubah.",
-  "unlock-busy": "Izin dunia lain sedang diproses. Harap tunggu."
+  "unlock-busy": "Izin dunia lain sedang diproses. Harap tunggu.",
+  "discover-player": "Gunakan di dalam permainan untuk memeriksa dunia dan posisi Anda.",
+  "discover-usage": "/terra2 biome | /terra2 structures [radius] | /terra2 locate biome <ID> [radius] | /terra2 locate structure <ID> [radius]",
+  "discover-radius": "Radius: 32..8192 blok.",
+  "discover-provider": "Dunia ini tidak memiliki penyedia bioma Terra untuk pencarian terbatas.",
+  "discover-index": "Indeks struktur tidak tersedia/sedang dimuat. Hanya struktur yang dihasilkan dan diindeks dapat ditemukan.",
+  "discover-id": "ID bioma tidak dikenal di dunia ini: {0}",
+  "discover-busy": "Pencarian sudah berjalan.",
+  "discover-search": "Mencari tanpa memuat chunk…",
+  "discover-biome": "Dunia {0}: bioma {1}; bioma Minecraft {2}.",
+  "discover-found-biome": "Sampel ditemukan: {0} [{1}, {2}, {3}]. Pada Y Anda; kisi 32 blok, tidak menjamin yang terdekat.",
+  "discover-notfound-biome": "Tidak ada sampel sebelum batas radius/waktu/kueri ({0} sampel). Ini tidak membuktikan ketiadaan.",
+  "discover-structures": "Titik acuan terindeks: {0}. Batas indeks tercapai: {1}. Hanya posisi yang dihasilkan/diindeks; tidak membuktikan berada di dalam.",
+  "discover-error": "Pencarian gagal: {0}"
 }

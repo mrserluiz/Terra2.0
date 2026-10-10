@@ -72,6 +72,13 @@ public class PlatformImpl extends AbstractPlatform {
         load();
     }
 
+    @Override public void recordStructurePlacement(com.dfsek.terra.api.world.chunk.generation.ProtoWorld world,
+                                                   String stage, String feature, int x, int y, int z) {
+        if(!stage.equalsIgnoreCase("structures")) return;
+        var handle = (org.bukkit.World) world.getWorld().getHandle();
+        com.dfsek.terra.bukkit.util.StructureIndex.record(handle.getUID(), handle.getSeed(), feature, x, y, z, "feature");
+    }
+
     public TerraBukkitPlugin getPlugin() {
         return plugin;
     }

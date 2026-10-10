@@ -69,6 +69,8 @@ public class TerraBukkitPlugin extends JavaPlugin {
     public org.terra2.pack.TerraPackStore terraPackStore() { return terraPacks; }
     public PlatformImpl platform() { return platform; }
     public org.terra2.adapter.vanilla.paper.WorldLootManager lootManager() { return lootManager; }
+    private com.dfsek.terra.bukkit.util.DiscoveryCommands discovery;
+    private io.papermc.paper.threadedregions.scheduler.ScheduledTask structureIndexTask;
     private AsyncScheduler asyncScheduler = this.getServer().getAsyncScheduler();
 
     private GlobalRegionScheduler globalRegionScheduler = this.getServer().getGlobalRegionScheduler();
@@ -119,12 +121,27 @@ public class TerraBukkitPlugin extends JavaPlugin {
             return;
         }
 
+        try { com.dfsek.terra.bukkit.util.StructureIndex.configure(getDataFolder().toPath().resolve("structure-index")); }
+        catch(java.io.IOException error) { logger.error("Cannot initialize structure index", error); Bukkit.getPluginManager().disablePlugin(this); return; }
+        discovery = new com.dfsek.terra.bukkit.util.DiscoveryCommands(this);
+        structureIndexTask = asyncScheduler.runAtFixedRate(this, task -> {
+            try { com.dfsek.terra.bukkit.util.StructureIndex.flush(); }
+            catch(java.io.IOException error) { logger.error("Cannot save structure index", error); }
+        }, 5, 5, TimeUnit.SECONDS);
         platform = NMSInitializer.init(this);
         if(platform != null && platform.nativePackBackend() != null) terraPacks.nativeBackend(platform.nativePackBackend());
         com.dfsek.terra.bukkit.util.GenerationReport.packDiagnostics(this::packResolutionDiagnostics);
         Bukkit.getPluginManager().registerEvents(new org.bukkit.event.Listener() {
             @org.bukkit.event.EventHandler(priority = org.bukkit.event.EventPriority.LOWEST)
             public void bindWorld(org.bukkit.event.world.WorldInitEvent event) {
+                var uuid = event.getWorld().getUID(); long seed = event.getWorld().getSeed();
+                if(event.getWorld().getGenerator() instanceof BukkitChunkGeneratorWrapper
+                    || event.getWorld().getGenerator() instanceof org.terra2.adapter.vanilla.paper.FlatChunkGenerator) {
+                    asyncScheduler.runNow(TerraBukkitPlugin.this, task -> {
+                        try { com.dfsek.terra.bukkit.util.StructureIndex.load(uuid, seed); }
+                        catch(java.io.IOException error) { logger.error("Cannot read structure index for {}", uuid, error); }
+                    });
+                }
                 if(event.getWorld().getGenerator() instanceof org.terra2.adapter.vanilla.paper.FlatChunkGenerator flat) {
                     try {
                         assertGenerationAuthorized(event.getWorld().getName(), generationSettings.isString("worlds." + event.getWorld().getName() + ".datapack") ? "DATAPACK" : "PACKS");
@@ -217,6 +234,9 @@ public class TerraBukkitPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if(structureIndexTask != null) structureIndexTask.cancel();
+        try { com.dfsek.terra.bukkit.util.StructureIndex.flush(); }
+        catch(java.io.IOException error) { logger.error("Cannot save structure index on shutdown", error); }
         if(heartbeatTask != null) heartbeatTask.cancel();
         if(stallMonitor != null) stallMonitor.close();
         if(consoleCapture != null) consoleCapture.close();
@@ -442,6 +462,9 @@ public class TerraBukkitPlugin extends JavaPlugin {
         boolean allowed = sender.hasPermission(command.getName().equalsIgnoreCase("terra2reportlog")
             ? "terra2.diagnostics.capture" : "terra2.settings.reload");
         if(!allowed || generationSettings == null || platform == null) return java.util.List.of();
+        if(command.getName().equalsIgnoreCase("terra2") && discovery != null && args.length > 1
+            && java.util.Set.of("biome", "structures", "locate").contains(args[0].toLowerCase(java.util.Locale.ROOT)))
+            return discovery.complete(sender, args);
         var worlds = new java.util.TreeSet<String>();
         worlds.addAll(generationSettings.getConfigurationSection("worlds").getKeys(false));
         Bukkit.getWorlds().forEach(world -> worlds.add(world.getName()));
@@ -498,6 +521,7 @@ public class TerraBukkitPlugin extends JavaPlugin {
             sender.sendMessage(message("permission", "terra2.settings.reload"));
             return true;
         }
+        if(discovery != null && discovery.handle(sender, args)) return true;
         if(args.length == 0 || (args.length == 1 && args[0].equalsIgnoreCase("help"))) {
             sender.sendMessage(message("help")); return true;
         }

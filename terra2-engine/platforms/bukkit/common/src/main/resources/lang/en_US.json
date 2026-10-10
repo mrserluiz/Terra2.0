@@ -1,6 +1,6 @@
 {
   "permission": "Missing permission: {0}",
-  "help": "Commands: /terra2 help | /terra2 lis Cpack | /terra2 lis Tpack | /terra2 unlock <world> <pack[;pack]> | /terra2 reload | /terra2 packs list | /terra2 packs inspect <ID> | /terra2 convert <ID> <sources> [dimension] | /terra2 datapack list | /terra2 datapack inspect <file> [dimension] | /terra2 loot status",
+  "help": "Commands: /terra2 help | /terra2 lis Cpack | /terra2 lis Tpack | /terra2 unlock <world> <pack[;pack]> | /terra2 reload | /terra2 packs list | /terra2 packs inspect <ID> | /terra2 convert <ID> <sources> [dimension] | /terra2 datapack list | /terra2 datapack inspect <file> [dimension] | /terra2 loot status | /terra2 biome | /terra2 structures [radius] | /terra2 locate biome <ID> [radius] | /terra2 locate structure <ID> [radius]",
   "list-usage": "Usage: /terra2 lis <Cpack|Tpack|all> (list)",
   "community-list": "Registered Community Packs: {0}",
   "community-source": "Community Pack {0}: {1}. {2}",
@@ -15,5 +15,18 @@
   "restart-packs": "Community Packs discovered; restart the server to register: {0}",
   "reloaded": "Terra2: authorizations reloaded. Loaded worlds retain their generators.",
   "unlock-start": "Validating packs for world {0} in the background. No world is created or changed.",
-  "unlock-busy": "Another world authorization is in progress. Please wait."
+  "unlock-busy": "Another world authorization is in progress. Please wait.",
+  "discover-player": "Run in-game to use your current world and position.",
+  "discover-usage": "/terra2 biome | /terra2 structures [radius] | /terra2 locate biome <ID> [radius] | /terra2 locate structure <ID> [radius]",
+  "discover-radius": "Radius: 32..8192 blocks.",
+  "discover-provider": "This world has no Terra biome provider for bounded search.",
+  "discover-index": "Structure index unavailable/loading. Only indexed generated structures can be found.",
+  "discover-id": "Unknown biome ID in this world: {0}",
+  "discover-busy": "A search is already running.",
+  "discover-search": "Searching without loading chunks…",
+  "discover-biome": "World {0}: biome {1}; Minecraft biome {2}.",
+  "discover-found-biome": "Sample found: {0} [{1}, {2}, {3}]. At your Y; 32-block grid, not exact nearest.",
+  "discover-notfound-biome": "No sample found before the radius/time/budget limit ({0} samples). This does not prove absence.",
+  "discover-structures": "Indexed structure anchors: {0}. Index limit reached: {1}. Only generated indexed placements; anchors do not prove you are inside.",
+  "discover-error": "Discovery failed: {0}"
 }

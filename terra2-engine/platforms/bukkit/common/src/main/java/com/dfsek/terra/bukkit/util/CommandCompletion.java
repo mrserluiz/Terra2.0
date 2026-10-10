@@ -17,7 +17,7 @@ public final class CommandCompletion {
         if(command.equalsIgnoreCase("terra2reportlog")) {
             if(args.length == 1) options = List.of("start", "stop", "status");
         } else if(command.equalsIgnoreCase("terra2")) {
-            if(args.length == 1) options = List.of("help", "reload", "lis", "list", "unlock", "packs", "convert", "datapack", "loot");
+            if(args.length == 1) options = List.of("help", "reload", "lis", "list", "unlock", "packs", "convert", "datapack", "loot", "biome", "structures", "locate");
             else if(args.length == 2) options = switch(action) {
                 case "unlock" -> worlds;
                 case "lis", "list" -> List.of("Cpack", "Tpack", "all");

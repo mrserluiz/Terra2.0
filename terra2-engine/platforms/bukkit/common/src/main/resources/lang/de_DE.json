@@ -1,6 +1,6 @@
 {
   "permission": "Fehlende Berechtigung: {0}",
-  "help": "Befehle: /terra2 help | /terra2 lis Cpack | /terra2 lis Tpack | /terra2 unlock <world> <pack[;pack]> | /terra2 reload | /terra2 packs list | /terra2 packs inspect <ID> | /terra2 convert <ID> <sources> [dimension] | /terra2 datapack list | /terra2 datapack inspect <file> [dimension] | /terra2 loot status",
+  "help": "Befehle: /terra2 help | /terra2 lis Cpack | /terra2 lis Tpack | /terra2 unlock <world> <pack[;pack]> | /terra2 reload | /terra2 packs list | /terra2 packs inspect <ID> | /terra2 convert <ID> <sources> [dimension] | /terra2 datapack list | /terra2 datapack inspect <file> [dimension] | /terra2 loot status | /terra2 biome | /terra2 structures [radius] | /terra2 locate biome <ID> [radius] | /terra2 locate structure <ID> [radius]",
   "list-usage": "Verwendung: /terra2 lis <Cpack|Tpack|all> (list)",
   "community-list": "Registrierte Community Packs: {0}",
   "community-source": "Community Pack {0}: {1}. {2}",
@@ -15,5 +15,18 @@
   "restart-packs": "Community Packs gefunden; Server zur Registrierung neu starten: {0}",
   "reloaded": "Terra2: Freigaben neu geladen. Geladene Welten behalten ihre Generatoren.",
   "unlock-start": "Packs für Welt {0} werden im Hintergrund geprüft. Keine Welt wird erstellt oder verändert.",
-  "unlock-busy": "Eine andere Weltfreigabe wird gerade bearbeitet. Bitte warten."
+  "unlock-busy": "Eine andere Weltfreigabe wird gerade bearbeitet. Bitte warten.",
+  "discover-player": "Im Spiel verwenden, um deine Welt und Position abzufragen.",
+  "discover-usage": "/terra2 biome | /terra2 structures [radius] | /terra2 locate biome <ID> [radius] | /terra2 locate structure <ID> [radius]",
+  "discover-radius": "Radius: 32..8192 Blöcke.",
+  "discover-provider": "Diese Welt hat keinen Terra-Biomanbieter für die begrenzte Suche.",
+  "discover-index": "Strukturindex nicht verfügbar/wird geladen. Nur generierte und indexierte Strukturen sind auffindbar.",
+  "discover-id": "Unbekannte Biom-ID in dieser Welt: {0}",
+  "discover-busy": "Eine Suche läuft bereits.",
+  "discover-search": "Suche ohne Chunks zu laden…",
+  "discover-biome": "Welt {0}: Biom {1}; Minecraft-Biom {2}.",
+  "discover-found-biome": "Stichprobe gefunden: {0} [{1}, {2}, {3}]. Auf deinem Y; 32-Block-Raster, nicht garantiert am nächsten.",
+  "discover-notfound-biome": "Keine Stichprobe vor Radius-/Zeit-/Abfragelimit ({0} Stichproben). Kein Nachweis der Abwesenheit.",
+  "discover-structures": "Indexierte Strukturanker: {0}. Indexlimit erreicht: {1}. Nur generierte/indexierte Positionen; kein Nachweis, dass du innerhalb bist.",
+  "discover-error": "Abfrage fehlgeschlagen: {0}"
 }

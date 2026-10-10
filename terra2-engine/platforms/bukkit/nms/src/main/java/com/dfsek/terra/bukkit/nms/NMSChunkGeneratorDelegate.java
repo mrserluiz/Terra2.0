@@ -87,7 +87,7 @@ public class NMSChunkGeneratorDelegate extends ChunkGenerator {
         net.minecraft.world.level.chunk.ChunkGeneratorStructureState original, StructureManager manager,
         ChunkAccess chunk, net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager templates,
         net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimension) {
-        if(nativeExecutor == null) { super.createStructures(registries, original, manager, chunk, templates, dimension); return; }
+        if(nativeExecutor == null) { super.createStructures(registries, original, manager, chunk, templates, dimension); recordStarts(registries, manager, chunk); return; }
         var level = manager.level.getMinecraftWorld(); nativeExecutor.verify(level);
         var state = nativeState;
         if(state == null) synchronized(this) {
@@ -95,6 +95,24 @@ public class NMSChunkGeneratorDelegate extends ChunkGenerator {
             if(state == null) nativeState = state = nativeExecutor.placementState(level, this, original.randomState());
         }
         super.createStructures(registries, state, manager, chunk, templates, dimension);
+        recordStarts(registries, manager, chunk);
+    }
+
+    private void recordStarts(net.minecraft.core.RegistryAccess registries, StructureManager manager, ChunkAccess chunk) {
+        var world = manager.level.getMinecraftWorld().getWorld();
+        var registry = registries.lookupOrThrow(net.minecraft.core.registries.Registries.STRUCTURE);
+        chunk.getAllStarts().forEach((structure, start) -> {
+            if(!start.isValid()) return;
+            var resource = registry.getKey(structure); if(resource == null) return;
+            String id = resource.toString();
+            if(resource.getNamespace().equals("terra2")) {
+                String[] parts = resource.getPath().split("/", 3);
+                if(parts.length == 3) id = parts[1] + ":" + parts[2];
+            }
+            var box = start.getBoundingBox();
+            com.dfsek.terra.bukkit.util.StructureIndex.record(world.getUID(), world.getSeed(), id,
+                box.minX(), box.minY(), box.minZ(), "native");
+        });
     }
 
     @Override

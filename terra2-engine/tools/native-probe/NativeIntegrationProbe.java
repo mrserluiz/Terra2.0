@@ -115,6 +115,18 @@ public final class NativeIntegrationProbe extends JavaPlugin {
                 long starts = nativeStarts(world, 0, 0);
                 if(starts < 1) throw new IllegalStateException("Native structure-start record missing");
                 data.setProperty("starts", Long.toString(starts));
+                com.dfsek.terra.bukkit.util.StructureIndex.load(world.getUID(), world.getSeed());
+                var indexed = com.dfsek.terra.bukkit.util.StructureIndex.entries(world.getUID());
+                if(indexed.stream().noneMatch(value -> value.kind().equals("native") && value.id().startsWith("smoke:")))
+                    throw new IllegalStateException("Native discovery index missing or private ID not restored");
+                if(!com.dfsek.terra.bukkit.util.StructureIndex.entries(getServer().getWorld("world").getUID()).isEmpty())
+                    throw new IllegalStateException("Discovery index leaked into primary world");
+                var wrapper = (com.dfsek.terra.bukkit.generator.BukkitChunkGeneratorWrapper) world.getGenerator();
+                var biome = wrapper.getPack().getBiomeProvider().getBiome(8,100,8,world.getSeed());
+                if(biome.getID().isBlank()) throw new IllegalStateException("Actual pack biome ID unavailable");
+                com.dfsek.terra.bukkit.util.StructureIndex.flush();
+                data.setProperty("indexed", Integer.toString(indexed.size()));
+                getLogger().info("TERRA2_DISCOVERY_INDEX_CREATED " + indexed.size() + " biome=" + biome.getID());
                 if(nativeStarts(getServer().getWorld("world"), 8, 8) != 0) throw new IllegalStateException("Native structures activated in primary world");
                 String table = engine.platform().nativeLootTables(world.getName()).keySet().stream()
                     .filter(key -> key.endsWith("/smoke/mob")).findFirst().orElseThrow();
@@ -140,6 +152,10 @@ public final class NativeIntegrationProbe extends JavaPlugin {
                     throw new IllegalStateException("World identity changed after restart");
                 if(nativeStarts(world, 0, 0) != Long.parseLong(data.getProperty("starts")))
                     throw new IllegalStateException("Native structure starts did not survive restart");
+                com.dfsek.terra.bukkit.util.StructureIndex.load(world.getUID(), world.getSeed());
+                if(com.dfsek.terra.bukkit.util.StructureIndex.entries(world.getUID()).size() < Integer.parseInt(data.getProperty("indexed")))
+                    throw new IllegalStateException("Discovery index did not survive restart");
+                getLogger().info("TERRA2_DISCOVERY_INDEX_RESTART_OK");
                 var xyz = Arrays.stream(data.getProperty("chest").split(",")).mapToInt(Integer::parseInt).toArray();
                 var chest = (Chest) world.getBlockAt(xyz[0], xyz[1], xyz[2]).getState();
                 var item = Arrays.stream(chest.getBlockInventory().getContents()).filter(Objects::nonNull).findFirst().orElseThrow();

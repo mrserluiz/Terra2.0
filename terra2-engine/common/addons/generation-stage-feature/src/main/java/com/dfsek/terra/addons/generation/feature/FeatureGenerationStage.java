@@ -82,14 +82,15 @@ public class FeatureGenerationStage implements GenerationStage, StringIdentifiab
                                         if(feature.getDistributor().matches(x, z, seed)) {
                                             feature.getLocator()
                                                 .getSuitableCoordinates(column.clamp(min, max))
-                                                .forEach(y -> feature.getStructure(world, x, y, z)
+                                                .forEach(y -> { if(feature.getStructure(world, x, y, z)
                                                     .generate(Vector3Int.of(x, y, z),
                                                         world,
                                                         RandomGeneratorFactory.<RandomGenerator.SplittableGenerator>of(
                                                                 "Xoroshiro128PlusPlus")
                                                             .create(coordinateSeed * 31 + y),
-                                                        Rotation.NONE)
-                                                );
+                                                        Rotation.NONE)) {
+                                                    platform.recordStructurePlacement(world, id, feature.getID(), x, y, z);
+                                                }});
                                         }
                                         platform.getProfiler().pop(feature.getID());
                                     });

@@ -12,6 +12,8 @@ class CommandCompletionTest {
     @Test void permissionsPrefixesAliasesAndDynamicIds() {
         assertEquals(List.of(), complete(false, ""));
         assertEquals(List.of("unlock"), complete(true, "UN"));
+        assertEquals(List.of("locate"), complete(true, "loc"));
+        assertEquals(List.of("biome"), complete(true, "bio"));
         assertEquals(List.of("Cpack"), complete(true, "lis", "c"));
         assertEquals(List.of("custom"), complete(true, "unlock", "cu"));
         assertEquals(List.of("HYDRAXIA"), complete(true, "unlock", "new", "hyd"));
