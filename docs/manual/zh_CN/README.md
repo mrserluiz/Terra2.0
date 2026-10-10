@@ -10,3 +10,5 @@
 6. [未来功能：按世界管理物品和战利品](06-world-items-loot.md)
 
 [All languages](../README.md)
+
+7. [新命令（7.0.22-BETA）](07-world-commands.md)

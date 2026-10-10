@@ -10,3 +10,5 @@
 6. [Futuro: oggetti e loot per mondo](06-world-items-loot.md)
 
 [All languages](../README.md)
+
+7. [Nuovi comandi (7.0.22-BETA)](07-world-commands.md)

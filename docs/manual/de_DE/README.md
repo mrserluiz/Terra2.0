@@ -10,3 +10,5 @@
 6. [Geplant: weltbezogene Gegenstände und Beute](06-world-items-loot.md)
 
 [All languages](../README.md)
+
+7. [Neue Befehle (7.0.22-BETA)](07-world-commands.md)

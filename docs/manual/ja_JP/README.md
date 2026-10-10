@@ -10,3 +10,5 @@
 6. [将来予定：ワールド別アイテムと戦利品](06-world-items-loot.md)
 
 [All languages](../README.md)
+
+7. [新しいコマンド（7.0.22-BETA）](07-world-commands.md)

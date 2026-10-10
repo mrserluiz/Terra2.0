@@ -10,3 +10,5 @@
 6. [Tương lai: vật phẩm và chiến lợi phẩm theo thế giới](06-world-items-loot.md)
 
 [All languages](../README.md)
+
+7. [Lệnh mới (7.0.22-BETA)](07-world-commands.md)

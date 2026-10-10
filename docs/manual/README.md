@@ -32,3 +32,5 @@ Referências técnicas: [BUILD-STATUS](../../BUILD-STATUS.md) · [TERRAPACKS](..
 - [Türkçe (tr_TR)](tr_TR/README.md)
 - [简体中文 (zh_CN)](zh_CN/README.md)
 - [日本語 (ja_JP)](ja_JP/README.md)
+
+7. [Novos comandos (7.0.22-BETA)](07-world-commands.md)

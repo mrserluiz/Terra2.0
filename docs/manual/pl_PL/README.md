@@ -10,3 +10,5 @@
 6. [W przyszłości: przedmioty i łupy na świat](06-world-items-loot.md)
 
 [All languages](../README.md)
+
+7. [Nowe polecenia (7.0.22-BETA)](07-world-commands.md)

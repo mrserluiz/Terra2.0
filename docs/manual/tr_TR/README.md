@@ -10,3 +10,5 @@
 6. [Gelecek: dünyaya özel eşyalar ve ganimet](06-world-items-loot.md)
 
 [All languages](../README.md)
+
+7. [Yeni komutlar (7.0.22-BETA)](07-world-commands.md)

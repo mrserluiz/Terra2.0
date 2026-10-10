@@ -10,3 +10,5 @@
 6. [Rencana item dan loot per dunia](06-world-items-loot.md)
 
 [All languages](../README.md)
+
+7. [Perintah baru (7.0.22-BETA)](07-world-commands.md)

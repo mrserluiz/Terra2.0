@@ -10,3 +10,5 @@
 6. [В будущем: предметы и добыча по мирам](06-world-items-loot.md)
 
 [All languages](../README.md)
+
+7. [Новые команды (7.0.22-BETA)](07-world-commands.md)
