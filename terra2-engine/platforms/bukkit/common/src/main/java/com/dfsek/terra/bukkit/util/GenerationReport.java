@@ -87,6 +87,7 @@ public final class GenerationReport {
             writer.println(environment);
             writer.println("Stage: " + stage);
             writer.println("World: " + world);
+            writer.println("Pack: " + pack);
             writer.println("Requested Pack ID: " + pack);
             try { writer.println(packDiagnostics.get()); }
             catch(Exception diagnosticFailure) { writer.println("Resolution diagnostics unavailable: " + diagnosticFailure); }
