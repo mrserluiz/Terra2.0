@@ -1,4 +1,4 @@
-name: Optional climate bridge validation
+name: Climate bridge capabilities and experimental receiver validation
 'on':
   push:
     paths:
@@ -12,7 +12,7 @@ permissions:
   actions: read
 jobs:
   climate:
-    name: Optional Terra2 to Aeternum climate integration
+    name: Bridge protocol (experimental receiver fixture)
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -63,17 +63,15 @@ jobs:
         clean verify
 
         '
+    - name: Inspect official receiver capabilities (no plugin replacement)
+      run: python3 terra2-engine/tools/inspect-official-climate.py
     - name: Verify climate source, reload, save/restart and optional removal
       run: python3 terra2-engine/tools/paper-climate-smoke.py
-    - name: Upload optional integration JARs
+    - name: Upload standalone bridge
       uses: actions/upload-artifact@v4
       with:
-        name: Terra2-Aeternum-optional-integration-26.2
-        path: 'integrations/aeternum/target/Terra2AeternumBridge-1.0.0-BETA.jar
-
-          integration-aeternum/aeternum-build/target/AeternumSeasons-4.5.2-CLIMATE-API-BETA.jar
-
-          '
+        name: Terra2-climate-bridge-26.2
+        path: integrations/aeternum/target/Terra2AeternumBridge-1.0.1-BETA.jar
         if-no-files-found: error
     - name: Upload climate integration diagnostics
       if: always()
@@ -83,6 +81,8 @@ jobs:
         path: 'terra2-engine/build/climate-smoke/*.log
 
           terra2-engine/build/climate-smoke/*.json
+
+          terra2-engine/build/official-climate/*
 
           '
         if-no-files-found: warn

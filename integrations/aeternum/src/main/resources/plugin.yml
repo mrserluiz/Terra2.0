@@ -1,5 +1,5 @@
 name: Terra2AeternumBridge
-version: 1.0.0-BETA
+version: 1.0.1-BETA
 main: org.terra2.integrations.aeternum.Terra2AeternumBridge
 api-version: '26.2'
 softdepend: [Terra2, AeternumSeasons]

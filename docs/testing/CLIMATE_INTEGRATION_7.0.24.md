@@ -38,3 +38,8 @@ An earlier probe incorrectly disabled/re-enabled a whole Paper plugin in-process
 | Terra2-bukkit-7.0.24-BETA.jar | b588c55d3497e3717aa273ef4c76b88231a74dc449a9f25b76852e585bec2b7d |
 | Terra2AeternumBridge-1.0.0-BETA.jar | e9db9df40c47b4497460af1298f1b21fa6a6a8fa0a67d9a8b94b440ddf177748 |
 | AeternumSeasons-4.5.2-CLIMATE-API-BETA.jar | af494873cb40501cf2121e41769cc8c7b6485fdd8b93cc480addeca1805fe92c |
+
+
+## Correção de escopo
+
+Este relatório valida um fork experimental, não o AeternumSeasons oficial do autor. A ponte 1.0.1 detecta capacidades e não exige substituir o plugin oficial. Consulte [CLIMATE_API.md](../CLIMATE_API.md). Sem o contrato de consumo, não há aplicação de clima ao Aeternum.

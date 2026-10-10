@@ -20,7 +20,7 @@ public final class Terra2AeternumBridge extends JavaPlugin implements Listener {
     private String lastStatus;
     private boolean paused;
 
-    public void onEnable() { Bukkit.getPluginManager().registerEvents(this, this); connect(); }
+    public void onEnable() { saveDefaultConfig(); Bukkit.getPluginManager().registerEvents(this, this); connect(); }
     public void onDisable() { disconnect(); }
 
     private void status(String message) {
@@ -38,12 +38,12 @@ public final class Terra2AeternumBridge extends JavaPlugin implements Listener {
     private void connect() {
         if(paused) { disconnect(); status("Paused: climate metadata is disconnected."); return; }
         var provided = registration();
-        Plugin target = Bukkit.getPluginManager().getPlugin("AeternumSeasons");
+        Plugin target = Bukkit.getPluginManager().getPlugin(targetName());
         if(provided == null || target == null || !target.isEnabled()) {
             disconnect(); status("Inactive: requires Terra2 climate API and an enabled AeternumSeasons."); return;
         }
         try {
-            Object consumer = target.getClass().getMethod("getSeasons").invoke(target);
+            Object consumer = ClimateReceiverAdapter.find(target, getConfig().getString("receiver.accessor", "getSeasons"));
             if(seasons == consumer && source == provided.getProvider()) return;
             disconnect();
             Method register = consumer.getClass().getMethod("registerWorldClimateProvider", Plugin.class, Function.class);
@@ -65,13 +65,16 @@ public final class Terra2AeternumBridge extends JavaPlugin implements Listener {
             };
             register.invoke(consumer, this, metadata);
             seasons = consumer; source = provider; unregister = remove;
-            status("Connected: Terra2 climate API -> AeternumSeasons. Real biomes and configuration files remain untouched.");
+            status("Connected: Terra2 climate API -> " + target.getName() + " " + target.getPluginMeta().getVersion() + ". Real biomes and configuration files remain untouched.");
         } catch(ReflectiveOperationException | RuntimeException incompatible) {
             disconnect();
-            status("Inactive: AeternumSeasons must expose optional climate-provider API 1 (4.5.2-CLIMATE-API-BETA or compatible). "
+            status("UNSUPPORTED: " + target.getName() + " " + target.getPluginMeta().getVersion()
+                + " has no usable climate receiver contract. Terra2 metadata remains available through Bukkit ServicesManager; target was not modified. "
                 + incompatible.getClass().getSimpleName());
         }
     }
+    private String targetName() { return getConfig().getString("receiver.plugin", "AeternumSeasons"); }
+
     private void disconnect() {
         if(seasons != null && unregister != null) {
             try { unregister.invoke(seasons, this); }
@@ -89,6 +92,7 @@ public final class Terra2AeternumBridge extends JavaPlugin implements Listener {
             default -> { return false; }
         }
         sender.sendMessage("Terra2 climate bridge: " + (paused ? "PAUSED" : source != null ? "CONNECTED" : "INACTIVE"));
+        sender.sendMessage(lastStatus == null ? "No receiver detected." : lastStatus);
         return true;
     }
     @Override public java.util.List<String> onTabComplete(org.bukkit.command.CommandSender sender, org.bukkit.command.Command command, String alias, String[] args) {
@@ -97,10 +101,10 @@ public final class Terra2AeternumBridge extends JavaPlugin implements Listener {
             .filter(value -> value.startsWith(args[0].toLowerCase(java.util.Locale.ROOT))).toList();
     }
     @EventHandler public void pluginEnabled(PluginEnableEvent event) {
-        if(event.getPlugin().getName().equals("Terra2") || event.getPlugin().getName().equals("AeternumSeasons")) connect();
+        if(event.getPlugin().getName().equals("Terra2") || event.getPlugin().getName().equals(targetName())) connect();
     }
     @EventHandler public void pluginDisabled(PluginDisableEvent event) {
-        if(event.getPlugin().getName().equals("Terra2") || event.getPlugin().getName().equals("AeternumSeasons")) disconnect();
+        if(event.getPlugin().getName().equals("Terra2") || event.getPlugin().getName().equals(targetName())) disconnect();
     }
     @EventHandler public void serviceRegistered(ServiceRegisterEvent event) {
         if(event.getProvider().getService().getName().equals(SERVICE)) connect();

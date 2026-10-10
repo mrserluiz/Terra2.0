@@ -1,0 +1,6 @@
+# Optional receiver adapter. Does not patch plugins or their configuration.
+# Missing capabilities leave the bridge inactive; metadata stays available in Terra2.
+receiver:
+  plugin: AeternumSeasons
+  # Public no-argument accessor; root-level receivers are also supported.
+  accessor: getSeasons

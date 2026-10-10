@@ -28,19 +28,23 @@ Não é necessário recriar um mundo que já usa Terra2. A configuração não c
 
 ## Addon opcional para AeternumSeasons
 
-1. Instale **Terra2-bukkit-7.0.24-BETA.jar** (substitui o gerador Terra2 anterior).
-2. Use **AeternumSeasons-4.5.2-CLIMATE-API-BETA.jar** ou uma versão que ofereça a API genérica `registerWorldClimateProvider`. Substitua apenas o JAR antigo do Aeternum, preservando seus arquivos.
-3. Instale **Terra2AeternumBridge-1.0.0-BETA.jar** para conectar os dois. Reinicie após trocar/adicionar JARs.
+Instale o motor Terra2 e, opcionalmente, `Terra2AeternumBridge-1.0.1-BETA.jar`. **Mantenha o AeternumSeasons oficial, publicado por seu autor. Nenhuma substituição por um fork é exigida ou recomendada.** Troca de JAR requer reinício.
 
-O addon é outro plugin, não outro gerador. Nenhum dos plugins principais depende dele. Não instale simultaneamente duas versões do Terra2 ou do Aeternum.
+A ponte detecta capacidades, sem fixar uma versão do consumidor. Procura os métodos públicos `registerWorldClimateProvider(Plugin, Function)` e `unregisterWorldClimateProvider(Plugin)`, ambos retornando `void`, no plugin ou no objeto retornado pelo accessor configurado. Esse é um contrato opcional da ponte, **não uma API oficial presumida do Aeternum**. Nome/versão do plugin não comprovam compatibilidade.
 
-Controle da integração (OP por padrão): `/terra2climatebridge status`, `/terra2climatebridge disconnect` e `/terra2climatebridge connect`. Os comandos pausam/restabelecem o fluxo sem descarregar plugins. Reload de perfis usa `/terra2 reload`; troca de JAR requer reinício. Não use desativação/reativação de plugins como substituto de reload no Paper moderno.
+Em `plugins/Terra2AeternumBridge/config.yml`:
 
-A ponte lê o serviço publicado pelo Terra2 e fornece ao Aeternum somente o perfil do mundo solicitado. Não copia YAML, não escreve biomas, não altera JARs e não exporta configurações do Aeternum para o Terra2. Sem um dos plugins, a ponte fica inativa. Sem a ponte, os dois funcionam separadamente. Aeternum antigo sem API de consumo não é modificado por reflexão: a ponte fica inativa e informa a incompatibilidade uma vez.
+```yaml
+receiver:
+  plugin: AeternumSeasons
+  accessor: getSeasons
+```
 
-O Aeternum usa o perfil como referência de temperatura, estação e classificação de neve. Preserva os IDs reais dos biomas, bloqueando o spoof/restauro sazonal naquele mundo. Isso não transforma visualmente chuva em neve em um bioma quente nem converte regras de agricultura/fauna.
+Outros consumidores com o mesmo contrato podem ser selecionados. A detecção acompanha ativação/desativação do consumidor e registro/remoção do serviço Terra2. Não usa campos privados, não injeta classes, não executa comandos globais de estação e não altera configurações, backups ou biomas.
 
-Se você instalou a beta 4.5.1 anterior, remova ou desative apenas o perfil local criado em `AeternumSeasons/climate.yml` para o mesmo mundo. Os perfis agora pertencem ao Terra2. Perfis locais escritos pelo usuário permanecem suportados pelo Aeternum; os metadados externos têm prioridade enquanto a ponte estiver disponível.
+Controle (OP por padrão): `/terra2climatebridge status`, `disconnect` e `connect`. O status inclui o motivo da inatividade e a versão detectada. Sem receptor compatível, informa `UNSUPPORTED` uma vez por mudança de estado e deixa o Aeternum funcionar normalmente. **Nesse estado, a estação e a referência de neve do Terra2 não são aplicadas ao Aeternum.** A ponte não corrige o tratamento de biomas customizados dentro do plugin oficial.
+
+Não precisamos solicitar mudanças ao autor: o serviço público Terra2 continua disponível para consumidores independentes, e adaptadores adicionais podem usar interfaces existentes quando verificadas. A compatibilidade só será anunciada para interfaces efetivamente validadas.
 
 ## API pública para outros plugins
 
@@ -60,10 +64,8 @@ Para adaptadores sem ligação de classes, `describe(World)` fornece um mapa imu
 
 Os metadados não incluem loot, drops, texturas ou regras de itens. Esses sistemas continuam separados.
 
-## Testes
+## Testes e limites
 
-CI verifica a geração Terra2 independente, depois Terra2 + ponte + Aeternum em um servidor Paper 26.2 isolado usando HYDRAXIA. A prova inclui bioma customizado preservado, reload válido/inválido, mundo principal protegido, desconexão/reconexão da ponte, salvamento/reinício e inicialização sem addon. Logs e JARs são publicados em artifacts separados para distinguir o motor da integração opcional.
+Os testes de descoberta verificam receptores públicos no plugin/objeto interno e rejeitam consumidores sem contrato. A CI inspeciona o JAR oficial 4.7, fixado ao commit `c0cfd8b7c0093c9b7ff15d8112a1c26b7be584ed`, para registrar assinaturas públicas e capacidades. Essa inspeção não equivale a um teste de clima no servidor oficial.
 
-Validação concluída: [teste da integração opcional](https://github.com/mrserluiz/Terra2.0/actions/runs/38083807981). [JAR do motor](https://github.com/mrserluiz/Terra2.0/actions/runs/38083190306/artifacts/11680524585) e [JARs da ponte + consumidor](https://github.com/mrserluiz/Terra2.0/actions/runs/38083807981/artifacts/11680779738). O ZIP do motor contém um único gerador; o ZIP opcional contém dois plugins diferentes, com as funções descritas acima.
-
-As notas completas e os limites do teste estão em [CLIMATE_INTEGRATION_7.0.24.md](testing/CLIMATE_INTEGRATION_7.0.24.md).
+O teste Paper/HYDRAXIA anterior usa um **fork experimental como fixture de receptor**, e valida o protocolo, reload, biomas preservados, salvamento/reinício e remoção da ponte. Seus resultados não comprovam compatibilidade do Aeternum oficial. O fork não integra o download normal da ponte. As notas históricas estão em [CLIMATE_INTEGRATION_7.0.24.md](testing/CLIMATE_INTEGRATION_7.0.24.md).

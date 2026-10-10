@@ -16,7 +16,7 @@ assert hashlib.sha256(binary).hexdigest()==download['checksums']['sha256']
 (SERVER/'paper.jar').write_bytes(binary)
 terra=next((ROOT/'platforms/bukkit/build/libs').glob('Terra2-bukkit-*-BETA.jar'))
 aet=next((REPO/'integration-aeternum/aeternum-build/target').glob('AeternumSeasons-*-BETA.jar'))
-bridge=REPO/'integrations/aeternum/target/Terra2AeternumBridge-1.0.0-BETA.jar'
+bridge=REPO/'integrations/aeternum/target/Terra2AeternumBridge-1.0.1-BETA.jar'
 for jar in (terra,aet,bridge):shutil.copy(jar,PLUGINS/jar.name)
 td=PLUGINS/'Terra2';(td/'packs').mkdir(parents=True,exist_ok=True)
 shutil.copy(ROOT/'tools/fixtures/HYDRAXIA.zip',td/'packs/HYDRAXIA.zip')

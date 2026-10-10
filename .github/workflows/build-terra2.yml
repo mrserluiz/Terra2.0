@@ -185,7 +185,7 @@ jobs:
         with:
           name: Terra2-Aeternum-optional-integration-26.2
           path: |
-            integrations/aeternum/target/Terra2AeternumBridge-1.0.0-BETA.jar
+            integrations/aeternum/target/Terra2AeternumBridge-1.0.1-BETA.jar
             integration-aeternum/aeternum-build/target/AeternumSeasons-4.5.2-CLIMATE-API-BETA.jar
           if-no-files-found: error
       - name: Upload climate integration diagnostics
