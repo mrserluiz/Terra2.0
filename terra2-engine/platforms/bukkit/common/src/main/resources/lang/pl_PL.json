@@ -13,5 +13,7 @@
   "unlock-loaded": "Świat {0} jest załadowany. Nie można zastąpić jego generatora podczas pracy; najpierw bezpiecznie wyładuj świat.",
   "unlock-name": "Nieprawidłowa nazwa świata lub konflikt wielkości liter: {0}. Użyj liter, cyfr, podkreślenia lub łącznika.",
   "restart-packs": "Wykryto Community Packs; uruchom serwer ponownie, aby je zarejestrować: {0}",
-  "reloaded": "Terra2: uprawnienia światów przeładowane. Załadowane światy zachowują generatory."
+  "reloaded": "Terra2: uprawnienia światów przeładowane. Załadowane światy zachowują generatory.",
+  "unlock-start": "Pakiety dla świata {0} są sprawdzane w tle. Żaden świat nie jest tworzony ani zmieniany.",
+  "unlock-busy": "Trwa autoryzacja innego świata. Poczekaj."
 }

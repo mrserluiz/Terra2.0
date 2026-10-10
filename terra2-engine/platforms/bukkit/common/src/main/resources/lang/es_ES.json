@@ -13,5 +13,7 @@
   "unlock-loaded": "El mundo {0} está cargado. No se puede cambiar su generador en ejecución; descárgalo de forma segura primero.",
   "unlock-name": "Nombre de mundo inválido o conflicto de mayúsculas: {0}. Usa letras, números, guion bajo o guion.",
   "restart-packs": "Community Packs detectados; reinicia el servidor para registrarlos: {0}",
-  "reloaded": "Terra2: autorizaciones recargadas. Los mundos cargados conservan sus generadores."
+  "reloaded": "Terra2: autorizaciones recargadas. Los mundos cargados conservan sus generadores.",
+  "unlock-start": "Validando los packs del mundo {0} en segundo plano. No se crea ni modifica ningún mundo.",
+  "unlock-busy": "Hay otra autorización de mundo en curso. Espera."
 }

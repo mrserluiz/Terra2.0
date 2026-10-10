@@ -10,6 +10,8 @@ Questo capitolo riguarda 7.0.22-BETA; i capitoli precedenti mantengono la build 
 /terra2 unlock terra2_mix OVERWORLD;Debris
 ```
 
+Validazione dei pack per il mondo terra2_teste in background. Nessun mondo viene creato o modificato.
+
 Community Pack registrati: OVERWORLD, TARTARUS, HYDRAXIA
 
 Mondo terra2_teste autorizzato con OVERWORLD. Configurazione salvata; generazione attivata per i mondi autorizzati.

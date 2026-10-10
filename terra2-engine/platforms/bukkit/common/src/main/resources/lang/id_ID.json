@@ -13,5 +13,7 @@
   "unlock-loaded": "Dunia {0} sedang dimuat. Generatornya tidak dapat diganti saat aktif; keluarkan dunia dari memori dengan aman terlebih dahulu.",
   "unlock-name": "Nama dunia tidak valid atau konflik huruf besar/kecil: {0}. Gunakan huruf, angka, garis bawah atau tanda hubung.",
   "restart-packs": "Community Pack ditemukan; mulai ulang server untuk mendaftarkan: {0}",
-  "reloaded": "Terra2: izin dunia dimuat ulang. Dunia yang aktif mempertahankan generatornya."
+  "reloaded": "Terra2: izin dunia dimuat ulang. Dunia yang aktif mempertahankan generatornya.",
+  "unlock-start": "Memvalidasi paket untuk dunia {0} di latar belakang. Tidak ada dunia yang dibuat atau diubah.",
+  "unlock-busy": "Izin dunia lain sedang diproses. Harap tunggu."
 }

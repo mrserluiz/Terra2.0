@@ -13,5 +13,7 @@
   "unlock-loaded": "Welt {0} ist geladen. Ihr Generator kann im laufenden Betrieb nicht ersetzt werden; die Welt zuerst sicher entladen.",
   "unlock-name": "Ungültiger Weltname oder Konflikt bei Groß-/Kleinschreibung: {0}. Buchstaben, Ziffern, Unterstriche oder Bindestriche verwenden.",
   "restart-packs": "Community Packs gefunden; Server zur Registrierung neu starten: {0}",
-  "reloaded": "Terra2: Freigaben neu geladen. Geladene Welten behalten ihre Generatoren."
+  "reloaded": "Terra2: Freigaben neu geladen. Geladene Welten behalten ihre Generatoren.",
+  "unlock-start": "Packs für Welt {0} werden im Hintergrund geprüft. Keine Welt wird erstellt oder verändert.",
+  "unlock-busy": "Eine andere Weltfreigabe wird gerade bearbeitet. Bitte warten."
 }

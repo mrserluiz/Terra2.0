@@ -57,6 +57,7 @@ public class TerraBukkitPlugin extends JavaPlugin {
     private PlatformImpl platform;
     private org.terra2.adapter.vanilla.paper.DatapackRuntime datapacks;
     private org.terra2.pack.TerraPackStore terraPacks;
+    private final java.util.concurrent.atomic.AtomicBoolean editingWorld = new java.util.concurrent.atomic.AtomicBoolean();
     private final java.util.concurrent.atomic.AtomicBoolean converting = new java.util.concurrent.atomic.AtomicBoolean();
     private final Map<String, java.util.List<org.bukkit.generator.BlockPopulator>> extraPopulators = new HashMap<>();
     private final Map<String, String> compositionVersions = new HashMap<>();
@@ -393,18 +394,46 @@ public class TerraBukkitPlugin extends JavaPlugin {
         return platform.getConfigRegistry().entries().stream().map(ConfigPack::getID).distinct().sorted().toList();
     }
 
-    public synchronized void unlockGenerationWorld(String world, String selection) throws Exception {
-        File file = new File(getDataFolder(), "terra2-settings.yml");
-        var current = com.dfsek.terra.bukkit.util.GenerationSettings.load(file);
+    private record WorldUnlock(YamlConfiguration expected, YamlConfiguration next, String world) {}
+    private synchronized WorldUnlock prepareWorldUnlock(String world, String selection) throws Exception {
+        var current = com.dfsek.terra.bukkit.util.GenerationSettings.load(new File(getDataFolder(), "terra2-settings.yml"));
+        if(!current.saveToString().equals(generationSettings.saveToString()))
+            throw new IllegalStateException("Settings file changed; run /terra2 reload before editing worlds");
         var loaded = Bukkit.getWorlds().stream().filter(value -> value.getName().equalsIgnoreCase(world)).findFirst().orElse(null);
         if(loaded != null && !loaded.getName().equals(world)) throw new IllegalArgumentException("world-name");
         var next = com.dfsek.terra.bukkit.util.WorldSettingsEditor.select(current, primaryWorldName, world,
             loaded == null ? null : loaded.getKey().toString(), loaded != null, generatorPacks.get(world), selection);
-        // Entire configuration is preflighted before either disk or live authorization changes.
-        var applyLoot = validateGenerationSettings(next);
-        com.dfsek.terra.bukkit.util.WorldSettingsEditor.persist(file.toPath(), next);
-        generationSettings = next;
+        return new WorldUnlock(generationSettings, next, world);
+    }
+    private synchronized void applyWorldUnlock(WorldUnlock edit, Composition selected) throws Exception {
+        File file = new File(getDataFolder(), "terra2-settings.yml");
+        var current = com.dfsek.terra.bukkit.util.GenerationSettings.load(file);
+        if(edit.expected() != generationSettings || !current.saveToString().equals(generationSettings.saveToString()))
+            throw new IllegalStateException("Settings changed during validation; retry after /terra2 reload");
+        // Recheck policy on the server thread in case the world loaded during background validation.
+        var loaded = Bukkit.getWorlds().stream().filter(value -> value.getName().equalsIgnoreCase(edit.world())).findFirst().orElse(null);
+        com.dfsek.terra.bukkit.util.WorldSettingsEditor.select(current, primaryWorldName, edit.world(),
+            loaded == null ? null : loaded.getKey().toString(), loaded != null, generatorPacks.get(edit.world()), selected.selection());
+        validateWorldComposition(edit.world(), selected);
+        datapacks.validateReload(edit.next());
+        var applyLoot = lootManager == null ? null : lootManager.prepareReload(edit.next());
+        com.dfsek.terra.bukkit.util.WorldSettingsEditor.persist(file.toPath(), edit.next());
+        generationSettings = edit.next();
         if(applyLoot != null) applyLoot.run();
+    }
+    public void unlockGenerationWorld(String world, String selection) throws Exception {
+        var edit = prepareWorldUnlock(world, selection);
+        applyWorldUnlock(edit, composition(edit.next(), world));
+    }
+    private void worldUnlockFailure(org.bukkit.command.CommandSender sender, String world, Exception error) {
+        String key = switch(java.util.Objects.toString(error.getMessage(), "")) {
+            case "protected" -> "unlock-protected";
+            case "loaded" -> "unlock-loaded";
+            case "world-name" -> "unlock-name";
+            default -> "failed";
+        };
+        sender.sendMessage(message(key, key.equals("failed") ? error.getMessage() : world));
+        logger.warn("World authorization command refused for {}", world, error);
     }
 
     @Override
@@ -489,20 +518,30 @@ public class TerraBukkitPlugin extends JavaPlugin {
         }
         if(args[0].equalsIgnoreCase("unlock")) {
             if(args.length != 3) { sender.sendMessage(message("unlock-usage")); return true; }
-            try {
-                unlockGenerationWorld(args[1], args[2]);
-                sender.sendMessage(message("unlock-success", args[1], args[2]));
-                sender.sendMessage(message("unlock-next", args[1]));
-            } catch(Exception error) {
-                String key = switch(java.util.Objects.toString(error.getMessage(), "")) {
-                    case "protected" -> "unlock-protected";
-                    case "loaded" -> "unlock-loaded";
-                    case "world-name" -> "unlock-name";
-                    default -> "failed";
-                };
-                sender.sendMessage(message(key, key.equals("failed") ? error.getMessage() : args[1]));
-                logger.warn("World authorization command refused for {}: {}", args[1], error.toString());
-            }
+            if(!editingWorld.compareAndSet(false, true)) { sender.sendMessage(message("unlock-busy")); return true; }
+            final WorldUnlock edit;
+            try { edit = prepareWorldUnlock(args[1], args[2]); }
+            catch(Exception error) { editingWorld.set(false); worldUnlockFailure(sender, args[1], error); return true; }
+            sender.sendMessage(message("unlock-start", args[1]));
+            asyncScheduler.runNow(this, task -> {
+                final Composition selected;
+                try { selected = composition(edit.next(), edit.world()); }
+                catch(Exception error) {
+                    globalRegionScheduler.execute(this, () -> {
+                        try { worldUnlockFailure(sender, edit.world(), error); }
+                        finally { editingWorld.set(false); }
+                    });
+                    return;
+                }
+                globalRegionScheduler.execute(this, () -> {
+                    try {
+                        applyWorldUnlock(edit, selected);
+                        sender.sendMessage(message("unlock-success", edit.world(), selected.selection()));
+                        sender.sendMessage(message("unlock-next", edit.world()));
+                    } catch(Exception error) { worldUnlockFailure(sender, edit.world(), error); }
+                    finally { editingWorld.set(false); }
+                });
+            });
             return true;
         }
         if(args.length >= 1 && args[0].equalsIgnoreCase("convert")) {
@@ -660,13 +699,16 @@ public class TerraBukkitPlugin extends JavaPlugin {
                 continue;
             }
             var selected = composition(next, world);
-            if(generatorMap.containsKey(world) && (!selected.selection().equals(generatorPacks.get(world)) ||
-                (compositionVersions.containsKey(world) && !selected.version().equals(compositionVersions.get(world)))))
-                throw new IllegalArgumentException("Cannot replace active TerraPack composition: " + world);
-            if(datapacks.hasWorld(world)) datapacks.validatePackReload(world, selected.selection(), selected.packs());
+            validateWorldComposition(world, selected);
         }
         datapacks.validateReload(next);
         return lootManager == null ? null : lootManager.prepareReload(next);
+    }
+    private void validateWorldComposition(String world, Composition selected) {
+        if(generatorMap.containsKey(world) && (!selected.selection().equals(generatorPacks.get(world)) ||
+            (compositionVersions.containsKey(world) && !selected.version().equals(compositionVersions.get(world)))))
+            throw new IllegalArgumentException("Cannot replace active TerraPack composition: " + world);
+        if(datapacks.hasWorld(world)) datapacks.validatePackReload(world, selected.selection(), selected.packs());
     }
     public void assertLegacyGenerationAuthorized(String worldName, String baseId) {
         var ids = com.dfsek.terra.bukkit.util.GenerationSettings.packIds(generationSettings, worldName);

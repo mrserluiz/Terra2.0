@@ -13,5 +13,7 @@
   "unlock-loaded": "Le monde {0} est chargé. Son générateur ne peut pas être remplacé en cours de fonctionnement ; déchargez-le d’abord en toute sécurité.",
   "unlock-name": "Nom de monde invalide ou conflit de casse : {0}. Utilisez des lettres, chiffres, tirets bas ou tirets.",
   "restart-packs": "Community Packs détectés ; redémarrez le serveur pour les enregistrer : {0}",
-  "reloaded": "Terra2 : autorisations rechargées. Les mondes chargés conservent leurs générateurs."
+  "reloaded": "Terra2 : autorisations rechargées. Les mondes chargés conservent leurs générateurs.",
+  "unlock-start": "Validation des packs du monde {0} en arrière-plan. Aucun monde n’est créé ou modifié.",
+  "unlock-busy": "Une autre autorisation de monde est en cours. Veuillez patienter."
 }

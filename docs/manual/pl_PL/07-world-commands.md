@@ -10,6 +10,8 @@ Ten rozdział dotyczy 7.0.22-BETA; wcześniejsze zachowują wskazaną wersję od
 /terra2 unlock terra2_mix OVERWORLD;Debris
 ```
 
+Pakiety dla świata terra2_teste są sprawdzane w tle. Żaden świat nie jest tworzony ani zmieniany.
+
 Zarejestrowane Community Packs: OVERWORLD, TARTARUS, HYDRAXIA
 
 Świat terra2_teste dopuszczony do użycia OVERWORLD. Ustawienia zapisane; generowanie włączone dla dozwolonych światów.

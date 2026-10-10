@@ -13,5 +13,7 @@
   "unlock-loaded": "World {0} is loaded. Its generator cannot be replaced live; unload it safely first.",
   "unlock-name": "Invalid world name or case conflict: {0}. Use letters, digits, underscore or hyphen.",
   "restart-packs": "Community Packs discovered; restart the server to register: {0}",
-  "reloaded": "Terra2: authorizations reloaded. Loaded worlds retain their generators."
+  "reloaded": "Terra2: authorizations reloaded. Loaded worlds retain their generators.",
+  "unlock-start": "Validating packs for world {0} in the background. No world is created or changed.",
+  "unlock-busy": "Another world authorization is in progress. Please wait."
 }

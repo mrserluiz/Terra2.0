@@ -13,5 +13,7 @@
   "unlock-loaded": "{0} dünyası yüklü. Çalışırken üreticisi değiştirilemez; önce dünyayı güvenli şekilde bellekten çıkarın.",
   "unlock-name": "Geçersiz dünya adı veya büyük/küçük harf çakışması: {0}. Harf, rakam, alt çizgi veya kısa çizgi kullanın.",
   "restart-packs": "Community Pack paketleri bulundu; kaydetmek için sunucuyu yeniden başlatın: {0}",
-  "reloaded": "Terra2: dünya yetkileri yeniden yüklendi. Yüklü dünyalar üreticilerini korur."
+  "reloaded": "Terra2: dünya yetkileri yeniden yüklendi. Yüklü dünyalar üreticilerini korur.",
+  "unlock-start": "{0} dünyasının paketleri arka planda doğrulanıyor. Hiçbir dünya oluşturulmuyor veya değiştirilmiyor.",
+  "unlock-busy": "Başka bir dünya yetkilendirmesi sürüyor. Lütfen bekleyin."
 }

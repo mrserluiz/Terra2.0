@@ -13,5 +13,7 @@
   "unlock-loaded": "Il mondo {0} è caricato. Non è possibile sostituire il generatore mentre è attivo; scarica prima il mondo in sicurezza.",
   "unlock-name": "Nome del mondo non valido o conflitto di maiuscole/minuscole: {0}. Usa lettere, numeri, trattini bassi o trattini.",
   "restart-packs": "Community Pack rilevati; riavvia il server per registrarli: {0}",
-  "reloaded": "Terra2: autorizzazioni ricaricate. I mondi caricati mantengono i propri generatori."
+  "reloaded": "Terra2: autorizzazioni ricaricate. I mondi caricati mantengono i propri generatori.",
+  "unlock-start": "Validazione dei pack per il mondo {0} in background. Nessun mondo viene creato o modificato.",
+  "unlock-busy": "È in corso un’altra autorizzazione di mondo. Attendi."
 }

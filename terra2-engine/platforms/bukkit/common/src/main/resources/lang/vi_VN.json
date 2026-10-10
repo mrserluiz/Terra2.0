@@ -13,5 +13,7 @@
   "unlock-loaded": "Thế giới {0} đang được tải. Không thể thay bộ tạo địa hình khi đang hoạt động; hãy dỡ tải thế giới an toàn trước.",
   "unlock-name": "Tên thế giới không hợp lệ hoặc xung đột chữ hoa/thường: {0}. Dùng chữ cái, chữ số, gạch dưới hoặc gạch nối.",
   "restart-packs": "Đã phát hiện Community Pack; khởi động lại máy chủ để đăng ký: {0}",
-  "reloaded": "Terra2: đã tải lại quyền thế giới. Các thế giới đang tải giữ nguyên bộ tạo địa hình."
+  "reloaded": "Terra2: đã tải lại quyền thế giới. Các thế giới đang tải giữ nguyên bộ tạo địa hình.",
+  "unlock-start": "Đang kiểm tra các gói của thế giới {0} trong nền. Không tạo hoặc thay đổi thế giới nào.",
+  "unlock-busy": "Đang xử lý quyền cho một thế giới khác. Vui lòng chờ."
 }

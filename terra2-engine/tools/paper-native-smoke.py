@@ -130,6 +130,9 @@ def run_server(phase):
                     wait(process, report.exists, 'conversion ' + id, 420)
                     data = json.loads(report.read_text())
                     if data['status'] != 'READY_NATIVE': raise RuntimeError('Conversion blocked: ' + report.read_text()[:12000])
+            if phase == 'create':
+                command('terra2 unlock terra2_command_smoke OVERWORLD')
+                wait(process, lambda: 'Mundo terra2_command_smoke autorizado com OVERWORLD' in log(), 'world authorization command', 120)
             command('nativeprobe ' + ('create' if phase == 'create' else 'reload'))
             marker = 'TERRA2_NATIVE_SMOKE_CREATED' if phase == 'create' else 'TERRA2_NATIVE_SMOKE_RESTART_OK'
             wait(process, lambda: marker in log() or 'TERRA2_NATIVE_SMOKE_FAILED' in log(), 'native generation ' + phase, 420)

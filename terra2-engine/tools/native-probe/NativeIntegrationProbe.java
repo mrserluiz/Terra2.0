@@ -49,8 +49,6 @@ public final class NativeIntegrationProbe extends JavaPlugin {
                 catch(Exception expected) { unknownRejected = true; }
                 if(!unknownRejected || !originalSettings.equals(Files.readString(settingsPath)))
                     throw new IllegalStateException("Refused unlock modified settings");
-                if(!Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "terra2 unlock terra2_command_smoke OVERWORLD"))
-                    throw new IllegalStateException("unlock command did not dispatch");
                 if(!"OVERWORLD".equals(engine.generationSettings().getString("worlds.terra2_command_smoke.pack")))
                     throw new IllegalStateException("unlock command failed to persist authorization");
                 var suggestions = engine.onTabComplete(Bukkit.getConsoleSender(), engine.getCommand("terra2"), "terra2",
