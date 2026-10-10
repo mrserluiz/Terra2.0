@@ -64,9 +64,26 @@ class PackSourceAdapterTest {
         Files.writeString(added.resolve("pack.yml"), "id: NEW_COMMUNITY\nversion: 1.0.0\n");
         registry.discoverForReload(platform());
         assertEquals(1, calls.get()); assertSame(pack, registry.get(key).orElseThrow());
+        assertTrue(registry.discoveredSources().stream().anyMatch(source -> source.matches("fixture") && source.status().equals("REGISTERED")));
         var failure = assertThrows(IllegalArgumentException.class, () -> registry.assertSourceAvailable("NEW_COMMUNITY"));
         assertTrue(failure.getMessage().contains("server restart required"));
         assertTrue(registry.getByID("NEW_COMMUNITY").isEmpty());
+    }
+
+    @Test void adapterFileFormatsRemainDiscoverable() throws Exception {
+        Files.createDirectories(directory.resolve("packs"));
+        Files.writeString(directory.resolve("packs/fixture"), "custom source format");
+        RegistryKey key = RegistryKey.parse("terra2:fixture");
+        ConfigPack pack = (ConfigPack) Proxy.newProxyInstance(ConfigPack.class.getClassLoader(), new Class<?>[]{ConfigPack.class},
+            (proxy, method, args) -> {
+                if(method.getName().equals("getRegistryKey")) return key;
+                throw new AssertionError("Unexpected pack call: " + method.getName());
+            });
+        AtomicInteger calls = new AtomicInteger();
+        ConfigRegistry registry = new ConfigRegistry(); registry.registerSourceAdapter(adapter("terra2:fixture", calls, pack));
+        registry.loadAll(platform()); registry.discoverForReload(platform());
+        assertEquals(1, calls.get()); assertSame(pack, registry.get(key).orElseThrow());
+        assertEquals("REGISTERED", registry.discoveredSources().getFirst().status());
     }
 
     @Test void ambiguousAdaptersFailBeforeEitherLoaderRuns() throws Exception {

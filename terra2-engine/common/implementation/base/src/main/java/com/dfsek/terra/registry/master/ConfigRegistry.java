@@ -44,18 +44,32 @@ public class ConfigRegistry extends OpenRegistryImpl<ConfigPack> {
     private volatile List<CommunityPackDiscovery.Source> discovered = List.of();
     public List<CommunityPackDiscovery.Source> discoveredSources() { return discovered; }
     public synchronized List<CommunityPackDiscovery.Source> discoverForReload(Platform platform) throws IOException {
-        var scanned = CommunityPackDiscovery.scan(platform.getDataFolder().toPath().resolve("packs"));
+        var scanned = scanSources(platform.getDataFolder().toPath().resolve("packs"));
         List<CommunityPackDiscovery.Source> refreshed = new ArrayList<>();
         for(var source : scanned) {
             var previous = discovered.stream().filter(old -> old.path().equals(source.path()) &&
-                java.util.Objects.equals(old.manifestId(), source.manifestId()) && old.version().equals(source.version())).findFirst();
-            var next = source.failure() == null && previous.isPresent() && !previous.get().status().equals("RESTART_REQUIRED")
-                ? previous.get() : source.failure() == null ? source.state("RESTART_REQUIRED", null) : source;
+                (java.util.Objects.equals(old.manifestId(), source.manifestId()) && old.version().equals(source.version())
+                    || source.key() == null && sourceAdapters.stream().anyMatch(adapter -> adapter.supports(source.path())))).findFirst();
+            boolean adapted = sourceAdapters.stream().anyMatch(adapter -> adapter.supports(source.path()));
+            var next = (source.failure() == null || adapted) && previous.isPresent() && !previous.get().status().equals("RESTART_REQUIRED")
+                ? previous.get() : (source.failure() == null || adapted) ? source.state("RESTART_REQUIRED", null) : source;
             refreshed.add(next);
             LOGGER.info("{}", next.diagnostic());
         }
         discovered = List.copyOf(refreshed);
         return discovered;
+    }
+    private List<CommunityPackDiscovery.Source> scanSources(Path directory) throws IOException {
+        var sources = new ArrayList<>(CommunityPackDiscovery.scan(directory));
+        try(var paths = Files.list(directory)) {
+            for(var path : paths.sorted().toList()) {
+                if(sources.stream().anyMatch(source -> source.path().equals(path))) continue;
+                if(sourceAdapters.stream().anyMatch(adapter -> adapter.supports(path)))
+                    sources.add(new CommunityPackDiscovery.Source(path, null, null, "unknown", "DISCOVERED", null));
+            }
+        }
+        sources.sort(java.util.Comparator.comparing(source -> source.path().toString()));
+        return List.copyOf(sources);
     }
     public String discoveryDiagnostics() {
         return discovered.stream().map(CommunityPackDiscovery.Source::diagnostic).collect(java.util.stream.Collectors.joining("\n"));
@@ -95,7 +109,7 @@ public class ConfigRegistry extends OpenRegistryImpl<ConfigPack> {
 
     public synchronized void loadAll(Platform platform) throws IOException, PackLoadFailuresException {
         Path packsDirectory = platform.getDataFolder().toPath().resolve("packs");
-        var scanned = CommunityPackDiscovery.scan(packsDirectory);
+        var scanned = scanSources(packsDirectory);
         List<Exception> failedLoads = new ArrayList<>();
         List<CommunityPackDiscovery.Source> results = new ArrayList<>();
         List<PackSourceAdapter> adapters = List.copyOf(sourceAdapters);
