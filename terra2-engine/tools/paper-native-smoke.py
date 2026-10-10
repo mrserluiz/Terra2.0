@@ -156,6 +156,7 @@ def main():
         PLUGIN / 'packs/Overworld.zip', 'sha256', '64e715bc1e591f59d5835650a76fd638c1615772187d91e74eb0255e922afd27')
     download('https://github.com/PolyhedralDev/Tartarus/releases/download/latest/Tartarus.zip',
         PLUGIN / 'packs/filename-does-not-select-id.zip', 'sha256', 'e964ac8a9017aeab4dca7ae843e274421e82f3be7b6aa0351e6a7084eadf3412')
+    shutil.copy(ROOT / "tools/fixtures/HYDRAXIA.zip", PLUGIN / "packs/HYDRAXIA.zip")
     fixture(); dnt()
     cp = os.pathsep.join([str(jars[0])] + [str(p) for p in (pathlib.Path.home() / '.gradle/caches').rglob('*.jar')])
     classes = SERVER / 'probe-classes'; classes.mkdir(exist_ok=True)
@@ -170,6 +171,8 @@ def main():
     (PLUGIN / 'terra2-settings.yml').write_text('generation:\n  enabled: true\n  protected-worlds: [world, world_nether, world_the_end]\nworlds:\n  terra2_native_smoke:\n    packs: [OVERWORLD, SmokeNative, DNTNative]\n    loot:\n      enabled: true\n      tables:\n        "smoke:chest":\n          name: "Smoke relic"\n          lore: ["Origin: {world}", "{dimension}"]\n          item-model: smoke:relic\n')
     with (PLUGIN / 'terra2-settings.yml').open('a') as settings:
         settings.write('        "smoke:mob":\n          name: "Smoke drop"\n          item-model: smoke:relic\n')
+    with (PLUGIN / 'terra2-settings.yml').open('a') as settings:
+        settings.write('  terra2_hydraxia_smoke:\n    pack: HYDRAXIA\n')
     run_server('create'); run_server('restart')
     (SERVER / 'result.json').write_text(json.dumps({'status': 'PASSED', 'paper': '26.2', 'jigsaw': True, 'processors': True, 'nativeLoot': True, 'saveRestart': True}, indent=2))
 

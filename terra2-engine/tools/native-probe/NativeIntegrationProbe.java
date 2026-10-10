@@ -20,7 +20,7 @@ public final class NativeIntegrationProbe extends JavaPlugin {
             var engine = (TerraBukkitPlugin) getServer().getPluginManager().getPlugin("Terra2");
             if(engine == null || !engine.isEnabled()) throw new IllegalStateException("Engine did not enable");
             // Community IDs must come from manifests, including an archive renamed in CI.
-            for(String id : List.of("OVERWORLD", "TARTARUS")) {
+            for(String id : List.of("OVERWORLD", "TARTARUS", "HYDRAXIA")) {
                 engine.platform().getRawConfigRegistry().assertSourceAvailable(id);
                 if(engine.platform().getConfigRegistry().getByID(id).isEmpty()) throw new IllegalStateException("Community regression: " + id);
             }
@@ -43,6 +43,12 @@ public final class NativeIntegrationProbe extends JavaPlugin {
                 .generator("Terra2:PACKS").createWorld();
             if(world == null) throw new IllegalStateException("World creation failed");
             world.getChunkAt(0, 0); world.getChunkAt(1, 0); world.getChunkAt(0, 1);
+            var hydraxia = WorldCreator.name("terra2_hydraxia_smoke").seed(42).environment(World.Environment.NORMAL)
+                .generator("Terra2:HYDRAXIA").createWorld();
+            if(hydraxia == null) throw new IllegalStateException("HYDRAXIA world creation failed");
+            hydraxia.getChunkAt(args[0].equals("create") ? 0 : 2, 0);
+            hydraxia.save();
+            getLogger().info("TERRA2_HYDRAXIA_GENERATION_OK " + args[0]);
             var checkpoint = getDataFolder().toPath().resolve("checkpoint.properties");
             Files.createDirectories(checkpoint.getParent());
             Properties data = new Properties();
