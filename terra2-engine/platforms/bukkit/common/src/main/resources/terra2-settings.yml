@@ -3,6 +3,16 @@
 # Command help and world-authorization messages; existing technical diagnostics retain their original causes.
 # en_US, es_ES, id_ID, it_IT, fr_FR, de_DE, pt_BR, ru_RU, pl_PL, vi_VN, tr_TR, zh_CN, ja_JP
 language: pt_BR
+# Read-only metadata API. No climate plugin is required; no biome is replaced.
+climate:
+  enabled: false
+# Optional per-world profile (only on an authorized Terra2-generated world):
+# worlds:
+#   aeternum_frost:
+#     pack: HYDRAXIA
+#     climate:
+#       season: WINTER
+#       reference-biome: minecraft:snowy_plains
 generation:
   enabled: false
   protected-worlds: [world, world_nether, world_the_end]

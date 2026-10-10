@@ -28,6 +28,10 @@ public final class GenerationSettings {
         var settings = new YamlConfiguration();
         settings.options().parseComments(true);
         settings.load(file);
+        if(settings.contains("climate") && !settings.isConfigurationSection("climate"))
+            throw new InvalidConfigurationException("climate deve ser uma seção YAML");
+        if(settings.contains("climate.enabled") && !settings.isBoolean("climate.enabled"))
+            throw new InvalidConfigurationException("climate.enabled deve ser true ou false");
         if(settings.contains("language") && (!(settings.get("language") instanceof String locale)
                 || CommandMessages.LANGUAGES.stream().noneMatch(code -> code.equalsIgnoreCase(locale.replace('-', '_')))))
             throw new InvalidConfigurationException("Unsupported language; use: " + CommandMessages.LANGUAGES);
@@ -43,6 +47,17 @@ public final class GenerationSettings {
                 throw new InvalidConfigurationException("Nome de mundo inválido: " + world);
             var entry = worlds.getConfigurationSection(world);
             if(entry == null) throw new InvalidConfigurationException("Mundo deve ser uma seção YAML: " + world);
+            if(entry.contains("climate")) {
+                var climate = entry.getConfigurationSection("climate");
+                if(climate == null || (climate.contains("enabled") && !climate.isBoolean("enabled")))
+                    throw new InvalidConfigurationException("climate inválido para " + world);
+                if(climate.getBoolean("enabled", true)) {
+                    if(!climate.isString("season") || !climate.isString("reference-biome"))
+                        throw new InvalidConfigurationException("Defina climate.season e climate.reference-biome para " + world);
+                    try { new org.terra2.api.climate.WorldClimateProfile(climate.getString("season"), climate.getString("reference-biome")); }
+                    catch(IllegalArgumentException error) { throw new InvalidConfigurationException("Climate inválido para " + world + ": " + error.getMessage()); }
+                }
+            }
             if(entry.contains("pack") && entry.contains("packs")) throw new InvalidConfigurationException("Use pack OU packs: " + world);
             boolean terra = entry.contains("pack") || entry.contains("packs"), vanilla = entry.contains("datapack");
             if(terra == vanilla) throw new InvalidConfigurationException("Defina pack OU datapack para " + world);

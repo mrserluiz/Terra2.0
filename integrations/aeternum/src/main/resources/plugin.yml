@@ -1,0 +1,7 @@
+name: Terra2AeternumBridge
+version: 1.0.0-BETA
+main: org.terra2.integrations.aeternum.Terra2AeternumBridge
+api-version: '26.2'
+softdepend: [Terra2, AeternumSeasons]
+description: Optional read-only Terra2 climate metadata adapter for AeternumSeasons
+authors: [mrserluiz]

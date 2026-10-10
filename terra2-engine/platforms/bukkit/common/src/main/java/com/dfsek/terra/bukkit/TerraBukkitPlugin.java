@@ -65,6 +65,7 @@ public class TerraBukkitPlugin extends JavaPlugin {
     private volatile YamlConfiguration generationSettings;
     private String primaryWorldName;
     private org.terra2.adapter.vanilla.paper.WorldLootManager lootManager;
+    private com.dfsek.terra.bukkit.util.TerraWorldClimateService climateService;
     public YamlConfiguration generationSettings() { return generationSettings; }
     public org.terra2.pack.TerraPackStore terraPackStore() { return terraPacks; }
     public PlatformImpl platform() { return platform; }
@@ -230,10 +231,20 @@ public class TerraBukkitPlugin extends JavaPlugin {
             }
         }, this);
         logger.info("Terra2 diagnostics enabled; reports directory: {}", getDataFolder().toPath().resolve("reports"));
+        try {
+            climateService = new com.dfsek.terra.bukkit.util.TerraWorldClimateService();
+            climateService.apply(com.dfsek.terra.bukkit.util.TerraWorldClimateService.prepare(generationSettings, primaryWorldName));
+            Bukkit.getServicesManager().register(org.terra2.api.climate.WorldClimateService.class, climateService, this,
+                org.bukkit.plugin.ServicePriority.Normal);
+        } catch(IllegalArgumentException invalidClimate) {
+            logger.error("Invalid Terra2 climate configuration; disabling plugin", invalidClimate);
+            Bukkit.getPluginManager().disablePlugin(this);
+        }
     }
 
     @Override
     public void onDisable() {
+        Bukkit.getServicesManager().unregisterAll(this);
         if(structureIndexTask != null) structureIndexTask.cancel();
         try { com.dfsek.terra.bukkit.util.StructureIndex.flush(); }
         catch(java.io.IOException error) { logger.error("Cannot save structure index on shutdown", error); }
@@ -437,8 +448,10 @@ public class TerraBukkitPlugin extends JavaPlugin {
         validateWorldComposition(edit.world(), selected);
         datapacks.validateReload(edit.next());
         var applyLoot = lootManager == null ? null : lootManager.prepareReload(edit.next());
+        var nextClimate = com.dfsek.terra.bukkit.util.TerraWorldClimateService.prepare(edit.next(), primaryWorldName);
         com.dfsek.terra.bukkit.util.WorldSettingsEditor.persist(file.toPath(), edit.next());
         generationSettings = edit.next();
+        if(climateService != null) climateService.apply(nextClimate);
         if(applyLoot != null) applyLoot.run();
     }
     public void unlockGenerationWorld(String world, String selection) throws Exception {
@@ -712,7 +725,9 @@ public class TerraBukkitPlugin extends JavaPlugin {
         for(var source : discovery) if(source.status().equals("RESTART_REQUIRED"))
             logger.warn("Community Pack discovered: {}; server restart required: {}", source.manifestId(), source.path());
         var applyLoot = validateGenerationSettings(next);
+        var nextClimate = com.dfsek.terra.bukkit.util.TerraWorldClimateService.prepare(next, primaryWorldName);
         generationSettings = next;
+        if(climateService != null) climateService.apply(nextClimate);
         if(applyLoot != null) applyLoot.run();
     }
     private Runnable validateGenerationSettings(YamlConfiguration next) throws Exception {

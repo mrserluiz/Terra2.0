@@ -5,11 +5,13 @@ on:
     paths:
       - 'terra2-plugin/**'
       - 'terra2-engine/**'
+      - 'integrations/**'
       - '.github/workflows/build-terra2.yml'
   pull_request:
     paths:
       - 'terra2-plugin/**'
       - 'terra2-engine/**'
+      - 'integrations/**'
       - '.github/workflows/build-terra2.yml'
   workflow_dispatch:
 
@@ -118,7 +120,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Terra2-engine-experimental-26.2
-          path: terra2-engine/platforms/bukkit/build/libs/Terra2-bukkit-7.0.23-BETA.jar
+          path: terra2-engine/platforms/bukkit/build/libs/Terra2-bukkit-7.0.24-BETA.jar
           if-no-files-found: error
 
       - name: Upload native integration diagnostics
@@ -146,3 +148,52 @@ jobs:
               break
             fi
           done
+
+  climate-integration-26-2:
+    name: Optional Terra2 to Aeternum climate integration
+    needs: recovered-engine-26-2
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Checkout compatible generic consumer
+        uses: actions/checkout@v4
+        with:
+          repository: mrserluiz/AeternumSeasons-CustomETHER
+          ref: ff141a727767f43c8c31171b07ce13b2c91790f9
+          path: integration-aeternum
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+          cache-dependency-path: |
+            integration-aeternum/aeternum-build/pom.xml
+            integrations/aeternum/pom.xml
+      - name: Download independently tested Terra2 engine
+        uses: actions/download-artifact@v4
+        with:
+          name: Terra2-engine-experimental-26.2
+          path: terra2-engine/platforms/bukkit/build/libs
+      - name: Build generic consumer and separate addon
+        run: |
+          mvn --batch-mode --no-transfer-progress --file integration-aeternum/aeternum-build/pom.xml clean verify dependency:build-classpath -Dmdep.outputFile=target/compile-classpath.txt
+          mvn --batch-mode --no-transfer-progress --file integrations/aeternum/pom.xml clean verify
+      - name: Verify climate source, reload, save/restart and optional removal
+        run: python3 terra2-engine/tools/paper-climate-smoke.py
+      - name: Upload optional integration JARs
+        uses: actions/upload-artifact@v4
+        with:
+          name: Terra2-Aeternum-optional-integration-26.2
+          path: |
+            integrations/aeternum/target/Terra2AeternumBridge-1.0.0-BETA.jar
+            integration-aeternum/aeternum-build/target/AeternumSeasons-4.5.2-CLIMATE-API-BETA.jar
+          if-no-files-found: error
+      - name: Upload climate integration diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Terra2-climate-integration-diagnostics
+          path: |
+            terra2-engine/build/climate-smoke/*.log
+            terra2-engine/build/climate-smoke/*.json
+          if-no-files-found: warn
