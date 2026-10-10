@@ -1,0 +1,18 @@
+# Manual do usuário — Terra2.0
+
+**Idioma:** Português (Brasil) · **Build de referência:** 7.0.14-BETA
+
+Este manual documenta o comportamento confirmado na documentação da build de referência. Se seu JAR for mais recente, confira as notas da versão correspondente. Recursos futuros estão identificados como **planejados**, e exemplos conceituais não são comandos válidos.
+
+## Índice
+
+1. [Instalação e configuração](01-instalacao-configuracao.md)
+2. [Community Packs do Terra original](02-community-packs.md)
+3. [Criação de mundos com Multiverse-Core](03-multiverse.md)
+4. [Conversor de datapacks vanilla e TerraPacks](04-conversor-datapacks.md)
+5. [Comandos, diagnóstico e solução de problemas](05-comandos-diagnostico.md)
+6. [Futuro gerenciamento de itens e loot por mundo](06-itens-loot-mundiais.md)
+
+**Regras fundamentais:** geração desativada por padrão; autorize cada mundo; preserve `world`, `world_nether` e `world_the_end`; teste sempre em mundos novos; não troque o JAR com o servidor ligado; não altere o plano de geração de mundos existentes.
+
+Referências técnicas: [BUILD-STATUS](../../BUILD-STATUS.md) · [TERRAPACKS](../../terra2-engine/TERRAPACKS.md) · [Diagnósticos](../../terra2-engine/DIAGNOSTICS.md).
