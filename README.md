@@ -4,7 +4,7 @@
 
 Terra 2.0 is an independent continuation and modernization of the Terra world-generation engine for Paper, focused on **per-world generation**, **Community Pack compatibility**, safe world isolation, and a path toward native Minecraft datapack support.
 
-> **Current reference build:** `Terra2-bukkit-7.0.25-BETA.jar`
+> **Current reference build:** `Terra2-bukkit-7.0.27-BETA.jar` (RGB palette compiler added; Bedrock position projection remains blocked)
 
 Terra 2.0 is no longer only a recovery scaffold. The 7.0.25 line has an executable generation core, a Terra Community Pack compatibility backend, a first vanilla datapack importer, local TerraPacks, and per-world pack composition.
 

@@ -58,4 +58,10 @@ Usar a identidade persistente Terra2 para resolver perfis por posição e valida
 
 ## Validação
 
-Testes de unidade verificam RGB exato nos pixels, deduplicação entre geradores, determinismo, conflitos, limites e preservação de arquivos não pertencentes ao Terra2. O teste Paper gera a paleta pelo comando e verifica repetibilidade, reinício e ausência de alterações no bioma principal. Resultados da build serão associados à execução de CI após concluída.
+Testes de unidade verificam RGB exato nos pixels, deduplicação entre geradores, determinismo, conflitos, limites e preservação de arquivos não pertencentes ao Terra2. O teste Paper gera a paleta pelo comando e verifica repetibilidade, reinício e ausência de alterações no bioma principal. A validação do motor passou na [execução 38163982449](https://github.com/mrserluiz/Terra2.0/actions/runs/38163982449), fonte `f72d60425e75cfd44651e3f69c37b777feb99a24`. Em Paper 26.2, o comando gerou 484 cores exatas para 328 perfis, pack de 148.937 bytes. Inicialização e reinício emitiram `TERRA2_GENERIC_PALETTE_OK`; arquivo e UUIDs permaneceram idênticos. Não houve Geyser modificado nem cliente Bedrock nessa validação.
+
+Artefatos da execução: `Terra2-engine-experimental-26.2` contém o JAR 7.0.27; `Terra2-native-integration-diagnostics` contém o pack e logs em `biome-smoke`. Não use o artefato `Terra2-plugin` como motor independente.
+
+SHA-256 do JAR: `9a4ece29f3272dbf84946171639f7bd1dafba81867c905af1c13023c6518fe6a`.
+
+SHA-256 do pack: `d67b7cd8f796567ef6b3b27b5f8e4d4481f033ca2aaa9ddfe3bd260dc7322c2d`.
