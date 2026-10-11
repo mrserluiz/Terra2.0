@@ -90,3 +90,7 @@ O envio ocorre no event loop da sessão, com tokens que invalidam lotes após st
 ### Validação da nova build
 
 CI baixa um binário **oficial**, verifica o SHA-256 divulgado pela API de downloads e registra a versão/build usada no diagnóstico. Testa registro de pack e blocos, construção de updates com runtime IDs reais, captura isolada do envio, rejeição de lotes expirados, lookup da identidade persistente, proteção do mundo principal e reinício. Não conecta um cliente Bedrock real nem simula renderização. O teste visual final é o procedimento acima.
+
+Resultado da build 7.0.28: [CI 38167748169](https://github.com/mrserluiz/Terra2.0/actions/runs/38167748169), fonte `9a33260530c5e4fffab9a1e3bbbd4649c96c4549`. Motor, persistência/reinício e ponte oficial passaram. Geyser oficial 2.11.3 build 1251, Paper 26.2: 65 cores de grama e 195 definições de protocolo validadas em ambas as inicializações. Captura de envio isolada; cliente Bedrock real não conectado.
+
+SHA-256 do JAR `Terra2-bukkit-7.0.28-BETA.jar`: `d8edae81662388ae1a4bdcffb434d96758086ff044b691b88025b826d235fc7d`. Pack da fixture HYDRAXIA: `525e113db5d610a51e49c6a3cf6139a9850cb21e049649d0bb32210fd17f44a4`. O pack oferecido no servidor é recompilado a partir do catálogo local e pode ter outro hash.
