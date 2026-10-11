@@ -49,3 +49,11 @@ Se AeternumSeasons ou outro plugin chamar `World#setBiome` e gravar snowy_plains
 CI verifica exportação real, leitura no código Geyser e cores dos assets gerados. Isso não é uma conexão com cliente Bedrock real. A aceitação do pack, o rendering em celular/console e coexistência com os plugins EtherCraft precisam do teste do usuário. Vibrant Visuals pode reinterpretar água/céu/névoa; o autor da proposta relata maior fidelidade no renderizador clássico. Nenhuma garantia de igualdade pixel a pixel entre edições.
 
 A geração de terreno continua Paper 26.2. O trabalho não moderniza automaticamente o motor para 26.3. A falha separada de NBT do REIMAGEND ainda existe.
+
+## Build validada em 11/10/2026
+
+[Execução de CI 38161131342](https://github.com/mrserluiz/Terra2.0/actions/runs/38161131342), fonte `3a07a6db7c0e169fc58933c8cad7a8d719acb123`: geração/salvamento/reinício do motor passaram; o leitor real do Geyser aceitou 328 IDs sem mappings vanilla; os assets preservaram água/grama/folhagem; Paper 26.2 build 133 iniciou Terra2 e Geyser, registrou os 328 biomas, gerou o pack e repetiu a verificação após reiniciar. Não houve cliente Bedrock conectado.
+
+Na execução, baixe os artefatos `Terra2-engine-experimental-26.2` e `Geyser-PR6658-experimental-Spigot` e extraia seus JARs. Não use `Terra2-plugin` (controlador separado). O Geyser experimental substitui o JAR do Geyser na cópia de teste: nunca instale dois Geysers ao mesmo tempo. Seu config.yml/Floodgate continuam sendo os do servidor; confirme `gameplay.enable-custom-content: true` no formato de configuração desta build. O JSON só é registrado no próximo início após `/terra2 bedrock install`.
+
+Em jogo, `/terra2 bedrock status` também mostra o ID Bukkit na posição atual, o modo de projeção, a quantidade de IDs Terra registrados no Geyser e a presença do pack em cache. `minecraft:snowy_plains` nessa posição não usa o mapping de Sakura, mesmo que a previsão do provider indique Sakura.
