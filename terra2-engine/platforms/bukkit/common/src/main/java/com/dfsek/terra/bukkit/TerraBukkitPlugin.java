@@ -419,7 +419,11 @@ public class TerraBukkitPlugin extends JavaPlugin {
             throw new IllegalArgumentException("Cannot replace active TerraPack composition: " + worldName);
         var wrapper = new BukkitChunkGeneratorWrapper(delegate, pack, platform.getWorldHandle().air(), platform.usesNativeBiomeProvider());
         wrapper.setBiomeCompatibility(policy);
-        wrapper.setBiomeStorageValidator(info -> platform.validateBiomeStorage(info, policy));
+        wrapper.setBiomeStorageValidator(info -> {
+            if(!worldName.equals(info.getName())) throw new IllegalArgumentException("Generator belongs to " + worldName + ", not " + info.getName());
+            assertLegacyGenerationAuthorized(info.getName(), pack.getID());
+            platform.validateBiomeStorage(info, policy);
+        });
         wrapper.setExtraPopulators(extraPopulators.getOrDefault(worldName, java.util.List.of()));
         return wrapper;
         } catch(RuntimeException | LinkageError e) {

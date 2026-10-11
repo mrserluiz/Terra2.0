@@ -13,6 +13,19 @@ public final class BiomeCompatibilityProbe extends JavaPlugin {
     void require(boolean valid,String why){if(!valid)throw new IllegalStateException(why);}
     void check(){
         try {
+            var world=new WorldCreator("terra2_biome_compat").seed(42).generator("Terra2:HYDRAXIA").createWorld();
+            var control=new WorldCreator("terra2_biome_control").seed(42).generator("Terra2:HYDRAXIA").createWorld();
+            require(world!=null&&control!=null,"Both fixture worlds created");
+            java.util.concurrent.CompletableFuture.allOf(world.getChunkAtAsync(0,0,true),control.getChunkAtAsync(0,0,true),world.getChunkAtAsync(-1,-2,true))
+                .orTimeout(240,java.util.concurrent.TimeUnit.SECONDS).whenComplete((unused,error)->
+                    Bukkit.getScheduler().runTask(this,()->{
+                        if(error!=null){getLogger().log(java.util.logging.Level.SEVERE,"TERRA2_BIOME_COMPAT_FAILED",error);Bukkit.shutdown();}
+                        else inspect();
+                    }));
+        }catch(Throwable failed){getLogger().log(java.util.logging.Level.SEVERE,"TERRA2_BIOME_COMPAT_FAILED",failed);Bukkit.shutdown();}
+    }
+    void inspect(){
+        try {
             var terra=(TerraBukkitPlugin)Bukkit.getPluginManager().getPlugin("Terra2");
             require(terra!=null&&terra.isEnabled(),"Terra2 enabled");
             var api=Bukkit.getServicesManager().load(WorldBiomeService.class);
@@ -23,6 +36,10 @@ public final class BiomeCompatibilityProbe extends JavaPlugin {
             require(world!=null&&control!=null,"Both fixture worlds created");
             require(world.getSeed()==42&&control.getSeed()==42,"Identical fixture seeds");
             world.getChunkAt(0,0); control.getChunkAt(0,0);
+            boolean wrongWorldRefused=false;
+            try {world.getGenerator().getDefaultBiomeProvider(Bukkit.getWorld("world"));}
+            catch(IllegalArgumentException expected){wrongWorldRefused=true;}
+            require(wrongWorldRefused,"World generator cannot be reused on the primary world");
             var identity=api.at(world,0,64,0).orElseThrow(()->new IllegalStateException("Missing identity at surface"));
             require(identity.registeredId().startsWith("terra:"),"Original registry identity retained");
             require(world.getBiome(0,64,0).getKey().toString().equals(identity.vanillaReference()),"Unmodified Bukkit consumer sees the vanilla equivalent");
@@ -48,6 +65,13 @@ public final class BiomeCompatibilityProbe extends JavaPlugin {
             require(bytes!=null,"Identity is in the same chunk persistent data");
             var decoded=BiomeIdentityChunk.decode(bytes);
             require(decoded.world.equals(world.getUID())&&decoded.seed==world.getSeed(),"World and seed recorded");
+            var foreign=new BiomeIdentityChunk(UUID.randomUUID(),world.getSeed(),0,0,decoded.minY,decoded.height,decoded.pack,decoded.fingerprint,List.of(identity),new int[decoded.height*4]);
+            pdc.set(PersistedBiomeService.KEY,PersistentDataType.BYTE_ARRAY,foreign.encode());
+            require(api.at(world,0,64,0).isEmpty(),"Foreign UUID is not accepted or reconstructed");
+            var wrongHeight=new BiomeIdentityChunk(world.getUID(),world.getSeed(),0,0,decoded.minY+4,decoded.height,decoded.pack,decoded.fingerprint,List.of(identity),new int[decoded.height*4]);
+            pdc.set(PersistedBiomeService.KEY,PersistentDataType.BYTE_ARRAY,wrongHeight.encode());
+            require(api.at(world,0,64,0).isEmpty(),"Wrong dimension height range is not accepted");
+            pdc.set(PersistedBiomeService.KEY,PersistentDataType.BYTE_ARRAY,bytes);
             String before=world.getBiome(0,64,0).getKey().toString();
             world.setBiome(0,64,0,org.bukkit.block.Biome.DESERT);
             require(api.at(world,0,64,0).orElseThrow().equals(identity),"Engine identity unaffected by external biome mutation");

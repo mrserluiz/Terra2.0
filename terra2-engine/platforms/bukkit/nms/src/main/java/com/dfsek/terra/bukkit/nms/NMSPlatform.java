@@ -55,6 +55,8 @@ public class NMSPlatform extends PlatformImpl {
     public boolean usesNativeBiomeProvider() { return true; }
     @Override public void validateBiomeStorage(org.bukkit.generator.WorldInfo world, com.dfsek.terra.bukkit.compatibility.BiomeCompatibility policy) {
         var server = net.minecraft.server.MinecraftServer.getServer();
+        if(java.util.Set.of("minecraft:overworld", "minecraft:the_nether", "minecraft:the_end").contains(world.getKey().toString()))
+            throw new IllegalArgumentException("Terra2 biome storage cannot target a primary dimension: " + world.getKey());
         var dimension = org.bukkit.craftbukkit.util.CraftNamespacedKey.toResourceKey(net.minecraft.core.registries.Registries.DIMENSION, world.getKey());
         try { policy.bind(server.storageSource.getDimensionPath(dimension), world.getUID(), world.getSeed(), world.getName()); }
         catch(java.io.IOException refused) { throw new IllegalStateException("Terra2 biome compatibility storage refused for " + world.getName(), refused); }

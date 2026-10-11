@@ -17,7 +17,8 @@ public final class PersistedBiomeService implements WorldBiomeService {
         var bytes=world.getChunkAt(x>>4,z>>4).getPersistentDataContainer().get(KEY,PersistentDataType.BYTE_ARRAY);
         try {
             var data=BiomeIdentityChunk.decode(bytes);
-            if(!data.world.equals(world.getUID()) || data.seed!=world.getSeed() || data.x!=(x>>4) || data.z!=(z>>4)
+            if(data.minY!=world.getMinHeight() || data.height!=world.getMaxHeight()-world.getMinHeight()
+                    || !data.world.equals(world.getUID()) || data.seed!=world.getSeed() || data.x!=(x>>4) || data.z!=(z>>4)
                     || !data.fingerprint.equals(wrapper.biomeCompatibility().fingerprint))return Optional.empty();
             return data.at(x,y,z);
         }catch(java.io.IOException invalid){return Optional.empty();}
