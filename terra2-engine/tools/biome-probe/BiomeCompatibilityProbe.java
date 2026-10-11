@@ -21,6 +21,7 @@ public final class BiomeCompatibilityProbe extends JavaPlugin {
             var world=new WorldCreator("terra2_biome_compat").seed(42).generator("Terra2:HYDRAXIA").createWorld();
             var control=new WorldCreator("terra2_biome_control").seed(42).generator("Terra2:HYDRAXIA").createWorld();
             require(world!=null&&control!=null,"Both fixture worlds created");
+            require(world.getSeed()==42&&control.getSeed()==42,"Identical fixture seeds");
             world.getChunkAt(0,0); control.getChunkAt(0,0);
             var identity=api.at(world,0,64,0).orElseThrow(()->new IllegalStateException("Missing identity at surface"));
             require(identity.registeredId().startsWith("terra:"),"Original registry identity retained");
@@ -39,7 +40,7 @@ public final class BiomeCompatibilityProbe extends JavaPlugin {
             require(!world.isChunkLoaded(100000,100000),"Lookup did not load a chunk");
             int compared=0;
             for(int x=0;x<16;x+=3) for(int z=0;z<16;z+=3) for(int y=-60;y<200;y+=7) {
-                require(world.getBlockAt(x,y,z).getBlockData().getAsString().equals(control.getBlockAt(x,y,z).getBlockData().getAsString()),"Terrain/decorations changed at "+x+","+y+","+z);
+                require(world.getBlockAt(x,y,z).getBlockData().getAsString().equals(control.getBlockAt(x,y,z).getBlockData().getAsString()),"Terrain/decorations changed at "+x+","+y+","+z+" actual="+world.getBlockAt(x,y,z).getBlockData().getAsString()+" control="+control.getBlockAt(x,y,z).getBlockData().getAsString());
                 compared++;
             }
             var chunk=world.getChunkAt(0,0); var pdc=chunk.getPersistentDataContainer();

@@ -46,6 +46,9 @@ public class PlatformImpl extends AbstractPlatform {
 
     /** Whether world-init installs the native pack biome source before chunk generation. */
     public boolean usesNativeBiomeProvider() { return false; }
+    public void validateBiomeStorage(org.bukkit.generator.WorldInfo world, com.dfsek.terra.bukkit.compatibility.BiomeCompatibility policy) {
+        if(policy.vanilla) throw new IllegalStateException("Native biome compatibility is unavailable");
+    }
     public org.terra2.pack.NativePackBackend nativePackBackend() { return null; }
     public org.terra2.pack.TemplateMigration.Backend templateMigration() { return new org.terra2.adapter.vanilla.paper.PaperTemplateMigration(); }
     public void initializeLootManager(org.terra2.adapter.vanilla.paper.WorldLootManager manager) {}

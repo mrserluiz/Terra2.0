@@ -379,6 +379,8 @@ public class TerraBukkitPlugin extends JavaPlugin {
         try { composition = composition(generationSettings, worldName); }
         catch(java.io.IOException error) { throw new IllegalArgumentException("Cannot load TerraPack composition", error); }
         if(composition.legacy() == null) {
+            if(generationSettings.contains("worlds."+worldName+".biomes"))
+                throw new IllegalArgumentException("Biome projection currently requires a Community Pack terrain base");
             if(generatorMap.containsKey(worldName)) throw new IllegalArgumentException("World already has a Terra generator: " + worldName);
             return datapacks.preparePacks(worldName, composition.selection(), composition.packs());
         }
@@ -417,6 +419,7 @@ public class TerraBukkitPlugin extends JavaPlugin {
             throw new IllegalArgumentException("Cannot replace active TerraPack composition: " + worldName);
         var wrapper = new BukkitChunkGeneratorWrapper(delegate, pack, platform.getWorldHandle().air(), platform.usesNativeBiomeProvider());
         wrapper.setBiomeCompatibility(policy);
+        wrapper.setBiomeStorageValidator(info -> platform.validateBiomeStorage(info, policy));
         wrapper.setExtraPopulators(extraPopulators.getOrDefault(worldName, java.util.List.of()));
         return wrapper;
         } catch(RuntimeException | LinkageError e) {

@@ -67,28 +67,10 @@ public final class BiomeCompatibility {
     }
     public BiomeIdentity identity(Biome biome) { return Objects.requireNonNull(identities.get(biome), "Unregistered Terra biome"); }
     public org.bukkit.block.Biome reference(Biome biome) { return Objects.requireNonNull(references.get(biome), "Unregistered reference"); }
+    public void bind(Path folder, UUID uuid, long seed, String name) throws java.io.IOException {
+        BiomeWorldManifest.bind(folder, uuid, seed, vanilla, fingerprint, name);
+    }
     public void bind(World world) throws java.io.IOException {
-        Path folder=world.getWorldFolder().toPath();
-        Path manifest=folder.resolve("terra2-biomes-"+world.getUID()+".properties");
-        var expected=new Properties();expected.setProperty("schema","1");expected.setProperty("mode",vanilla?"VANILLA_COMPATIBLE":"CUSTOM");
-        expected.setProperty("world",world.getUID().toString());expected.setProperty("seed",Long.toString(world.getSeed()));expected.setProperty("fingerprint",fingerprint);
-        if(Files.exists(manifest)) {
-            var saved=new Properties();try(var in=Files.newInputStream(manifest)){saved.load(in);}
-            if(!saved.equals(expected))throw new java.io.IOException("World biome mode/pack/reference manifest mismatch; refusing to mix generations: "+world.getName());
-            return;
-        }
-        if(!vanilla)return;
-        // No conversion of existing saves. Examine only the actual world/dimension region directory.
-        Path region=folder.resolve("region");
-        if(Files.isDirectory(region))try(var files=Files.list(region)) {
-            if(files.anyMatch(p->p.getFileName().toString().endsWith(".mca")))
-                throw new java.io.IOException("VANILLA_COMPATIBLE is for new worlds only: "+world.getName());
-        }
-        Files.createDirectories(folder);
-        Path temp=Files.createTempFile(folder,"terra2-biomes-", ".tmp");
-        try {
-            try(var out=Files.newOutputStream(temp)){expected.store(out,"Terra2 biome projection - do not edit");}
-            Files.move(temp,manifest,StandardCopyOption.ATOMIC_MOVE);
-        }finally{Files.deleteIfExists(temp);}
+        bind(world.getWorldPath(), world.getUID(), world.getSeed(), world.getName());
     }
 }

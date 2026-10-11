@@ -42,6 +42,8 @@ public class BukkitChunkGeneratorWrapper extends org.bukkit.generator.ChunkGener
     private final BlockState air;
     private com.dfsek.terra.bukkit.compatibility.BiomeCompatibility biomeCompatibility;
     private volatile boolean nativeBiomesBound;
+    private java.util.function.Consumer<WorldInfo> biomeStorageValidator;
+    public void setBiomeStorageValidator(java.util.function.Consumer<WorldInfo> value) { biomeStorageValidator = value; }
     public void markNativeBiomesBound() { nativeBiomesBound = true; }
     public void setBiomeCompatibility(com.dfsek.terra.bukkit.compatibility.BiomeCompatibility value) {
         if(biomeCompatibility != null) throw new IllegalStateException("Biome projection is already bound");
@@ -76,6 +78,7 @@ public class BukkitChunkGeneratorWrapper extends org.bukkit.generator.ChunkGener
 
     @Override
     public @Nullable BiomeProvider getDefaultBiomeProvider(@NotNull WorldInfo worldInfo) {
+        if(biomeStorageValidator != null) biomeStorageValidator.accept(worldInfo);
         // Paper creates its structure placement state before WorldInitEvent. Feeding the
         // expensive pack pipeline into that state makes the stronghold ring search
         // evaluate distant biome chunks while the server synchronously waits for spawn.

@@ -36,6 +36,8 @@ import com.dfsek.terra.bukkit.world.block.data.BukkitBlockState;
 
 public class NMSChunkGeneratorDelegate extends ChunkGenerator {
     private static final Logger LOGGER = LoggerFactory.getLogger(NMSChunkGeneratorDelegate.class);
+    private static final net.minecraft.world.level.biome.BiomeGenerationSettings NO_VANILLA_FEATURES =
+        new net.minecraft.world.level.biome.BiomeGenerationSettings.PlainBuilder().build();
     private final com.dfsek.terra.api.world.chunk.generation.ChunkGenerator delegate;
 
     private final ChunkGenerator vanilla;
@@ -52,7 +54,7 @@ public class NMSChunkGeneratorDelegate extends ChunkGenerator {
     }
     public NMSChunkGeneratorDelegate(ChunkGenerator vanilla, ConfigPack pack, NMSBiomeProvider biomeProvider, long seed,
                                      com.dfsek.terra.api.world.chunk.generation.ChunkGenerator generator, NativeWorldExecutor nativeExecutor) {
-        super(biomeProvider);
+        super(biomeProvider, holder -> biomeProvider.vanillaCompatible() ? NO_VANILLA_FEATURES : holder.value().getGenerationSettings());
         this.terraBiomes = biomeProvider;
         this.nativeExecutor = nativeExecutor;
         this.delegate = generator;
@@ -81,12 +83,8 @@ public class NMSChunkGeneratorDelegate extends ChunkGenerator {
     @Override
     public void applyBiomeDecoration(@NotNull WorldGenLevel world, @NotNull ChunkAccess chunk,
                                      @NotNull StructureManager structureAccessor) {
-        if(terraBiomes.vanillaCompatible()) {
-            // Preserve Terra pack populators without adding vanilla trees/ores on top of its terrain.
-            vanilla.applyBiomeDecoration(world, chunk, structureAccessor, false);
-        }
-        else if(nativeExecutor == null) vanilla.applyBiomeDecoration(world, chunk, structureAccessor);
-        else { nativeExecutor.verify(world.getLevel()); super.applyBiomeDecoration(world, chunk, structureAccessor); }
+        if(nativeExecutor == null && !terraBiomes.vanillaCompatible()) vanilla.applyBiomeDecoration(world, chunk, structureAccessor);
+        else { if(nativeExecutor != null) nativeExecutor.verify(world.getLevel()); super.applyBiomeDecoration(world, chunk, structureAccessor); }
     }
 
     @Override public void createStructures(net.minecraft.core.RegistryAccess registries,
