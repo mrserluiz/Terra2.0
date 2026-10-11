@@ -73,4 +73,8 @@ O fingerprint considera a versão declarada do pack e seu catálogo de biomas/re
 
 ## Validação
 
-A CI compila o motor, verifica o codec e executa dois boots de Paper 26.2 com HYDRAXIA. O teste compara terreno com um mundo de controle, confere referências vanilla, identidades próprias, coordenadas negativas, alturas, leitura sem carga de chunks, corrupção, reload recusado e preservação exata do payload após reinício. Resultados concretos e download serão vinculados após a execução.
+A CI compila o motor, verifica o codec e executa dois boots de Paper 26.2 com HYDRAXIA. O teste compara terreno com um mundo de controle, confere referências vanilla, identidades próprias, coordenadas negativas, alturas, leitura sem carga de chunks, corrupção, reload recusado e preservação exata do payload após reinício. Resultado: **PASSOU** na [CI 38121349293](https://github.com/mrserluiz/Terra2.0/actions/runs/38121349293). Os dois boots preservaram a identidade `terra:hydraxia/hydraxia/drafty_streams`, enquanto Bukkit devolveu `minecraft:frozen_river`; 1.368 amostras de blocos coincidiram com o controle.
+
+[Download do motor 7.0.25-BETA](https://github.com/mrserluiz/Terra2.0/actions/runs/38121349293/artifacts/11695343432): o ZIP contém **um único JAR**, `Terra2-bukkit-7.0.25-BETA.jar`. Substitua o JAR anterior do Terra2 e reinicie para atualizar o código. Não instale outra versão simultaneamente. Configure um nome de mundo novo para o teste. [Relatório e limites da build](testing/BIOME_COMPATIBILITY_7.0.25.md).
+
+SHA-256 do JAR: `9d937569643df2578e958da6cd443eeaf658941b15fba1e9712255f47d2e4979`.

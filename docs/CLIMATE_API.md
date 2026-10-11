@@ -26,6 +26,10 @@ Somente mundos autorizados, carregados com o gerador Terra2, recebem metadados. 
 
 Não é necessário recriar um mundo que já usa Terra2. A configuração não cria mundos e não substitui o gerador de saves existentes.
 
+## Compatibilidade por biomas, sem ponte externa (7.0.25)
+
+O [modo VANILLA_COMPATIBLE](BIOME_COMPATIBILITY.md) entrega equivalentes vanilla às consultas Bukkit normais e guarda os biomas próprios nos chunks. É integrado ao motor Terra2 e não exige um Aeternum modificado ou o addon separado. Isso resolve a referência de bioma por localização, mas não aplica o perfil de estação desta API ao calendário do Aeternum. A instalação continua opt-in, somente em mundos novos autorizados.
+
 ## Addon opcional para AeternumSeasons
 
 Instale o motor Terra2 e, opcionalmente, `Terra2AeternumBridge-1.0.1-BETA.jar`. **Mantenha o AeternumSeasons oficial, publicado por seu autor. Nenhuma substituição por um fork é exigida ou recomendada.** Troca de JAR requer reinício.

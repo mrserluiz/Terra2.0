@@ -1,14 +1,14 @@
 # Terra 2.0
 
-**Languages:** English | [Português (Brasil)](README.pt-BR.md)
+**Languages:** English | [Português (Brasil)](docs/manual/README.md)
 
 Terra 2.0 is an independent continuation and modernization of the Terra world-generation engine for Paper, focused on **per-world generation**, **Community Pack compatibility**, safe world isolation, and a path toward native Minecraft datapack support.
 
-> **Current reference build:** `Terra2-bukkit-7.0.14-BETA.jar`
+> **Current reference build:** `Terra2-bukkit-7.0.25-BETA.jar`
 
-Terra 2.0 is no longer only a recovery scaffold. The 7.0.14 line has an executable generation core, a Terra Community Pack compatibility backend, a first vanilla datapack importer, local TerraPacks, and per-world pack composition.
+Terra 2.0 is no longer only a recovery scaffold. The 7.0.25 line has an executable generation core, a Terra Community Pack compatibility backend, a first vanilla datapack importer, local TerraPacks, and per-world pack composition.
 
-## What works in 7.0.14
+## What works in 7.0.25
 
 - Terra Community Packs can be selected independently per authorized world.
 - Existing Terra generation remains available through the compatibility backend.
@@ -16,17 +16,23 @@ Terra 2.0 is no longer only a recovery scaffold. The 7.0.14 line has an executab
 - World authorization is explicit and generation is disabled by default.
 - The primary vanilla worlds remain protected.
 - A first vanilla datapack importer compiles the supported `minecraft:flat` subset.
-- Local `.terrapack` archives distinguish `READY` from `BLOCKED` conversions.
+- Local `.terrapack` archives distinguish `READY`, `READY_NATIVE`, and `BLOCKED` conversions.
 - A world can compose one terrain base with supported additive feature packs.
 - Conversion is asynchronous and preserves source/provenance data.
 - Generation manifests/fingerprints protect worlds from silent pack/source changes.
+- Supported converted structure packs use native jigsaw assembly, processors and loot.
+- New Community Pack worlds can keep Terra2 identities in chunk PDC while exposing vanilla-equivalent biomes to Bukkit.
 - Diagnostic capture is available through `/terra2reportlog`.
 
+## Vanilla biome compatibility (7.0.25-BETA)
+
+New Community Pack worlds can opt into `biomes.mode: VANILLA_COMPATIBLE`. Minecraft/Bukkit receives the pack's vanilla biome reference, while Terra2 keeps original three-dimensional identities in each chunk's persistent data. The built-in API and `/terra2 biome` read these saved identities; other plugins can keep using ordinary Bukkit biome queries. Existing saves are not converted. See [configuration, persistence and limitations](docs/BIOME_COMPATIBILITY.md).
+
+## Optional climate metadata API (7.0.24-BETA)
+
+Terra2 publishes read-only climate profiles per authorized world. The separate **Terra2AeternumBridge** addon connects only when a public compatible receiver contract is detected; neither plugin requires the other. Keep the author's official AeternumSeasons distribution. Official climate-profile receiver compatibility is not established; an unsupported receiver remains untouched and inactive. Profiles live in Terra2 settings, keep real biome IDs, and can be reloaded without unloading plugins. See [configuration, API and downloads](docs/CLIMATE_API.md) and the [Paper integration verification](docs/testing/CLIMATE_INTEGRATION_7.0.24.md).
+
 ## Community Packs
-
-### Optional climate metadata API (7.0.24-BETA)
-
-Terra2 publishes read-only climate profiles per authorized world. The separate **Terra2AeternumBridge** addon connects only when a public compatible receiver contract is detected; neither plugin requires the other. Keep the author's official AeternumSeasons distribution. Official receiver compatibility is not established; an unsupported receiver remains untouched and inactive. Profiles live in Terra2 settings, keep real biome IDs, and can be reloaded without unloading plugins. See [configuration, API and downloads](docs/CLIMATE_API.md) and the [Paper integration verification](docs/testing/CLIMATE_INTEGRATION_7.0.24.md).
 
 Known Terra-style packs remain the primary compatibility path. A world may select a single legacy pack directly:
 
