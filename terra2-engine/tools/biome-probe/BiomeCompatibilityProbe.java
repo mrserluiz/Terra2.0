@@ -28,6 +28,15 @@ public final class BiomeCompatibilityProbe extends JavaPlugin {
         try {
             var terra=(TerraBukkitPlugin)Bukkit.getPluginManager().getPlugin("Terra2");
             require(terra!=null&&terra.isEnabled(),"Terra2 enabled");
+            var bedrockEntries = terra.platform().bedrockBiomeAppearances();
+            require(!bedrockEntries.isEmpty(), "Real registry biome appearance export");
+            require(bedrockEntries.keySet().stream().allMatch(id -> id.startsWith("terra:")), "No vanilla overrides in export");
+            var sakura = bedrockEntries.get("terra:hydraxia/hydraxia/sakura_woodlands");
+            require(sakura != null && sakura.getAsJsonObject("effects").has("water_color"), "HYDRAXIA Sakura colors exported");
+            var bedrockPath = terra.getDataFolder().toPath().resolve("bedrock/terra2-biomes.json");
+            com.dfsek.terra.bukkit.bedrock.BedrockMappings.write(bedrockPath, com.dfsek.terra.bukkit.bedrock.BedrockMappings.document(bedrockEntries));
+            require(!com.dfsek.terra.bukkit.bedrock.BedrockCommands.supportsBiomes(null), "Geyser remains optional");
+            getLogger().info("TERRA2_BEDROCK_EXPORT_OK biomes=" + bedrockEntries.size() + " sakura=" + sakura);
             var api=Bukkit.getServicesManager().load(WorldBiomeService.class);
             require(api!=null&&api.apiVersion()==1,"Persisted identity service registered");
             require(api.at(Bukkit.getWorld("world"),0,64,0).isEmpty(),"Primary world untouched");

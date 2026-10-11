@@ -552,6 +552,7 @@ public class TerraBukkitPlugin extends JavaPlugin {
             return true;
         }
         if(discovery != null && discovery.handle(sender, args)) return true;
+        if(com.dfsek.terra.bukkit.bedrock.BedrockCommands.handle(this, sender, args)) return true;
         if(args.length == 0 || (args.length == 1 && args[0].equalsIgnoreCase("help"))) {
             sender.sendMessage(message("help")); return true;
         }

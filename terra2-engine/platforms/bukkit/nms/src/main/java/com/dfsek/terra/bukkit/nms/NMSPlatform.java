@@ -41,6 +41,9 @@ import com.dfsek.terra.bukkit.nms.config.VillagerTypeTemplate;
 
 
 public class NMSPlatform extends PlatformImpl {
+    @Override public java.util.Map<String, com.google.gson.JsonObject> bedrockBiomeAppearances() {
+        return NativeBedrockBiomes.export(this);
+    }
     private NativePackRuntime nativeRuntime;
     public NativePackRuntime nativeRuntime() { return nativeRuntime; }
     @Override public org.terra2.pack.TemplateMigration.Backend templateMigration() { return new NativePaperTemplateMigration(); }
