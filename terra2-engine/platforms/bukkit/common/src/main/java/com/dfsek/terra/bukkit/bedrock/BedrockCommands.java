@@ -22,15 +22,39 @@ public final class BedrockCommands {
     }
     public static boolean handle(TerraBukkitPlugin plugin, CommandSender sender, String[] args) {
         if(args.length == 0 || !args[0].equalsIgnoreCase("bedrock")) return false;
-        if(args.length != 2 || !Set.of("status", "export", "install").contains(args[1].toLowerCase(Locale.ROOT))) {
-            sender.sendMessage("Uso: /terra2 bedrock <status|export|install>"); return true;
+        if(args.length != 2 || !Set.of("status", "export", "install", "pack").contains(args[1].toLowerCase(Locale.ROOT))) {
+            sender.sendMessage("Uso: /terra2 bedrock <status|export|pack>"); return true;
         }
         Plugin geyser = Bukkit.getPluginManager().getPlugin("Geyser-Spigot");
+        if(args[1].equalsIgnoreCase("pack")) {
+            try {
+                var profiles = new java.util.ArrayList<>(BedrockVisualPack.fromBiomes(plugin.platform().bedrockBiomeAppearances()));
+                for(var registration : Bukkit.getServicesManager().getRegistrations(org.terra2.api.visual.VisualPaletteProvider.class)) {
+                    var provider = registration.getProvider();
+                    if(provider.apiVersion() != 1) throw new IllegalArgumentException("Unsupported visual provider API");
+                    profiles.addAll(provider.profiles());
+                }
+                var target = plugin.getDataFolder().toPath().resolve("bedrock/terra2-palette.mcpack");
+                BedrockVisualPack.write(target, profiles);
+                var index = BedrockVisualPack.index(profiles);
+                sender.sendMessage("Paleta RGB gerada: " + target + "; cores exatas: " + index.get("exact_color_count")
+                    + "; perfis: " + index.getAsJsonObject("profiles").size());
+                sender.sendMessage("Atlas preparatório. Aplicação por posição ainda BLOCKED; copiar o pack não ativa cores de biomas. Nenhum mapping/world foi alterado.");
+            } catch(Exception error) {
+                sender.sendMessage("Falha ao preparar paleta: " + error.getMessage());
+                plugin.getLogger().warning("Terra2 palette: " + error.getMessage());
+            }
+            return true;
+        }
+        if(args[1].equalsIgnoreCase("install")) {
+            sender.sendMessage("Instalação experimental retirada. Mantenha o Geyser oficial; use pack para preparar a paleta genérica. A aplicação por posição ainda não está disponível.");
+            return true;
+        }
         if(args[1].equalsIgnoreCase("status")) {
             sender.sendMessage("Terra2 Bedrock: " + (geyser == null ? "GEYSER_ABSENT" : supportsBiomes(geyser)
                 ? "CUSTOM_BIOME_API_PRESENT (registro e cliente ainda precisam ser validados)" : "UNSUPPORTED_CUSTOM_BIOMES")
                 + "; exportação: plugins/Terra2/bedrock/terra2-biomes.json");
-            sender.sendMessage("Cores precisam dos IDs personalizados nos chunks. VANILLA_COMPATIBLE ou outro plugin alterando biomas impede esta primeira integração.");
+            sender.sendMessage("Paleta genérica: /terra2 bedrock pack. Projeção de variantes por posição: BLOCKED_PENDING_POSITION_TRANSPORT; nenhuma recoloração ativa.");
             if(supportsBiomes(geyser)) {
                 try {
                     var registryType = Class.forName("org.geysermc.geyser.registry.Registries", false, geyser.getClass().getClassLoader());
@@ -52,21 +76,11 @@ public final class BedrockCommands {
             }
             return true;
         }
-        boolean install = args[1].equalsIgnoreCase("install");
-        if(install && !supportsBiomes(geyser)) {
-            sender.sendMessage("Instalação recusada: o Geyser carregado não expõe suporte a mappings de biomas. Use export para preparar o arquivo; teste uma build compatível com PR #6658.");
-            return true;
-        }
         try {
             var document = BedrockMappings.document(plugin.platform().bedrockBiomeAppearances());
             var exported = plugin.getDataFolder().toPath().resolve("bedrock/terra2-biomes.json");
             BedrockMappings.write(exported, document);
             sender.sendMessage("Exportados " + document.getAsJsonObject("biomes").size() + " biomas: " + exported);
-            if(install) {
-                var target = geyser.getDataFolder().toPath().resolve("custom_mappings/terra2-biomes.json");
-                BedrockMappings.write(target, document);
-                sender.sendMessage("Mapping instalado: " + target + ". Reinicie o servidor e aceite o pack visual no Bedrock; não regenere mundos para aplicar cores.");
-            }
         } catch(Exception error) {
             sender.sendMessage("Falha na integração Bedrock: " + error.getMessage());
             plugin.getLogger().warning("Terra2 Bedrock: " + error.getMessage());

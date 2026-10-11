@@ -1,59 +1,61 @@
-# Cores de biomas no Bedrock — Terra2 7.0.26-BETA
+# Paleta visual genérica Bedrock — 7.0.27-BETA
 
-Integração experimental integrada ao JAR do Terra2. O gerador e os blocos não são modificados por estes comandos.
+O Geyser oficial deve ser mantido. A build 7.0.26 usou a proposta experimental PR #6658 para validar cores de biomas; aquele Geyser não é requisito nem a solução escolhida para distribuição. A nova build não compila outro Geyser e `/terra2 bedrock install` recusa a instalação experimental.
 
-## O que faz
+## Estado real
 
-Lê os biomas Community Pack realmente registrados no adaptador Paper 26.2, incluindo os valores herdados do bioma base. Exporta um mapping Geyser com os IDs canônicos `terra:<pack>/<namespace>/<bioma>`: água, overrides de grama, folhagem e folhagem seca, céu, névoa e névoa aquática. Sem override de vegetação, o Geyser usa a temperatura/umidade recebida do registro Java. Modificadores espaciais de grama, partículas, sons e efeitos dependentes de horário não são reproduzidos integralmente nesta etapa.
+Esta etapa implementa o compilador de um pack de recursos RGB independente do gerador. **Não aplica cores aos chunks ou à tela do jogador.** A seleção de variantes por posição está `BLOCKED_PENDING_POSITION_TRANSPORT`. Um resource pack sozinho não transmite a identidade Terra2, nem executa behavior packs num servidor Paper.
 
-Não cria uma textura global nem substitui `minecraft:*`: as cores acompanham cada ID de bioma. O Geyser gera e envia seu próprio `custom_biomes.mcpack`. Outros packs de itens/blocos continuam separados e não são mesclados/sobrescritos pelo Terra2.
+## Gerar a paleta
 
-## Dependência real e estado experimental
-
-O Geyser oficial consultado em 11/10/2026 ainda não contém a API. A implementação usada no teste é a proposta [Geyser PR #6658](https://github.com/GeyserMC/Geyser/pull/6658), de darkcupid412, commit `c609c0e517954fbb58579c24c81564724a3be3bb`. Não é uma release oficial nem código criado pelo Terra2. CI compila essa fonte sem alterar seu motor e testa o mapping produzido pelo nosso registro real. A proposta tem autoria/licença próprias, preservadas no JAR; não redistribuímos o nome como uma versão oficial.
-
-A versão atual instalada pode permanecer: exportar funciona sem Geyser, e a instalação recusa versões sem as classes de API/leitor/gerador de pack. Detecção de classes confirma capacidade disponível, não confirma que o cliente aceitou o pack ou que custom content foi habilitado.
-
-## Comandos (OP / terra2.settings.reload)
+Como OP, execute:
 
 ```text
+/terra2 bedrock pack
 /terra2 bedrock status
-/terra2 bedrock export
-/terra2 bedrock install
 ```
 
-- `status`: informa GEYSER_ABSENT, UNSUPPORTED_CUSTOM_BIOMES ou CUSTOM_BIOME_API_PRESENT.
-- `export`: grava `plugins/Terra2/bedrock/terra2-biomes.json` com todos os biomas Community Pack carregados; não depende de mundos ativos nem carrega chunks.
-- `install`: exige Geyser-Spigot habilitado e com suporte; exporta e instala SOMENTE `plugins/Geyser-Spigot/custom_mappings/terra2-biomes.json`. Se esse arquivo já existir sem a marca do exportador, a substituição é recusada. Os demais mappings não são tocados.
+Saída: `plugins/Terra2/bedrock/terra2-palette.mcpack`. Dentro do arquivo há:
 
-Os mappings são registrados na inicialização do Geyser, portanto reinicie o servidor após instalar/atualizar. Jogadores devem aceitar o pack visual e reconectar. Não use PlugMan para trocar o Geyser nem regenere mundos para aplicar cores. Se o Geyser estiver em proxy/standalone, use export e copie o JSON para `custom_mappings` dessa instância; install só cobre Spigot local.
+- `manifest.json`: identidade do pack calculada a partir do conteúdo para invalidar o cache quando a paleta muda.
+- `terra2-palette.json`: perfis de origem, cores RGB exatas, nomes estáveis das texturas e estado da futura projeção.
+- `textures/terrain_texture.json`: entradas próprias do atlas `terra2_rgb_<rrggbb>`.
+- `textures/terra2/palette/*.png`: amostras opacas de cor, 16×16, geradas pelo Terra2. Não são as texturas de grama/folhas do Minecraft e não alteram texturas vanilla.
 
-## Primeiro teste
+A base contém 256 cores RGB332. Cada RGB solicitado que ainda não exista é adicionado **exatamente**, sem aproximar ao RGB332. Por exemplo, `#FFD1EF` continua `#FFD1EF`. O espaço RGB aceita 16.777.216 cores, mas o pack contém somente a base e as cores solicitadas. O limite desta etapa é 4096 cores por catálogo; excesso é recusado antes de sobrescrever a saída. Não há promessa de registrar milhares de permutations de blocos: o transporte ainda será definido.
 
-1. Faça o teste numa cópia do servidor; mantenha seu JAR atual do Geyser para retorno.
-2. Substitua o Terra2 pela build 7.0.26-BETA e, só na cópia, o Geyser pelo artefato explicitamente experimental PR6658. Mantenha Floodgate e os packs existentes.
-3. Inicie, execute status e install, reinicie.
-4. Confira no console o registro dos mappings e a geração do pack. Entre com um cliente Bedrock compatível com essa build, aceite o download e compare água/grama/folhas ao Java na mesma posição. Teste HYDRAXIA e uma região vanilla para verificar ausência de recoloração global. Confira a versão Bedrock suportada na mensagem do próprio Geyser; a proposta está baseada na linha feature/26.50, e não garante todo cliente antigo.
-5. Se houver falha de login/pack, volte ao Geyser anterior com o servidor desligado e retire apenas `custom_mappings/terra2-biomes.json`.
+Copiar este pack para `plugins/Geyser-Spigot/packs` permite preparar o envio do atlas, mas **não ativa as variantes no mundo**. Não é necessário instalá-lo no servidor de produção nesta etapa. Não há mappings globais substituindo `minecraft:grass_block`, folhas ou biomas. Não altera terreno, loot, biomas ou dimensões. Não precisa regenerar mundos.
 
-## Identidade nos chunks e AeternumSeasons
+O compilador compartilha uma única amostra por RGB entre todos os perfis e detecta IDs conflitantes. Repetir o comando preserva bytes/UUIDs quando o catálogo não muda. Saídas não identificadas como nossa paleta são recusadas; os packs e mappings de terceiros não são mesclados/sobrescritos.
 
-Este caminho depende dos IDs personalizados Java presentes nos chunks. Funciona com `biomes.mode: CUSTOM` (padrão), sem converter chunks.
+## API para outros geradores
 
-`VANILLA_COMPATIBLE` escreve IDs vanilla para a compatibilidade Bukkit; o Geyser não recebe a identidade paralela do PDC. Nesta primeira etapa não há recuperação por pacote/rewrite do PDC para o Geyser. NÃO mude um mundo existente para CUSTOM/VANILLA_COMPATIBLE para testar: a política persistente impede mistura de modos; use um mundo novo caso precise testar o outro modo.
+No JAR Terra2:
 
-Se AeternumSeasons ou outro plugin chamar `World#setBiome` e gravar snowy_plains no chunk, o cliente recebe snowy_plains, e o mapping de Sakura deixa de ser usado. O comando `/terra2 biome` em CUSTOM pode prever Sakura pelo provider, mas isso não prova que o ID entregue ao cliente ainda seja Sakura. Corrigir cores nessas condições exigirá uma futura projeção visual por sessão; esta build não altera o AeternumSeasons do autor nem promete resolver essa etapa.
+```java
+org.terra2.api.visual.VisualProfile
+org.terra2.api.visual.VisualPaletteProvider
+```
 
-## Limites de validação
+`VisualProfile` contém um ID namespaced e um mapa de cores RGB de 24 bits. Papéis suportados: `grass`, `foliage`, `dry_foliage`, `water`, `sky`, `fog`, `water_fog`. Cada valor é um inteiro entre 0 e `0xFFFFFF`.
 
-CI verifica exportação real, leitura no código Geyser e cores dos assets gerados. Isso não é uma conexão com cliente Bedrock real. A aceitação do pack, o rendering em celular/console e coexistência com os plugins EtherCraft precisam do teste do usuário. Vibrant Visuals pode reinterpretar água/céu/névoa; o autor da proposta relata maior fidelidade no renderizador clássico. Nenhuma garantia de igualdade pixel a pixel entre edições.
+Um plugin externo registra `VisualPaletteProvider` no Bukkit ServicesManager com `apiVersion() == 1`. `profiles()` fornece o catálogo. O comando de compilação reúne todos os providers registrados e as cores dos Community Packs realmente registrados pelo Terra2. Exemplo:
 
-A geração de terreno continua Paper 26.2. O trabalho não moderniza automaticamente o motor para 26.3. A falha separada de NBT do REIMAGEND ainda existe.
+```java
+public Collection<VisualProfile> profiles() {
+    return List.of(new VisualProfile("meugerador:planicie_congelante",
+        Map.of("grass", 0x80D9FF, "foliage", 0xBBDFFF, "water", 0x77AACC)));
+}
+```
 
-## Build validada em 11/10/2026
+A API é de **catálogo**, sem seleção por coordenadas nesta etapa. Deve ser implementada numa integração externa; registrar o provider não adapta automaticamente qualquer gerador. O provider deve fornecer um snapshot pequeno, sem carregar chunks ou executar geração. O comando é administrativo, executado na thread do servidor; não existe scanner contínuo.
 
-[Execução de CI 38161131342](https://github.com/mrserluiz/Terra2.0/actions/runs/38161131342), fonte `3a07a6db7c0e169fc58933c8cad7a8d719acb123`: geração/salvamento/reinício do motor passaram; o leitor real do Geyser aceitou 328 IDs sem mappings vanilla; os assets preservaram água/grama/folhagem; Paper 26.2 build 133 iniciou Terra2 e Geyser, registrou os 328 biomas, gerou o pack e repetiu a verificação após reiniciar. Não houve cliente Bedrock conectado.
+## Próxima etapa
 
-Na execução, baixe os artefatos `Terra2-engine-experimental-26.2` e `Geyser-PR6658-experimental-Spigot` e extraia seus JARs. Não use `Terra2-plugin` (controlador separado). O Geyser experimental substitui o JAR do Geyser na cópia de teste: nunca instale dois Geysers ao mesmo tempo. Seu config.yml/Floodgate continuam sendo os do servidor; confirme `gameplay.enable-custom-content: true` no formato de configuração desta build. O JSON só é registrado no próximo início após `/terra2 bedrock install`.
+Usar a identidade persistente Terra2 para resolver perfis por posição e validar um transporte de variantes para o Geyser oficial, incluindo chunks iniciais, atualizações de blocos, reconexão e troca de mundo. Preservar aparência vanilla fora dos mundos autorizados. Não usar overrides globais nem estados de blocos reservados por outros plugins como atalho.
 
-Em jogo, `/terra2 bedrock status` também mostra o ID Bukkit na posição atual, o modo de projeção, a quantidade de IDs Terra registrados no Geyser e a presença do pack em cache. `minecraft:snowy_plains` nessa posição não usa o mapping de Sakura, mesmo que a previsão do provider indique Sakura.
+Água, céu e névoa são pedidos de cor no catálogo; não se tornam automaticamente variantes de blocos sólidos. Precisam de tratamento específico. A API pública de névoa por jogador é um caminho separado a explorar. A compatibilidade Java/Bedrock e a renderização em cliente real continuam pendentes.
+
+## Validação
+
+Testes de unidade verificam RGB exato nos pixels, deduplicação entre geradores, determinismo, conflitos, limites e preservação de arquivos não pertencentes ao Terra2. O teste Paper gera a paleta pelo comando e verifica repetibilidade, reinício e ausência de alterações no bioma principal. Resultados da build serão associados à execução de CI após concluída.

@@ -134,6 +134,6 @@ Terra2 is a successor project and is not an official release of the original Ter
 - [简体中文 (zh_CN)](docs/manual/zh_CN/README.md)
 - [日本語 (ja_JP)](docs/manual/ja_JP/README.md)
 
-## Biomas coloridos no Bedrock (experimental)
+## Paleta visual genérica Bedrock (7.0.27-BETA, preparatória)
 
-Terra2 7.0.26-BETA exporta as cores reais dos Community Packs para o formato de biomas da proposta Geyser #6658. `/terra2 bedrock status|export|install`. Requer Geyser com suporte experimental para exibir as cores e IDs customizados nos chunks; não resolve a projeção VANILLA_COMPATIBLE nem a alteração de biomas por outros plugins. [Instalação e limites](docs/BEDROCK_BIOMES.md).
+`/terra2 bedrock pack` gera um atlas RGB com uma base de 256 cores e as cores exatas solicitadas pelos Community Packs e providers externos (`VisualPaletteProvider`). Deduplica por RGB e preserva packs/mappings de terceiros. Mantém o Geyser oficial; instalação/compilação do fork experimental foi retirada. A seleção visual por posição está **BLOCKED_PENDING_POSITION_TRANSPORT**: o pack não ativa sozinho as cores dos biomas. [Formato, API, comandos e limites](docs/BEDROCK_BIOMES.md).

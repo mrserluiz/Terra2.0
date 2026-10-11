@@ -124,7 +124,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Terra2-engine-experimental-26.2
-          path: terra2-engine/platforms/bukkit/build/libs/Terra2-bukkit-7.0.26-BETA.jar
+          path: terra2-engine/platforms/bukkit/build/libs/Terra2-bukkit-7.0.27-BETA.jar
           if-no-files-found: error
 
       - name: Upload real registry biome mappings
@@ -143,7 +143,7 @@ jobs:
           path: |
             terra2-engine/build/biome-smoke/*.log
             terra2-engine/build/biome-smoke/*.json
-            terra2-engine/build/biome-smoke/plugins/Terra2/bedrock/*.json
+            terra2-engine/build/biome-smoke/plugins/Terra2/bedrock/**
             terra2-engine/build/biome-smoke/plugins/BiomeCompatibilityProbe/identity.txt
             terra2-engine/build/native-smoke/*.log
             terra2-engine/build/native-smoke/*.json
@@ -164,66 +164,6 @@ jobs:
               break
             fi
           done
-
-  bedrock-geyser-experimental:
-    name: Bedrock visuals / Geyser PR 6658 (experimental)
-    needs: recovered-engine-26-2
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Checkout proposed Geyser biome implementation
-        uses: actions/checkout@v4
-        with:
-          repository: darkcupid412/Geyser
-          ref: c609c0e517954fbb58579c24c81564724a3be3bb
-          submodules: recursive
-          path: integration-geyser
-      - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '21'
-      - uses: gradle/actions/setup-gradle@v4
-      - uses: actions/download-artifact@v4
-        with:
-          name: Terra2-bedrock-mappings
-          path: integration-geyser/core/src/test/resources/configuration
-      - name: Install independent Terra2 interoperability test
-        run: cp integrations/geyser/tests/Terra2BiomeMappingsTest.java integration-geyser/core/src/test/java/org/geysermc/geyser/pack/
-      - name: Test mappings and generated Bedrock assets; build experimental Geyser
-        working-directory: integration-geyser
-        run: ./gradlew --no-daemon :core:test --tests '*CustomBiome*' --tests '*CustomBiomes*' --tests '*Terra2BiomeMappingsTest' :spigot:shadowJar
-      - name: Upload explicitly experimental Geyser
-        uses: actions/upload-artifact@v4
-        with:
-          name: Geyser-PR6658-experimental-Spigot
-          path: integration-geyser/bootstrap/spigot/build/libs/Geyser-Spigot.jar
-          if-no-files-found: error
-      - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '25'
-      - uses: actions/download-artifact@v4
-        with:
-          name: Terra2-engine-experimental-26.2
-          path: terra2-engine/platforms/bukkit/build/libs
-      - name: Resolve Paper API for the runtime probe
-        run: |
-          mkdir -p /tmp/terra2-probe-api
-          printf '%s\n' '<project><modelVersion>4.0.0</modelVersion><groupId>org.terra2</groupId><artifactId>probe</artifactId><version>1</version><repositories><repository><id>paper</id><url>https://repo.papermc.io/repository/maven-public/</url></repository></repositories><dependencies><dependency><groupId>io.papermc.paper</groupId><artifactId>paper-api</artifactId><version>26.2.build.133-stable</version></dependency></dependencies></project>' > /tmp/terra2-probe-api/pom.xml
-          mvn --batch-mode --no-transfer-progress --file /tmp/terra2-probe-api/pom.xml dependency:copy-dependencies -DoutputDirectory="$HOME/.gradle/caches/terra2-probe-api"
-      - name: Verify real Paper startup, mappings, pack and restart
-        run: python3 terra2-engine/tools/paper-bedrock-smoke.py
-      - name: Upload mapping and pack diagnostics
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: Terra2-bedrock-diagnostics
-          path: |
-            integration-geyser/core/build/terra2-bedrock/**
-            integration-geyser/core/build/test-results/test/**
-            terra2-engine/build/bedrock-smoke/*.log
-            terra2-engine/build/bedrock-smoke/*.json
-          if-no-files-found: warn
 
   climate-integration-26-2:
     name: Climate bridge protocol (experimental receiver fixture)

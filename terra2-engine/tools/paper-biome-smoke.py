@@ -11,7 +11,7 @@ build=next(b for b in json.loads(fetch('https://fill.papermc.io/v3/projects/pape
 download=build['downloads']['server:default'];data=fetch(download['url'])
 assert hashlib.sha256(data).hexdigest()==download['checksums']['sha256']
 (SERVER/'paper.jar').write_bytes(data)
-terra=ROOT/'platforms/bukkit/build/libs/Terra2-bukkit-7.0.26-BETA.jar'
+terra=ROOT/'platforms/bukkit/build/libs/Terra2-bukkit-7.0.27-BETA.jar'
 shutil.copy(terra,PLUGINS/terra.name)
 td=PLUGINS/'Terra2';(td/'packs').mkdir(parents=True,exist_ok=True)
 shutil.copy(ROOT/'tools/fixtures/HYDRAXIA.zip',td/'packs/HYDRAXIA.zip')

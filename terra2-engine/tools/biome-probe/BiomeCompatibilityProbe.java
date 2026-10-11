@@ -37,6 +37,16 @@ public final class BiomeCompatibilityProbe extends JavaPlugin {
             com.dfsek.terra.bukkit.bedrock.BedrockMappings.write(bedrockPath, com.dfsek.terra.bukkit.bedrock.BedrockMappings.document(bedrockEntries));
             require(!com.dfsek.terra.bukkit.bedrock.BedrockCommands.supportsBiomes(null), "Geyser remains optional");
             getLogger().info("TERRA2_BEDROCK_EXPORT_OK biomes=" + bedrockEntries.size() + " sakura=" + sakura);
+            var palettePath = terra.getDataFolder().toPath().resolve("bedrock/terra2-palette.mcpack");
+            byte[] previousPalette = Files.exists(palettePath) ? Files.readAllBytes(palettePath) : null;
+            require(com.dfsek.terra.bukkit.bedrock.BedrockCommands.handle(terra, Bukkit.getConsoleSender(), new String[]{"bedrock", "pack"}), "Generic palette command handled");
+            require(Files.isRegularFile(palettePath), "Generic pack generated on real Paper");
+            byte[] originalPalette = Files.readAllBytes(palettePath);
+            require(previousPalette == null || java.util.Arrays.equals(previousPalette, originalPalette), "Palette survives restart without cache identity changes");
+            com.dfsek.terra.bukkit.bedrock.BedrockVisualPack.write(palettePath, com.dfsek.terra.bukkit.bedrock.BedrockVisualPack.fromBiomes(bedrockEntries));
+            require(java.util.Arrays.equals(originalPalette, Files.readAllBytes(palettePath)), "Palette stable across repeated generation");
+            require(Bukkit.getWorld("world").getBiome(0,64,0).getKey().getNamespace().equals("minecraft"), "Palette does not rewrite primary biome");
+            getLogger().info("TERRA2_GENERIC_PALETTE_OK colors=" + com.dfsek.terra.bukkit.bedrock.BedrockVisualPack.index(com.dfsek.terra.bukkit.bedrock.BedrockVisualPack.fromBiomes(bedrockEntries)).get("exact_color_count"));
             var api=Bukkit.getServicesManager().load(WorldBiomeService.class);
             require(api!=null&&api.apiVersion()==1,"Persisted identity service registered");
             require(api.at(Bukkit.getWorld("world"),0,64,0).isEmpty(),"Primary world untouched");
