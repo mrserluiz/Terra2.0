@@ -35,14 +35,13 @@ public final class DiscoveryCommands {
         if(!(sender instanceof Player player)) { message(sender, "discover-player"); return true; }
         var world = player.getWorld(); var location = player.getLocation();
         if(args[0].equalsIgnoreCase("biome") && args.length == 1) {
-            String id = world.getGenerator() instanceof BukkitChunkGeneratorWrapper wrapper
-                ? wrapper.getPack().getBiomeProvider().getBiome(location.getBlockX(), location.getBlockY(), location.getBlockZ(), world.getSeed()).getID()
-                : world.getBiome(location).getKey().toString();
-            if(world.getGenerator() instanceof BukkitChunkGeneratorWrapper wrapper && wrapper.biomeCompatibility() != null
-                    && wrapper.biomeCompatibility().vanilla) {
-                var persisted = plugin.biomeService().at(world, location.getBlockX(), location.getBlockY(), location.getBlockZ());
-                id = persisted.map(org.terra2.api.biome.BiomeIdentity::terraId).orElse("UNKNOWN (missing/invalid Terra2 chunk identity)");
-            }
+            String id;
+            if(world.getGenerator() instanceof BukkitChunkGeneratorWrapper wrapper) {
+                if(wrapper.biomeCompatibility() != null && wrapper.biomeCompatibility().vanilla) {
+                    var persisted = plugin.biomeService().at(world, location.getBlockX(), location.getBlockY(), location.getBlockZ());
+                    id = persisted.map(org.terra2.api.biome.BiomeIdentity::terraId).orElse("UNKNOWN (missing/invalid Terra2 chunk identity)");
+                } else id = wrapper.getPack().getBiomeProvider().getBiome(location.getBlockX(), location.getBlockY(), location.getBlockZ(), world.getSeed()).getID();
+            } else id = world.getBiome(location).getKey().toString();
             message(sender, "discover-biome", world.getName(), id, world.getBiome(location).getKey()); return true;
         }
         boolean near = args[0].equalsIgnoreCase("structures");
