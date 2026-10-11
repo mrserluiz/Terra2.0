@@ -191,7 +191,7 @@ jobs:
         run: cp integrations/geyser/tests/Terra2BiomeMappingsTest.java integration-geyser/core/src/test/java/org/geysermc/geyser/pack/
       - name: Test mappings and generated Bedrock assets; build experimental Geyser
         working-directory: integration-geyser
-        run: ./gradlew --no-daemon :core:test --tests '*CustomBiome*' --tests '*CustomBiomes*' --tests '*Terra2BiomeMappingsTest' :bootstrap:spigot:shadowJar
+        run: ./gradlew --no-daemon :core:test --tests '*CustomBiome*' --tests '*CustomBiomes*' --tests '*Terra2BiomeMappingsTest' :spigot:shadowJar
       - name: Upload explicitly experimental Geyser
         uses: actions/upload-artifact@v4
         with:
