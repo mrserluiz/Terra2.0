@@ -198,6 +198,21 @@ jobs:
           name: Geyser-PR6658-experimental-Spigot
           path: integration-geyser/bootstrap/spigot/build/libs/Geyser-Spigot.jar
           if-no-files-found: error
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+      - uses: actions/download-artifact@v4
+        with:
+          name: Terra2-engine-experimental-26.2
+          path: terra2-engine/platforms/bukkit/build/libs
+      - name: Resolve Paper API for the runtime probe
+        run: |
+          mkdir -p /tmp/terra2-probe-api
+          printf '%s\n' '<project><modelVersion>4.0.0</modelVersion><groupId>org.terra2</groupId><artifactId>probe</artifactId><version>1</version><repositories><repository><id>paper</id><url>https://repo.papermc.io/repository/maven-public/</url></repository></repositories><dependencies><dependency><groupId>io.papermc.paper</groupId><artifactId>paper-api</artifactId><version>26.2.build.133-stable</version></dependency></dependencies></project>' > /tmp/terra2-probe-api/pom.xml
+          mvn --batch-mode --no-transfer-progress --file /tmp/terra2-probe-api/pom.xml dependency:copy-dependencies -DoutputDirectory="$HOME/.gradle/caches/terra2-probe-api"
+      - name: Verify real Paper startup, mappings, pack and restart
+        run: python3 terra2-engine/tools/paper-bedrock-smoke.py
       - name: Upload mapping and pack diagnostics
         if: always()
         uses: actions/upload-artifact@v4
@@ -206,6 +221,8 @@ jobs:
           path: |
             integration-geyser/core/build/terra2-bedrock/**
             integration-geyser/core/build/test-results/test/**
+            terra2-engine/build/bedrock-smoke/*.log
+            terra2-engine/build/bedrock-smoke/*.json
           if-no-files-found: warn
 
   climate-integration-26-2:
