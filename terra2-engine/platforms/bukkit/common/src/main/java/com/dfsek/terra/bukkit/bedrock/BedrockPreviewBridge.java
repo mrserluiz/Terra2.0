@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.*;
 import org.bukkit.event.player.*;
 import org.bukkit.event.server.ServerLoadEvent;
+import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 import java.nio.file.*;
@@ -26,6 +27,7 @@ public final class BedrockPreviewBridge implements Listener {
     private BukkitTask timer;
     private volatile String status="DISABLED";
     private boolean packRegistered,defined;
+    private boolean listening;
     private List<VisualProfile> catalog;
     private UUID packId;
     private final Path pack,marker;
@@ -55,14 +57,16 @@ public final class BedrockPreviewBridge implements Listener {
             if(!Files.exists(marker))return;
             if(Bukkit.getName().equalsIgnoreCase("Folia")){status="UNSUPPORTED_FOLIA_PREVIEW";return;}
             if(Files.isSymbolicLink(marker) || !Files.readString(marker).equals(MARKER))throw new IllegalStateException("Invalid preview marker");
+            if(!listening){Bukkit.getPluginManager().registerEvents(this,plugin);listening=true;}
             Plugin geyser=Bukkit.getPluginManager().getPlugin("Geyser-Spigot");
-            if(geyser==null || !geyser.isEnabled()){status="GEYSER_ABSENT";return;}
+            if(geyser==null){status="GEYSER_ABSENT";return;}
+            if(!geyser.isEnabled()){status="WAITING_GEYSER_ENABLE";return;}
+            if(transport!=null)return;
             transport=new GeyserPositionTransport(geyser.getClass().getClassLoader());
             Object api=transport.api();bus=call(api,"eventBus");
             owner=call(transport.type("org.geysermc.geyser.api.event.EventRegistrar"),"of",plugin);
             subscribe("org.geysermc.geyser.api.event.lifecycle.GeyserDefineCustomBlocksEvent",this::defineBlocks);
             subscribe("org.geysermc.geyser.api.event.lifecycle.GeyserDefineResourcePacksEvent",this::definePack);
-            Bukkit.getPluginManager().registerEvents(this,plugin);
             status="WAITING_GEYSER_STARTUP";
         } catch(Exception | LinkageError failure){fail(failure);}
     }
@@ -119,8 +123,12 @@ public final class BedrockPreviewBridge implements Listener {
         } catch(Exception | LinkageError error){fail(error);}
     }
     @EventHandler(priority=EventPriority.MONITOR)
+    public void enabled(PluginEnableEvent event) {
+        if(event.getPlugin().getName().equals("Geyser-Spigot") && status.equals("WAITING_GEYSER_ENABLE"))initialize();
+    }
+    @EventHandler(priority=EventPriority.MONITOR)
     public void serverLoaded(ServerLoadEvent event) {
-        if(status.equals("FAILED_DISABLED"))return;
+        if(status.equals("FAILED_DISABLED") || status.equals("GEYSER_ABSENT") || status.equals("DISABLED"))return;
         try {
             if(!defined || !packRegistered)throw new IllegalStateException("Geyser custom-content events missing; check gameplay.enable-custom-content and restart");
             int definitions=transport.validate(colors.values());status="READY_OPT_IN";

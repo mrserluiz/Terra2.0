@@ -66,27 +66,14 @@ public final class BedrockCommands {
             return true;
         }
         if(args[1].equalsIgnoreCase("install")) {
-            sender.sendMessage("Instalação experimental retirada. Mantenha o Geyser oficial; use pack para preparar a paleta genérica. A aplicação por posição ainda não está disponível.");
+            sender.sendMessage("Instalação experimental retirada. Mantenha o Geyser oficial; use pack para preparar a paleta genérica. Use prepare para autorizar a prévia de grama no Geyser oficial.");
             return true;
         }
         if(args[1].equalsIgnoreCase("status")) {
-            sender.sendMessage("Terra2 Bedrock: " + (geyser == null ? "GEYSER_ABSENT" : supportsBiomes(geyser)
-                ? "CUSTOM_BIOME_API_PRESENT (registro e cliente ainda precisam ser validados)" : "UNSUPPORTED_CUSTOM_BIOMES")
-                + "; exportação: plugins/Terra2/bedrock/terra2-biomes.json");
+            sender.sendMessage("Terra2 Bedrock: " + (geyser == null ? "GEYSER_ABSENT" : "Geyser-Spigot local " + geyser.getDescription().getVersion())
+                + "; paleta: plugins/Terra2/bedrock/terra2-palette.mcpack");
             sender.sendMessage("Prévia por posição: "+(bridge==null?"DISABLED":bridge.status()));
             if(sender instanceof org.bukkit.entity.Player player && bridge!=null)sender.sendMessage(bridge.playerStatus(player));
-            if(supportsBiomes(geyser)) {
-                try {
-                    var registryType = Class.forName("org.geysermc.geyser.registry.Registries", false, geyser.getClass().getClassLoader());
-                    Object registry = registryType.getField("CUSTOM_BIOMES").get(null);
-                    var mappings = (java.util.Map<?, ?>) registry.getClass().getMethod("get").invoke(registry);
-                    long count = mappings.keySet().stream().filter(id -> id.toString().startsWith("terra:")).count();
-                    sender.sendMessage("Mappings Terra registrados no Geyser: " + count + "; pack gerado: "
-                        + java.nio.file.Files.isRegularFile(geyser.getDataFolder().toPath().resolve("cache/custom_biomes.mcpack")));
-                } catch(ReflectiveOperationException | LinkageError error) {
-                    sender.sendMessage("Não foi possível consultar o registro desta versão do Geyser; confirme no console após reiniciar.");
-                }
-            }
             if(sender instanceof org.bukkit.entity.Player player) {
                 var world = player.getWorld(); var location = player.getLocation();
                 sender.sendMessage("Mundo: " + world.getName() + "; bioma Bukkit no local: " + world.getBiome(location).getKey());
