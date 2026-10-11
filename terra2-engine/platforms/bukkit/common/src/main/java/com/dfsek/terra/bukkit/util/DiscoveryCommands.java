@@ -38,6 +38,11 @@ public final class DiscoveryCommands {
             String id = world.getGenerator() instanceof BukkitChunkGeneratorWrapper wrapper
                 ? wrapper.getPack().getBiomeProvider().getBiome(location.getBlockX(), location.getBlockY(), location.getBlockZ(), world.getSeed()).getID()
                 : world.getBiome(location).getKey().toString();
+            if(world.getGenerator() instanceof BukkitChunkGeneratorWrapper wrapper && wrapper.biomeCompatibility() != null
+                    && wrapper.biomeCompatibility().vanilla) {
+                var persisted = plugin.biomeService().at(world, location.getBlockX(), location.getBlockY(), location.getBlockZ());
+                id = persisted.map(org.terra2.api.biome.BiomeIdentity::terraId).orElse("UNKNOWN (missing/invalid Terra2 chunk identity)");
+            }
             message(sender, "discover-biome", world.getName(), id, world.getBiome(location).getKey()); return true;
         }
         boolean near = args[0].equalsIgnoreCase("structures");

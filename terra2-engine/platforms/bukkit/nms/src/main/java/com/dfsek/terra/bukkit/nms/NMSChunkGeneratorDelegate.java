@@ -39,6 +39,7 @@ public class NMSChunkGeneratorDelegate extends ChunkGenerator {
     private final com.dfsek.terra.api.world.chunk.generation.ChunkGenerator delegate;
 
     private final ChunkGenerator vanilla;
+    private final NMSBiomeProvider terraBiomes;
     private final ConfigPack pack;
     private final NativeWorldExecutor nativeExecutor;
     private volatile net.minecraft.world.level.chunk.ChunkGeneratorStructureState nativeState;
@@ -52,6 +53,7 @@ public class NMSChunkGeneratorDelegate extends ChunkGenerator {
     public NMSChunkGeneratorDelegate(ChunkGenerator vanilla, ConfigPack pack, NMSBiomeProvider biomeProvider, long seed,
                                      com.dfsek.terra.api.world.chunk.generation.ChunkGenerator generator, NativeWorldExecutor nativeExecutor) {
         super(biomeProvider);
+        this.terraBiomes = biomeProvider;
         this.nativeExecutor = nativeExecutor;
         this.delegate = generator;
         this.vanilla = vanilla;
@@ -79,7 +81,11 @@ public class NMSChunkGeneratorDelegate extends ChunkGenerator {
     @Override
     public void applyBiomeDecoration(@NotNull WorldGenLevel world, @NotNull ChunkAccess chunk,
                                      @NotNull StructureManager structureAccessor) {
-        if(nativeExecutor == null) vanilla.applyBiomeDecoration(world, chunk, structureAccessor);
+        if(terraBiomes.vanillaCompatible()) {
+            // Preserve Terra pack populators without adding vanilla trees/ores on top of its terrain.
+            vanilla.applyBiomeDecoration(world, chunk, structureAccessor, false);
+        }
+        else if(nativeExecutor == null) vanilla.applyBiomeDecoration(world, chunk, structureAccessor);
         else { nativeExecutor.verify(world.getLevel()); super.applyBiomeDecoration(world, chunk, structureAccessor); }
     }
 
@@ -138,6 +144,7 @@ public class NMSChunkGeneratorDelegate extends ChunkGenerator {
                     beard(structureAccessor, chunk, new BukkitWorldProperties(level.getMinecraftWorld().getWorld()),
                         biomeProvider, compatibilityOptions);
                 }
+                terraBiomes.persist(c);
                 return c;
             });
     }

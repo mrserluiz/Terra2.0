@@ -63,6 +63,9 @@ public class TerraBukkitPlugin extends JavaPlugin {
     private final Map<String, String> compositionVersions = new HashMap<>();
     private org.terra2.core.GenerationManager<com.dfsek.terra.api.block.state.BlockState, com.dfsek.terra.api.world.biome.Biome> core;
     private volatile YamlConfiguration generationSettings;
+    private final java.util.Map<String, com.dfsek.terra.bukkit.compatibility.BiomeCompatibility> biomePolicies = new java.util.concurrent.ConcurrentHashMap<>();
+    private final com.dfsek.terra.bukkit.compatibility.PersistedBiomeService biomeService = new com.dfsek.terra.bukkit.compatibility.PersistedBiomeService();
+    public org.terra2.api.biome.WorldBiomeService biomeService() { return biomeService; }
     private String primaryWorldName;
     private org.terra2.adapter.vanilla.paper.WorldLootManager lootManager;
     private com.dfsek.terra.bukkit.util.TerraWorldClimateService climateService;
@@ -232,6 +235,7 @@ public class TerraBukkitPlugin extends JavaPlugin {
         }, this);
         logger.info("Terra2 diagnostics enabled; reports directory: {}", getDataFolder().toPath().resolve("reports"));
         try {
+            Bukkit.getServicesManager().register(org.terra2.api.biome.WorldBiomeService.class, biomeService, this, org.bukkit.plugin.ServicePriority.Normal);
             climateService = new com.dfsek.terra.bukkit.util.TerraWorldClimateService();
             climateService.apply(com.dfsek.terra.bukkit.util.TerraWorldClimateService.prepare(generationSettings, primaryWorldName));
             Bukkit.getServicesManager().register(org.terra2.api.climate.WorldClimateService.class, climateService, this,
@@ -380,6 +384,11 @@ public class TerraBukkitPlugin extends JavaPlugin {
         }
         if(datapacks.hasWorld(worldName)) throw new IllegalArgumentException("World already has a vanilla/TerraPack generator: " + worldName);
         ConfigPack pack = composition.legacy();
+        if(generationSettings.getString("worlds."+worldName+".biomes.mode", "CUSTOM").equals("VANILLA_COMPATIBLE")
+                && (!composition.packs().isEmpty() || !platform.usesNativeBiomeProvider()))
+            throw new IllegalArgumentException("VANILLA_COMPATIBLE currently requires a native Community Pack terrain base without converted overlays");
+        var policy = biomePolicies.computeIfAbsent(worldName, name -> com.dfsek.terra.bukkit.compatibility.BiomeCompatibility.prepare(generationSettings, name, pack));
+        policy.validateReload(generationSettings, worldName);
         String selected = composition.selection();
         try { platform.prepareNativePacks(worldName, composition.packs()); }
         catch(java.io.IOException error) { throw new IllegalArgumentException("Cannot restore native pack resources", error); }
@@ -407,6 +416,7 @@ public class TerraBukkitPlugin extends JavaPlugin {
                 && !composition.version().equals(compositionVersions.get(worldName))))
             throw new IllegalArgumentException("Cannot replace active TerraPack composition: " + worldName);
         var wrapper = new BukkitChunkGeneratorWrapper(delegate, pack, platform.getWorldHandle().air(), platform.usesNativeBiomeProvider());
+        wrapper.setBiomeCompatibility(policy);
         wrapper.setExtraPopulators(extraPopulators.getOrDefault(worldName, java.util.List.of()));
         return wrapper;
         } catch(RuntimeException | LinkageError e) {
@@ -731,6 +741,7 @@ public class TerraBukkitPlugin extends JavaPlugin {
         if(applyLoot != null) applyLoot.run();
     }
     private Runnable validateGenerationSettings(YamlConfiguration next) throws Exception {
+        for(var binding : biomePolicies.entrySet()) binding.getValue().validateReload(next, binding.getKey());
         var worlds = next.getConfigurationSection("worlds");
         for(String world : worlds.getKeys(false)) {
             if(next.isString("worlds." + world + ".datapack")) {

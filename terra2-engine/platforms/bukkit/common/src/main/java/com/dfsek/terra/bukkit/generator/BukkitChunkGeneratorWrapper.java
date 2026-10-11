@@ -40,6 +40,14 @@ import com.dfsek.terra.bukkit.world.BukkitWorldProperties;
 public class BukkitChunkGeneratorWrapper extends org.bukkit.generator.ChunkGenerator implements GeneratorWrapper {
     private static final Logger LOGGER = LoggerFactory.getLogger(BukkitChunkGeneratorWrapper.class);
     private final BlockState air;
+    private com.dfsek.terra.bukkit.compatibility.BiomeCompatibility biomeCompatibility;
+    private volatile boolean nativeBiomesBound;
+    public void markNativeBiomesBound() { nativeBiomesBound = true; }
+    public void setBiomeCompatibility(com.dfsek.terra.bukkit.compatibility.BiomeCompatibility value) {
+        if(biomeCompatibility != null) throw new IllegalStateException("Biome projection is already bound");
+        biomeCompatibility = java.util.Objects.requireNonNull(value);
+    }
+    public com.dfsek.terra.bukkit.compatibility.BiomeCompatibility biomeCompatibility() { return biomeCompatibility; }
     private final boolean nativeBiomes;
     private final BukkitBlockPopulator blockPopulator;
     private ChunkGenerator delegate;
@@ -77,6 +85,8 @@ public class BukkitChunkGeneratorWrapper extends org.bukkit.generator.ChunkGener
 
     @Override
     public void generateNoise(@NotNull WorldInfo worldInfo, @NotNull Random random, int x, int z, @NotNull ChunkData chunkData) {
+        if(biomeCompatibility != null && biomeCompatibility.vanilla && !nativeBiomesBound)
+            throw new IllegalStateException("Native biome projection was not bound; refusing unsafe generation for " + worldInfo.getName());
         BukkitWorldProperties properties = new BukkitWorldProperties(worldInfo);
         try {
             delegate.generateChunkData(new BukkitProtoChunk(chunkData), properties, pack.getBiomeProvider(), x, z);

@@ -47,6 +47,19 @@ public final class GenerationSettings {
                 throw new InvalidConfigurationException("Nome de mundo inválido: " + world);
             var entry = worlds.getConfigurationSection(world);
             if(entry == null) throw new InvalidConfigurationException("Mundo deve ser uma seção YAML: " + world);
+            if(entry.contains("biomes")) {
+                var biomes = entry.getConfigurationSection("biomes");
+                if(biomes == null || (biomes.contains("mode") && (!biomes.isString("mode")
+                        || !java.util.Set.of("CUSTOM", "VANILLA_COMPATIBLE").contains(biomes.getString("mode")))))
+                    throw new InvalidConfigurationException("Invalid biomes.mode for " + world);
+                if(biomes.contains("references")) {
+                    var refs = biomes.getConfigurationSection("references");
+                    if(refs == null || refs.getValues(false).entrySet().stream().anyMatch(value -> !(value.getValue() instanceof String ref)
+                            || !ref.matches("minecraft:[a-z0-9_./-]+")))
+                        throw new InvalidConfigurationException("biomes.references must map IDs to vanilla minecraft: biome keys: " + world);
+                }
+                if(entry.contains("datapack")) throw new InvalidConfigurationException("biomes projection currently requires a Community Pack: " + world);
+            }
             if(entry.contains("climate")) {
                 var climate = entry.getConfigurationSection("climate");
                 if(climate == null || (climate.contains("enabled") && !climate.isBoolean("enabled")))

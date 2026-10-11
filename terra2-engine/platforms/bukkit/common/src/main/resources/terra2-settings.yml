@@ -31,4 +31,13 @@ generation:
 # Equivalent: pack: OVERWORLD;Debris
 # Create with --generator Terra2:PACKS after /terra2 reload.
 # Convert inputs separately: /terra2 convert Debris scatter-demo
+# Opt-in projection for NEW Community Pack worlds only:
+# worlds:
+#   terra2_compat_test:
+#     pack: HYDRAXIA
+#     biomes:
+#       mode: VANILLA_COMPATIBLE
+#       # Default reference comes from the pack's vanilla base biome.
+#       # references: {SNOWSWEPT_MEADOWS: minecraft:snowy_plains}
+# CUSTOM remains the default. Existing chunks are never converted.
 worlds: {}

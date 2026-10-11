@@ -42,11 +42,16 @@ public class NMSInjectListener implements Listener {
             ServerLevel serverWorld = craftWorld.getHandle();
 
             ConfigPack pack = bukkitChunkGeneratorWrapper.getPack();
+            if(bukkitChunkGeneratorWrapper.biomeCompatibility() != null) {
+                try { bukkitChunkGeneratorWrapper.biomeCompatibility().bind(craftWorld); }
+                catch(java.io.IOException denied) { throw new IllegalStateException("Biome compatibility binding refused", denied); }
+            }
 
             ChunkGenerator vanilla = serverWorld.getChunkSource().getGenerator();
             NMSBiomeProvider provider = new NMSBiomeProvider(pack.getBiomeProvider(), craftWorld.getSeed(),
                 bukkitChunkGeneratorWrapper.getHandle() instanceof org.terra2.adapter.terra.CoreTerraGenerator core ? core : null,
-                new com.dfsek.terra.bukkit.world.BukkitWorldProperties(craftWorld));
+                new com.dfsek.terra.bukkit.world.BukkitWorldProperties(craftWorld),
+                bukkitChunkGeneratorWrapper.biomeCompatibility(), craftWorld.getUID(), pack.getID());
             ChunkMap chunkMap = serverWorld.getChunkSource().chunkMap;
             WorldGenContext worldGenContext = Reflection.CHUNKMAP.getWorldGenContext(chunkMap);
             NativeWorldExecutor nativeExecutor = ((NMSPlatform) plugin.platform()).nativeRuntime().bind(serverWorld, worldGenContext.structureManager());
@@ -59,6 +64,7 @@ public class NMSInjectListener implements Listener {
                 worldGenContext.unsavedListener()
             ));
 
+            bukkitChunkGeneratorWrapper.markNativeBiomesBound();
             LOGGER.info("Successfully injected into world.");
             INJECTED.add(event.getWorld());
             } catch(RuntimeException | LinkageError e) {
