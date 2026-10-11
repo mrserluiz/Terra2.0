@@ -49,7 +49,7 @@ public final class BedrockVisualPack {
         }
         if(palette.size() > MAX_COLORS) throw new IllegalArgumentException("Palette exceeds " + MAX_COLORS + " exact colors; split the catalogs");
         var root = new JsonObject(); root.addProperty("terra2_visual_schema", 1);
-        root.addProperty("runtime_projection", "BLOCKED_PENDING_POSITION_TRANSPORT");
+        root.addProperty("runtime_projection", "OPT_IN_GRASS_PREVIEW");
         root.addProperty("base_palette_colors", 256); root.addProperty("exact_color_count", palette.size());
         var textures = new JsonObject();
         for(int rgb : palette) textures.addProperty(hex(rgb), texture(rgb));
@@ -67,7 +67,7 @@ public final class BedrockVisualPack {
         var index = index(profiles); String identity = JSON.toJson(index);
         var manifest = new JsonObject(); manifest.addProperty("format_version", 2);
         var header = new JsonObject(); header.addProperty("name", "Terra2 Generic RGB Palette");
-        header.addProperty("description", "Color atlas only; requires a position-aware visual bridge. No vanilla overrides.");
+        header.addProperty("description", "RGB atlas for optional Terra2 position preview. No vanilla overrides.");
         header.addProperty("uuid", UUID.nameUUIDFromBytes(("header:"+identity).getBytes(StandardCharsets.UTF_8)).toString());
         header.add("version", JsonParser.parseString("[1,0,0]")); header.add("min_engine_version", JsonParser.parseString("[1,21,40]"));
         manifest.add("header", header);

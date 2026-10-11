@@ -26,7 +26,7 @@ class BedrockVisualPackTest {
             var png = ImageIO.read(zip.getInputStream(zip.getEntry("textures/terra2/palette/terra2_rgb_ffd1ef.png")));
             assertEquals(0xFFFFD1EF,png.getRGB(8,8));
             assertNull(zip.getEntry("blocks.json")); assertNull(zip.getEntry("biomes/plains.json"));
-            assertEquals("BLOCKED_PENDING_POSITION_TRANSPORT",index.get("runtime_projection").getAsString());
+            assertEquals("OPT_IN_GRASS_PREVIEW",index.get("runtime_projection").getAsString());
         }
         BedrockVisualPack.write(target,List.of(a,b)); assertArrayEquals(first,Files.readAllBytes(target));
     }

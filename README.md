@@ -4,7 +4,7 @@
 
 Terra 2.0 is an independent continuation and modernization of the Terra world-generation engine for Paper, focused on **per-world generation**, **Community Pack compatibility**, safe world isolation, and a path toward native Minecraft datapack support.
 
-> **Current reference build:** `Terra2-bukkit-7.0.27-BETA.jar` (RGB palette compiler added; Bedrock position projection remains blocked)
+> **Current reference build:** `Terra2-bukkit-7.0.28-BETA.jar` (opt-in Bedrock grass position preview; full chunk projection remains incomplete)
 
 Terra 2.0 is no longer only a recovery scaffold. The 7.0.25 line has an executable generation core, a Terra Community Pack compatibility backend, a first vanilla datapack importer, local TerraPacks, and per-world pack composition.
 
@@ -137,3 +137,7 @@ Terra2 is a successor project and is not an official release of the original Ter
 ## Paleta visual genérica Bedrock (7.0.27-BETA, preparatória)
 
 `/terra2 bedrock pack` gera um atlas RGB com uma base de 256 cores e as cores exatas solicitadas pelos Community Packs e providers externos (`VisualPaletteProvider`). Deduplica por RGB e preserva packs/mappings de terceiros. Mantém o Geyser oficial; instalação/compilação do fork experimental foi retirada. A seleção visual por posição está **BLOCKED_PENDING_POSITION_TRANSPORT**: o pack não ativa sozinho as cores dos biomas. [Formato, API, comandos e limites](docs/BEDROCK_BIOMES.md).
+
+## 7.0.28-BETA: Bedrock grass position preview
+
+Keep official local Geyser-Spigot. `/terra2 bedrock prepare`, restart, accept the automatically offered RGB pack, then `/terra2 bedrock preview` as a Bedrock OP in an authorized Terra2 world. `/terra2 bedrock stop` restores normal visuals; `/terra2 bedrock disable` removes startup authorization. Bounded solid-color grass preview only: 64 nearby blocks, two participants, no saved-world changes or global Java mappings. Uses saved Terra2 identities in projected worlds and explicitly labeled provider prediction in CUSTOM worlds. Position transport is a guarded adapter to Geyser internals, not a stable public API; incompatible versions fail closed. [Instructions and limits](docs/BEDROCK_BIOMES.md).

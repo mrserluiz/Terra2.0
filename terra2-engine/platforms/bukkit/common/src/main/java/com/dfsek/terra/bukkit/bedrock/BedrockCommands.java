@@ -22,11 +22,30 @@ public final class BedrockCommands {
     }
     public static boolean handle(TerraBukkitPlugin plugin, CommandSender sender, String[] args) {
         if(args.length == 0 || !args[0].equalsIgnoreCase("bedrock")) return false;
-        if(args.length != 2 || !Set.of("status", "export", "install", "pack").contains(args[1].toLowerCase(Locale.ROOT))) {
-            sender.sendMessage("Uso: /terra2 bedrock <status|export|pack>"); return true;
+        if(args.length != 2 || !Set.of("status", "export", "install", "pack", "prepare", "preview", "stop", "disable").contains(args[1].toLowerCase(Locale.ROOT))) {
+            sender.sendMessage("Uso: /terra2 bedrock <status|export|pack|prepare|preview|stop|disable>"); return true;
         }
         Plugin geyser = Bukkit.getPluginManager().getPlugin("Geyser-Spigot");
+        var bridge=plugin.bedrockPreview();
+        if(Set.of("prepare","preview","stop","disable").contains(args[1].toLowerCase(Locale.ROOT))) {
+            try {
+                if(bridge==null)throw new IllegalStateException("Preview module not initialized");
+                if(args[1].equalsIgnoreCase("prepare")) {
+                    bridge.prepare();sender.sendMessage("Teste Bedrock autorizado para o próximo início. Reinicie com o Geyser oficial; o Terra2 registrará e enviará seu pack automaticamente.");
+                } else if(args[1].equalsIgnoreCase("disable")) {
+                    bridge.disable();sender.sendMessage("Prévia desativada e autorização removida. Reinicie para retirar os registros e o pack desta sessão do Geyser.");
+                } else if(sender instanceof org.bukkit.entity.Player player) {
+                    if(args[1].equalsIgnoreCase("stop")){bridge.stop(player,true);sender.sendMessage("Prévia encerrada; aparência real restaurada.");}
+                    else sender.sendMessage(bridge.start(player));
+                } else sender.sendMessage("Execute preview/stop em jogo pelo jogador Bedrock.");
+            } catch(Exception error){sender.sendMessage("Prévia recusada: "+error.getMessage());}
+            return true;
+        }
         if(args[1].equalsIgnoreCase("pack")) {
+            if(bridge!=null && bridge.status().startsWith("READY_OPT_IN")) {
+                sender.sendMessage("A paleta registrada nesta sessão está congelada em plugins/Terra2/bedrock/terra2-palette.mcpack. Reinicie para atualizar cores/providers.");
+                return true;
+            }
             try {
                 var profiles = new java.util.ArrayList<>(BedrockVisualPack.fromBiomes(plugin.platform().bedrockBiomeAppearances()));
                 for(var registration : Bukkit.getServicesManager().getRegistrations(org.terra2.api.visual.VisualPaletteProvider.class)) {
@@ -54,7 +73,8 @@ public final class BedrockCommands {
             sender.sendMessage("Terra2 Bedrock: " + (geyser == null ? "GEYSER_ABSENT" : supportsBiomes(geyser)
                 ? "CUSTOM_BIOME_API_PRESENT (registro e cliente ainda precisam ser validados)" : "UNSUPPORTED_CUSTOM_BIOMES")
                 + "; exportação: plugins/Terra2/bedrock/terra2-biomes.json");
-            sender.sendMessage("Paleta genérica: /terra2 bedrock pack. Projeção de variantes por posição: BLOCKED_PENDING_POSITION_TRANSPORT; nenhuma recoloração ativa.");
+            sender.sendMessage("Prévia por posição: "+(bridge==null?"DISABLED":bridge.status()));
+            if(sender instanceof org.bukkit.entity.Player player && bridge!=null)sender.sendMessage(bridge.playerStatus(player));
             if(supportsBiomes(geyser)) {
                 try {
                     var registryType = Class.forName("org.geysermc.geyser.registry.Registries", false, geyser.getClass().getClassLoader());

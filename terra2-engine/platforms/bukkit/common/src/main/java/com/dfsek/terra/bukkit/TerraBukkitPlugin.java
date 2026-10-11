@@ -244,10 +244,18 @@ public class TerraBukkitPlugin extends JavaPlugin {
             logger.error("Invalid Terra2 climate configuration; disabling plugin", invalidClimate);
             Bukkit.getPluginManager().disablePlugin(this);
         }
+        if(isEnabled()) {
+            bedrockPreview = new com.dfsek.terra.bukkit.bedrock.BedrockPreviewBridge(this);
+            bedrockPreview.initialize();
+        }
     }
+
+    private com.dfsek.terra.bukkit.bedrock.BedrockPreviewBridge bedrockPreview;
+    public com.dfsek.terra.bukkit.bedrock.BedrockPreviewBridge bedrockPreview() { return bedrockPreview; }
 
     @Override
     public void onDisable() {
+        if(bedrockPreview != null) bedrockPreview.close();
         Bukkit.getServicesManager().unregisterAll(this);
         if(structureIndexTask != null) structureIndexTask.cancel();
         try { com.dfsek.terra.bukkit.util.StructureIndex.flush(); }

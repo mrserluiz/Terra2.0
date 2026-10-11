@@ -1,10 +1,10 @@
-# Paleta visual genérica Bedrock — 7.0.27-BETA
+# Paleta visual genérica Bedrock — 7.0.28-BETA
 
 O Geyser oficial deve ser mantido. A build 7.0.26 usou a proposta experimental PR #6658 para validar cores de biomas; aquele Geyser não é requisito nem a solução escolhida para distribuição. A nova build não compila outro Geyser e `/terra2 bedrock install` recusa a instalação experimental.
 
 ## Estado real
 
-Esta etapa implementa o compilador de um pack de recursos RGB independente do gerador. **Não aplica cores aos chunks ou à tela do jogador.** A seleção de variantes por posição está `BLOCKED_PENDING_POSITION_TRANSPORT`. Um resource pack sozinho não transmite a identidade Terra2, nem executa behavior packs num servidor Paper.
+Esta etapa implementa o compilador de um pack de recursos RGB independente do gerador. A paleta não modifica chunks salvos. A seleção por posição agora possui uma **prévia opt-in de grama**, descrita abaixo. Água, folhas, céu e aplicação completa em chunks ainda não estão implementados. Um resource pack sozinho não transmite a identidade Terra2, nem executa behavior packs num servidor Paper.
 
 ## Gerar a paleta
 
@@ -48,11 +48,11 @@ public Collection<VisualProfile> profiles() {
 }
 ```
 
-A API é de **catálogo**, sem seleção por coordenadas nesta etapa. Deve ser implementada numa integração externa; registrar o provider não adapta automaticamente qualquer gerador. O provider deve fornecer um snapshot pequeno, sem carregar chunks ou executar geração. O comando é administrativo, executado na thread do servidor; não existe scanner contínuo.
+A API é de **catálogo**, sem seleção por coordenadas nesta etapa. Deve ser implementada numa integração externa; registrar o provider não adapta automaticamente qualquer gerador. O provider deve fornecer um snapshot pequeno, sem carregar chunks ou executar geração. A compilação é administrativa, executada na thread do servidor. Apenas jogadores em prévia explícita têm uma busca local limitada, uma vez por segundo.
 
-## Próxima etapa
+## Próxima etapa após a prévia
 
-Usar a identidade persistente Terra2 para resolver perfis por posição e validar um transporte de variantes para o Geyser oficial, incluindo chunks iniciais, atualizações de blocos, reconexão e troca de mundo. Preservar aparência vanilla fora dos mundos autorizados. Não usar overrides globais nem estados de blocos reservados por outros plugins como atalho.
+Substituir a prévia local por um transporte completo de variantes, incluindo chunks iniciais, atualizações de blocos, reconexão e troca de mundo. Preservar aparência vanilla fora dos mundos autorizados. Não usar overrides globais nem estados de blocos reservados por outros plugins como atalho.
 
 Água, céu e névoa são pedidos de cor no catálogo; não se tornam automaticamente variantes de blocos sólidos. Precisam de tratamento específico. A API pública de névoa por jogador é um caminho separado a explorar. A compatibilidade Java/Bedrock e a renderização em cliente real continuam pendentes.
 
@@ -65,3 +65,28 @@ Artefatos da execução: `Terra2-engine-experimental-26.2` contém o JAR 7.0.27;
 SHA-256 do JAR: `9a4ece29f3272dbf84946171639f7bd1dafba81867c905af1c13023c6518fe6a`.
 
 SHA-256 do pack: `d67b7cd8f796567ef6b3b27b5f8e4d4481f033ca2aaa9ddfe3bd260dc7322c2d`.
+
+## Prévia por posição — 7.0.28-BETA
+
+**Geyser oficial local (`Geyser-Spigot`)**, Paper 26.2, custom content habilitado. Sem fork, sem addon externo e sem dependência obrigatória. Geyser em proxy/standalone e Folia não são atendidos por esta prévia.
+
+1. Troque apenas o JAR Terra2 pela build 7.0.28 e inicie normalmente.
+2. Como OP, execute `/terra2 bedrock prepare`. Isso grava uma autorização própria em `plugins/Terra2/bedrock/preview.enabled`; não modifica o YAML nem cria mundos.
+3. Reinicie. Antes de aceitar logins, o Terra2 prepara a paleta e a registra pelo evento público de packs do Geyser. Registra até 128 blocos de cor próprios pelo evento público de blocos, **sem overrides Java ou de itens**. O Geyser oferece o pack durante o login. Não precisa copiar o pack para sua pasta nem instalar outro Geyser. Para o teste, aceite o pack ao entrar; recuse a prévia se o cliente não o carregar.
+4. Confira `/terra2 bedrock status`: deve mostrar `READY_OPT_IN`. Se apresentar `FAILED_DISABLED`, procure a causa no console e em `plugins/Terra2/reports`; o motor de geração não é desativado.
+5. Entre pelo Bedrock em um mundo Terra2 autorizado com grama próxima e execute `/terra2 bedrock preview`. A prévia colore até 64 blocos de grama por jogador, num raio horizontal de 4 e faixa vertical de ±3. Limite de dois participantes. É uma amostra de cor sólida em cubos, **não a textura final de grama com terra nas laterais**. Sem folhas, água, céu ou névoa nesta etapa.
+6. Use status para ver a quantidade de updates submetidos. Submeter pacotes não prova que o cliente renderizou. Compare o mesmo local pelo Java: seus blocos/biomas ficam inalterados.
+7. Execute `/terra2 bedrock stop` para restaurar a aparência enviada pelos mappings normais. Teleporte, mudança de mundo, perda da permissão OP e desconexão encerram a prévia; reative por comando quando retornar/reconectar.
+8. `/terra2 bedrock disable` encerra as prévias e retira a autorização persistente. Reinicie para retirar o pack/registros desta sessão. Não use PlugMan nem `/geyser reload` durante o teste.
+
+### Leitura e transporte
+
+Em `VANILLA_COMPATIBLE`, lê a identidade original persistente de cada posição. Se estiver ausente/inválida, não reconstrói nem aplica cor. Em CUSTOM, que não guarda a paleta PDC, usa uma **previsão do provider vinculado ao mundo**; não afirma que ela é um dado histórico salvo do chunk. Biomas Bukkit alterados por outro plugin não determinam essa seleção. Somente GRASS_BLOCK existente, chunks já carregados e mundos autorizados entram na busca. Sem geração adicional por lookup e sem alterações nos blocos salvos.
+
+A API pública registra packs e blocos, mas o envio arbitrário por posição usa um adaptador isolado às classes internas de sessão/protocolo do Geyser oficial, acessadas por reflexão. **Não é uma API pública estável**. Verifica métodos, runtime IDs e definições; incompatibilidade desativa apenas a prévia, com um reporte. Nenhum ID de protocolo é fixado manualmente. Atualizações futuras do Geyser podem exigir ajustes nesse adaptador.
+
+O envio ocorre no event loop da sessão, com tokens que invalidam lotes após stop/teleporte. Updates normais do Geyser ou reenvios de chunks podem substituir a prévia entre os refreshes de um segundo; essa limitação será tratada antes de habilitar projeção permanente. Não há mudança automática para todos os jogadores.
+
+### Validação da nova build
+
+CI baixa um binário **oficial**, verifica o SHA-256 divulgado pela API de downloads e registra a versão/build usada no diagnóstico. Testa registro de pack e blocos, construção de updates com runtime IDs reais, captura isolada do envio, rejeição de lotes expirados, lookup da identidade persistente, proteção do mundo principal e reinício. Não conecta um cliente Bedrock real nem simula renderização. O teste visual final é o procedimento acima.
