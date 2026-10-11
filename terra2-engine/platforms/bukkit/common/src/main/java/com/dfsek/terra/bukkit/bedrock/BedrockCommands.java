@@ -31,6 +31,25 @@ public final class BedrockCommands {
                 ? "CUSTOM_BIOME_API_PRESENT (registro e cliente ainda precisam ser validados)" : "UNSUPPORTED_CUSTOM_BIOMES")
                 + "; exportação: plugins/Terra2/bedrock/terra2-biomes.json");
             sender.sendMessage("Cores precisam dos IDs personalizados nos chunks. VANILLA_COMPATIBLE ou outro plugin alterando biomas impede esta primeira integração.");
+            if(supportsBiomes(geyser)) {
+                try {
+                    var registryType = Class.forName("org.geysermc.geyser.registry.Registries", false, geyser.getClass().getClassLoader());
+                    Object registry = registryType.getField("CUSTOM_BIOMES").get(null);
+                    var mappings = (java.util.Map<?, ?>) registry.getClass().getMethod("get").invoke(registry);
+                    long count = mappings.keySet().stream().filter(id -> id.toString().startsWith("terra:")).count();
+                    sender.sendMessage("Mappings Terra registrados no Geyser: " + count + "; pack gerado: "
+                        + java.nio.file.Files.isRegularFile(geyser.getDataFolder().toPath().resolve("cache/custom_biomes.mcpack")));
+                } catch(ReflectiveOperationException | LinkageError error) {
+                    sender.sendMessage("Não foi possível consultar o registro desta versão do Geyser; confirme no console após reiniciar.");
+                }
+            }
+            if(sender instanceof org.bukkit.entity.Player player) {
+                var world = player.getWorld(); var location = player.getLocation();
+                sender.sendMessage("Mundo: " + world.getName() + "; bioma Bukkit no local: " + world.getBiome(location).getKey());
+                if(world.getGenerator() instanceof com.dfsek.terra.bukkit.generator.BukkitChunkGeneratorWrapper wrapper)
+                    sender.sendMessage("Pack: " + wrapper.getPack().getID() + "; projeção vanilla: "
+                        + (wrapper.biomeCompatibility() != null && wrapper.biomeCompatibility().vanilla));
+            }
             return true;
         }
         boolean install = args[1].equalsIgnoreCase("install");
