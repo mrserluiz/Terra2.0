@@ -1,4 +1,4 @@
-# Paleta visual genérica Bedrock — 7.0.28-BETA
+# Paleta visual genérica Bedrock — 7.0.29-BETA
 
 O Geyser oficial deve ser mantido. A build 7.0.26 usou a proposta experimental PR #6658 para validar cores de biomas; aquele Geyser não é requisito nem a solução escolhida para distribuição. A nova build não compila outro Geyser e `/terra2 bedrock install` recusa a instalação experimental.
 
@@ -112,3 +112,11 @@ Se outro plugin substituir um bioma Terra por `minecraft:snowy_plains` ou outro 
 Teste com água parada e corrente, imersão, bordas entre biomas, folhas e grama; comparar Java no mesmo local. Após stop/reconectar, conferir o mundo principal. Reportar status e log; nenhuma confirmação visual deve ser inferida apenas da CI.
 
 Referências: [client biomes](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/clientbiomesreference/examples/clientbiomesoverview?view=minecraft-bedrock-stable), [water appearance](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/clientbiomesreference/examples/components/minecraftclientbiomes_water_appearance?view=minecraft-bedrock-stable).
+
+### Resultado da validação 7.0.29
+
+Motor e testes de geração/persistência/reinício: [run 38322434790](https://github.com/mrserluiz/Terra2.0/actions/runs/38322434790), fonte do JAR `8564e496282d3f985fabec3a41b3257775b86da3`. Teste corrigido e verificação Geyser: [run 38323135750](https://github.com/mrserluiz/Terra2.0/actions/runs/38323135750), fonte `696cdc2da9f9b016b890c0bd41f13197786ebda5`. A CI comparou todo o código do motor entre as duas revisões (excluindo ferramentas de teste) e confirmou igualdade antes de reutilizar o artefato.
+
+Geyser oficial 2.11.3 build 1251 + Paper 26.2: passou em primeira inicialização e reinício, codificação nos codecs reais, cor de água 9B42FF, alpha herdado, registros globais preservados, cache de sessão isolado, restauração e preservação de uma alteração posterior de outra integração. Também validou todos os biomas do catálogo HYDRAXIA do mundo CUSTOM e a recusa de VANILLA_COMPATIBLE. O pack da fixture contém 328 definições de client biome. Sem cliente Bedrock real: aceitação tardia dos biomas e renderização continuam experimentais.
+
+JAR SHA-256: `cf6501e3f23b20476e81677d6cd201b12d065f559e5877df11a652aa5549e04e`. Pack da fixture SHA-256: `5ad37ee304f6ca40588d9e840cc00b079f60c119eed1e2deb47fdc8dd03848cf`. O catálogo local do operador determina o pack que será oferecido no servidor.

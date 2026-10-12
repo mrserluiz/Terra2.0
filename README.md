@@ -141,3 +141,7 @@ Terra2 is a successor project and is not an official release of the original Ter
 ## 7.0.28-BETA: Bedrock grass position preview
 
 Keep official local Geyser-Spigot. `/terra2 bedrock prepare`, restart, accept the automatically offered RGB pack, then `/terra2 bedrock preview` as a Bedrock OP in an authorized Terra2 world. `/terra2 bedrock stop` restores normal visuals; `/terra2 bedrock disable` removes startup authorization. Bounded solid-color grass preview only: 64 nearby blocks, two participants, no saved-world changes or global Java mappings. Uses saved Terra2 identities in projected worlds and explicitly labeled provider prediction in CUSTOM worlds. Position transport is a guarded adapter to Geyser internals, not a stable public API; incompatible versions fail closed. [Instructions and limits](docs/BEDROCK_BIOMES.md).
+
+### Teste Bedrock 7.0.29-BETA
+
+Ponte embutida para Geyser-Spigot oficial no Paper 26.2. O novo `/terra2 bedrock native` testa cores de água, grama e folhagem via client biomes, mantendo texturas e líquidos vanilla. Exige OP, mundo autorizado CUSTOM e pack aceito. Transporte/pacotes e reinício verificados na CI; renderização/aceitação tardia no cliente ainda experimental. Caminhar até chunks ainda não vistos, sem teleportar após ativar. Não atende VANILLA_COMPATIBLE nem recupera IDs Terra que outro plugin tenha substituído por biomas vanilla. [Procedimento e limites](docs/BEDROCK_BIOMES.md#biomas-visuais-nativos--7029-beta-experimental).
