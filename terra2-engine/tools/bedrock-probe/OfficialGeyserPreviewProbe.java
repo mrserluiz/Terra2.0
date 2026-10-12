@@ -32,8 +32,8 @@ public final class OfficialGeyserPreviewProbe extends JavaPlugin {
             require(captured.packets.size()==1 && captured.packets.get(0)==update && count.get()==1,"Real protocol packet reaches isolated upstream capture");
             transport.submit(captured,java.util.List.of(update),()->false,count::incrementAndGet,error->{throw new AssertionError(error);});
             require(captured.packets.size()==1,"Stale preview batch is not emitted");
-            Object registry=transport.type("org.geysermc.geyser.registry.BlockRegistries").getField("CUSTOM_BLOCK_STATE_OVERRIDES").get(null);
-            require(((java.util.Map<?,?>)com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(registry,"get")).isEmpty(),"No global Java block override installed");
+            Object blockRegistry=transport.type("org.geysermc.geyser.registry.BlockRegistries").getField("CUSTOM_BLOCK_STATE_OVERRIDES").get(null);
+            require(((java.util.Map<?,?>)com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(blockRegistry,"get")).isEmpty(),"No global Java block override installed");
             var world=new WorldCreator("terra2_bedrock_test").seed(42).generator("Terra2:HYDRAXIA").createWorld();
             require(world!=null,"Authorized world created");world.getChunkAt(0,0);
             var sample=PositionVisualResolver.at(world,0,64,0).orElseThrow();
