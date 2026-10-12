@@ -247,6 +247,9 @@ public class TerraBukkitPlugin extends JavaPlugin {
         if(isEnabled()) {
             bedrockPreview = new com.dfsek.terra.bukkit.bedrock.BedrockPreviewBridge(this);
             bedrockPreview.initialize();
+            var configuredWorlds=generationSettings.getConfigurationSection("worlds");
+            com.dfsek.terra.bukkit.util.StartupBanner.print(this,generationSettings.getBoolean("generation.enabled"),
+                configuredWorlds==null?0:configuredWorlds.getKeys(false).size());
         }
     }
 
