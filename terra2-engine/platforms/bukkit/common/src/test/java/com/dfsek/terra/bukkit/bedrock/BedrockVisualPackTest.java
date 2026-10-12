@@ -25,8 +25,14 @@ class BedrockVisualPackTest {
             assertEquals(259,index.get("exact_color_count").getAsInt());
             var png = ImageIO.read(zip.getInputStream(zip.getEntry("textures/terra2/palette/terra2_rgb_ffd1ef.png")));
             assertEquals(0xFFFFD1EF,png.getRGB(8,8));
+            var client=JsonParser.parseString(new String(zip.getInputStream(zip.getEntry("biomes/"+BedrockClientBiomes.name(b.id()).substring(7)+".client_biome.json")).readAllBytes(),java.nio.charset.StandardCharsets.UTF_8)).getAsJsonObject().getAsJsonObject("minecraft:client_biome");
+            assertTrue(client.getAsJsonObject("description").get("identifier").getAsString().startsWith("terra2:"));
+            var water=client.getAsJsonObject("components").getAsJsonObject("minecraft:water_appearance");
+            assertEquals("#80F9FF",water.get("surface_color").getAsString());
+            assertFalse(water.has("surface_opacity")); // Leave vanilla transparency unchanged.
+            assertNull(zip.getEntry("textures/blocks/water_still.png"));
             assertNull(zip.getEntry("blocks.json")); assertNull(zip.getEntry("biomes/plains.json"));
-            assertEquals("OPT_IN_GRASS_PREVIEW",index.get("runtime_projection").getAsString());
+            assertEquals("OPT_IN_GRASS_AND_NATIVE_BIOME_PREVIEW",index.get("runtime_projection").getAsString());
         }
         BedrockVisualPack.write(target,List.of(a,b)); assertArrayEquals(first,Files.readAllBytes(target));
     }

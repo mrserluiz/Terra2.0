@@ -22,12 +22,12 @@ public final class BedrockCommands {
     }
     public static boolean handle(TerraBukkitPlugin plugin, CommandSender sender, String[] args) {
         if(args.length == 0 || !args[0].equalsIgnoreCase("bedrock")) return false;
-        if(args.length != 2 || !Set.of("status", "export", "install", "pack", "prepare", "preview", "stop", "disable").contains(args[1].toLowerCase(Locale.ROOT))) {
-            sender.sendMessage("Uso: /terra2 bedrock <status|export|pack|prepare|preview|stop|disable>"); return true;
+        if(args.length != 2 || !Set.of("status", "export", "install", "pack", "prepare", "preview", "native", "stop", "disable").contains(args[1].toLowerCase(Locale.ROOT))) {
+            sender.sendMessage("Uso: /terra2 bedrock <status|export|pack|prepare|preview|native|stop|disable>"); return true;
         }
         Plugin geyser = Bukkit.getPluginManager().getPlugin("Geyser-Spigot");
         var bridge=plugin.bedrockPreview();
-        if(Set.of("prepare","preview","stop","disable").contains(args[1].toLowerCase(Locale.ROOT))) {
+        if(Set.of("prepare","preview","native","stop","disable").contains(args[1].toLowerCase(Locale.ROOT))) {
             try {
                 if(bridge==null)throw new IllegalStateException("Preview module not initialized");
                 if(args[1].equalsIgnoreCase("prepare")) {
@@ -35,7 +35,8 @@ public final class BedrockCommands {
                 } else if(args[1].equalsIgnoreCase("disable")) {
                     bridge.disable();sender.sendMessage("Prévia desativada e autorização removida. Reinicie para retirar os registros e o pack desta sessão do Geyser.");
                 } else if(sender instanceof org.bukkit.entity.Player player) {
-                    if(args[1].equalsIgnoreCase("stop")){bridge.stop(player,true);sender.sendMessage("Prévia encerrada; aparência real restaurada.");}
+                    if(args[1].equalsIgnoreCase("stop")){bridge.stop(player,true);sender.sendMessage("Prévia encerrada; envio normal restaurado. Após o teste native, reconecte para limpar os biomas dos chunks no cliente.");}
+                    else if(args[1].equalsIgnoreCase("native"))sender.sendMessage(bridge.startNative(player));
                     else sender.sendMessage(bridge.start(player));
                 } else sender.sendMessage("Execute preview/stop em jogo pelo jogador Bedrock.");
             } catch(Exception error){sender.sendMessage("Prévia recusada: "+error.getMessage());}

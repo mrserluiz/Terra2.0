@@ -7,6 +7,8 @@ import com.dfsek.terra.bukkit.bedrock.PositionVisualResolver;
 /** Uses an official downloaded Geyser. No renderer/client acceptance is simulated. */
 public final class OfficialGeyserPreviewProbe extends JavaPlugin {
     public static final class CaptureSession {
+        public Object registryCache;
+        public Object getRegistryCache(){return registryCache;}
         public final java.util.List<Object> packets=new java.util.ArrayList<>();
         public boolean isClosed(){return false;}
         public boolean isSpawned(){return true;}
@@ -43,6 +45,37 @@ public final class OfficialGeyserPreviewProbe extends JavaPlugin {
             String checksum=java.util.HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(identity));
             Path state=getDataFolder().toPath().resolve("identity.sha256");Files.createDirectories(state.getParent());
             if(Files.exists(state))require(Files.readString(state).equals(checksum),"Identity survives preview registration/restart");else Files.writeString(state,checksum);
+            var nativeTransport=new com.dfsek.terra.bukkit.bedrock.GeyserNativeBiomeTransport(transport);
+            var profile=new org.terra2.api.visual.VisualProfile(sample.profile(),java.util.Map.of("water",0x9B42FF,"grass",0xFFD1EF,"foliage",0xFF99CC));
+            Object biomeHolder=transport.type("org.geysermc.geyser.registry.Registries").getField("BIOMES").get(null);
+            Object baseline=com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(biomeHolder,"get");
+            var baselineDefinitions=new java.util.HashMap<>((java.util.Map<?,?>)com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(baseline,"getDefinitions"));
+            var plan=nativeTransport.plan(java.util.Map.of(profile.id(),"minecraft:plains"),java.util.Map.of(profile.id(),profile));
+            require(plan.ids().size()==1 && plan.ids().get(profile.id())>=30000,"Custom native biome IDs are allocated separately");
+            Object nativeDefinition=plan.definitions().get(com.dfsek.terra.bukkit.bedrock.BedrockClientBiomes.name(profile.id()));
+            var water=(java.awt.Color)com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(nativeDefinition,"getMapWaterColor");
+            require((water.getRGB()&0xFFFFFF)==0x9B42FF,"Native biome retains exact water RGB");
+            Object base=baselineDefinitions.get("minecraft:plains");
+            require(water.getAlpha()==((java.awt.Color)com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(base,"getMapWaterColor")).getAlpha(),"Water opacity inherited from vanilla");
+            require(baselineDefinitions.equals(com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(baseline,"getDefinitions")),"Global Geyser biome definitions untouched");
+            var cache=transport.type("org.geysermc.geyser.session.cache.RegistryCache").getConstructors()[0].newInstance(new Object[]{null});
+            Object key=transport.type("org.geysermc.geyser.session.cache.registry.JavaRegistries").getField("BIOME").get(null);
+            Object registry=com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(cache,"registry",key);
+            var entryType=transport.type("org.geysermc.geyser.session.cache.registry.RegistryEntryData");
+            var keyType=transport.type("org.geysermc.geyser.util.MinecraftKey");
+            Object vanillaEntry=entryType.getConstructors()[0].newInstance(0,com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(keyType,"key","minecraft:plains"),1);
+            Object terraEntry=entryType.getConstructors()[0].newInstance(1,com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(keyType,"key",profile.id()),-1);
+            com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(registry,"reset",java.util.List.of(vanillaEntry,terraEntry));captured.registryCache=cache;
+            var change=nativeTransport.install(captured,plan);
+            require(captured.packets.get(captured.packets.size()-1)==plan.packet(),"Native definition packet submitted before remapping chunks");
+            var changed=(java.util.List<?>)com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(registry,"entries");
+            require(changed.get(0)==vanillaEntry && changed.get(1)!=terraEntry,"Only native Terra entry changed, vanilla entry preserved");
+            require(nativeTransport.restore(change)==1,"Session mapping restored");
+            require(((java.util.List<?>)com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(registry,"entries")).get(1)==terraEntry,"Original Terra entry restored exactly");
+            try{terra.bedrockPreview().nativePlan(world);throw new AssertionError("Projected world must refuse native-only prototype");}catch(IllegalArgumentException expected){}
+            var nativeWorld=new WorldCreator("terra2_native_biome_test").seed(42).generator("Terra2:HYDRAXIA").createWorld();require(nativeWorld!=null,"Native test world created");
+            var complete=terra.bedrockPreview().nativePlan(nativeWorld);require(complete.ids().size()>100,"All HYDRAXIA reference names resolve to real Bedrock definitions");nativeWorld.save();
+            getLogger().info("TERRA2_NATIVE_BIOME_TRANSPORT_OK waterRGB=9B42FF liquid=VANILLA sessionCapture=true clientVisualTest=false");
             world.save();
             getLogger().info("TERRA2_OFFICIAL_GEYSER_PREVIEW_OK definitions="+definitions+" profile="+sample.profile());
         } catch(Throwable error){getLogger().log(java.util.logging.Level.SEVERE,"TERRA2_OFFICIAL_GEYSER_PREVIEW_FAILED",error);}

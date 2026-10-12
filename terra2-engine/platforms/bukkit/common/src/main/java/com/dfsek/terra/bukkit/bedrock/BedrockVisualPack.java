@@ -49,7 +49,7 @@ public final class BedrockVisualPack {
         }
         if(palette.size() > MAX_COLORS) throw new IllegalArgumentException("Palette exceeds " + MAX_COLORS + " exact colors; split the catalogs");
         var root = new JsonObject(); root.addProperty("terra2_visual_schema", 1);
-        root.addProperty("runtime_projection", "OPT_IN_GRASS_PREVIEW");
+        root.addProperty("runtime_projection", "OPT_IN_GRASS_AND_NATIVE_BIOME_PREVIEW");
         root.addProperty("base_palette_colors", 256); root.addProperty("exact_color_count", palette.size());
         var textures = new JsonObject();
         for(int rgb : palette) textures.addProperty(hex(rgb), texture(rgb));
@@ -81,6 +81,11 @@ public final class BedrockVisualPack {
         try(var zip = new ZipOutputStream(bytes, StandardCharsets.UTF_8)) {
             entry(zip, "manifest.json", JSON.toJson(manifest).getBytes(StandardCharsets.UTF_8));
             entry(zip, "terra2-palette.json", identity.getBytes(StandardCharsets.UTF_8));
+            for(var profile : index.getAsJsonObject("profiles").entrySet()) {
+                var roles=new TreeMap<String,Integer>();profile.getValue().getAsJsonObject().entrySet().forEach(e -> roles.put(e.getKey(),Integer.parseInt(e.getValue().getAsString().substring(1),16)));
+                var settings=BedrockClientBiomes.document(new VisualProfile(profile.getKey(),roles));
+                entry(zip,"biomes/"+BedrockClientBiomes.name(profile.getKey()).substring(7)+".client_biome.json",JSON.toJson(settings).getBytes(StandardCharsets.UTF_8));
+            }
             for(var color : index.getAsJsonObject("textures").entrySet()) {
                 int rgb = Integer.parseInt(color.getKey().substring(1), 16); String name = color.getValue().getAsString();
                 var definition = new JsonObject(); definition.addProperty("textures", "textures/terra2/palette/"+name); textureData.add(name, definition);

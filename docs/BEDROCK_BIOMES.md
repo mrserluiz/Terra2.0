@@ -94,3 +94,21 @@ CI baixa um binário **oficial**, verifica o SHA-256 divulgado pela API de downl
 Resultado da build 7.0.28: [CI 38167748169](https://github.com/mrserluiz/Terra2.0/actions/runs/38167748169), fonte `9a33260530c5e4fffab9a1e3bbbd4649c96c4549`. Motor, persistência/reinício e ponte oficial passaram. Geyser oficial 2.11.3 build 1251, Paper 26.2: 65 cores de grama e 195 definições de protocolo validadas em ambas as inicializações. Captura de envio isolada; cliente Bedrock real não conectado.
 
 SHA-256 do JAR `Terra2-bukkit-7.0.28-BETA.jar`: `d8edae81662388ae1a4bdcffb434d96758086ff044b691b88025b826d235fc7d`. Pack da fixture HYDRAXIA: `525e113db5d610a51e49c6a3cf6139a9850cb21e049649d0bb32210fd17f44a4`. O pack oferecido no servidor é recompilado a partir do catálogo local e pode ter outro hash.
+
+## Biomas visuais nativos — 7.0.29-BETA experimental
+
+`/terra2 bedrock native` inicia uma rota separada da prévia de cubos. Requer Geyser-Spigot oficial local, pack aceito, OP, mundo autorizado com armazenamento CUSTOM e IDs Terra realmente presentes na conexão. Não muda o modo de um mundo existente.
+
+O pack contém definições `minecraft:client_biome` com namespace `terra2:` e cores exatas de água, grama e folhagem. Usa as texturas vanilla do cliente: água mantém sua animação, níveis e geometria de líquido; folhas mantêm as máscaras e transparência nativas. Plantas que não usam tint de bioma ou possuem cores fixas não são recoloridas. Nenhum PNG Mojang é redistribuído: Flora.zip não precisa ser instalado para esta rota.
+
+O adaptador clona definições vanilla do Geyser sem editar seus registros globais. Aloca IDs separados a partir de 30000, preserva os dados ambientais da referência e o alpha da cor de mapa de água. Não força `surface_opacity`. Envia um BiomeDefinitionListPacket e altera somente as traduções Terra do cache daquela conexão, em seu event loop. Traduções minecraft e blocos de água não são alterados. Usa classes internas do Geyser e pode exigir atualização de compatibilidade.
+
+**Limitação experimental:** a definição é enviada depois do login, quando o operador inicia o teste. A aceitação de novos biomas nessa fase depende do cliente e ainda precisa de validação Bedrock real. `NATIVE_INSTALLED_EXPERIMENTAL` comprova somente execução do transporte; não comprova renderização. O adaptador não reenvia chunks já vistos. Caminhe até chunks ainda não recebidos nessa conexão, sem teleportar após o comando. O teste não impõe limite de chunks à exploração normal do jogador.
+
+`/terra2 bedrock status` informa pendência, instalação ou falha. `/terra2 bedrock stop`, teleporte, troca de mundo, perda de permissão e saída interrompem o transporte e restauram as entradas ainda pertencentes ao adaptador. Biomas dos chunks que o cliente já recebeu podem continuar visuais até reconectar. Reconfigure/reconecte também após atualizar o pack. A rota não é ativada para jogadores comuns automaticamente.
+
+Se outro plugin substituir um bioma Terra por `minecraft:snowy_plains` ou outro ID vanilla antes de enviar o chunk, essa identidade não pode ser recuperada pelo cache de tradução. O pack não redefine snowy_plains globalmente. Mundos VANILLA_COMPATIBLE continuam recusados pelo protótipo; a futura projeção de chunks a partir do leitor persistente é necessária para esse caso.
+
+Teste com água parada e corrente, imersão, bordas entre biomas, folhas e grama; comparar Java no mesmo local. Após stop/reconectar, conferir o mundo principal. Reportar status e log; nenhuma confirmação visual deve ser inferida apenas da CI.
+
+Referências: [client biomes](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/clientbiomesreference/examples/clientbiomesoverview?view=minecraft-bedrock-stable), [water appearance](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/clientbiomesreference/examples/components/minecraftclientbiomes_water_appearance?view=minecraft-bedrock-stable).
