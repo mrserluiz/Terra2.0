@@ -54,6 +54,19 @@ public final class GeyserNativeBiomeTransport {
             if(constructor.getParameterCount()==14 && constructor.getParameterTypes()[12]==List.class)return constructor.newInstance(args);
         throw new NoSuchMethodException("Supported Bedrock biome definition constructor missing");
     }
+    /** Encode with every codec actually supported by this official Geyser; this is not a render test. */
+    public int validateCodecs(Plan plan) throws Exception {
+        Class<?> protocol=transport.type("org.geysermc.geyser.network.bedrock.GameProtocol");
+        var versions=(Iterable<?>)protocol.getField("SUPPORTED_BEDROCK_PROTOCOLS").get(null);int count=0;
+        for(Object version:versions) {
+            Object codec=call(protocol,"getBedrockCodec",version);Object helper=call(codec,"createHelper");
+            Object buffer=call(transport.type("io.netty.buffer.Unpooled"),"buffer");
+            try {call(codec,"tryEncode",helper,buffer,plan.packet());
+                if((Integer)call(buffer,"readableBytes")<=0)throw new IllegalStateException("Empty native biome packet");count++;
+            }finally{call(buffer,"release");}
+        }
+        if(count==0)throw new IllegalStateException("No supported biome codecs");return count;
+    }
     public Change install(Object session,Plan plan) throws Exception {
         Object cache=call(session,"getRegistryCache");
         Object key=transport.type("org.geysermc.geyser.session.cache.registry.JavaRegistries").getField("BIOME").get(null);

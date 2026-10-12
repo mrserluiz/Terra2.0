@@ -51,6 +51,7 @@ public final class OfficialGeyserPreviewProbe extends JavaPlugin {
             Object baseline=com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(biomeHolder,"get");
             var baselineDefinitions=new java.util.HashMap<>((java.util.Map<?,?>)com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(baseline,"getDefinitions"));
             var plan=nativeTransport.plan(java.util.Map.of(profile.id(),"minecraft:plains"),java.util.Map.of(profile.id(),profile));
+            require(nativeTransport.validateCodecs(plan)>0,"Native biome packet encodes with actual supported official Geyser codecs");
             require(plan.ids().size()==1 && plan.ids().get(profile.id())>=30000,"Custom native biome IDs are allocated separately");
             Object nativeDefinition=plan.definitions().get(com.dfsek.terra.bukkit.bedrock.BedrockClientBiomes.name(profile.id()));
             var water=(java.awt.Color)com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(nativeDefinition,"getMapWaterColor");
@@ -72,9 +73,13 @@ public final class OfficialGeyserPreviewProbe extends JavaPlugin {
             require(changed.get(0)==vanillaEntry && changed.get(1)!=terraEntry,"Only native Terra entry changed, vanilla entry preserved");
             require(nativeTransport.restore(change)==1,"Session mapping restored");
             require(((java.util.List<?>)com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(registry,"entries")).get(1)==terraEntry,"Original Terra entry restored exactly");
+            var secondChange=nativeTransport.install(captured,plan);
+            Object foreign=entryType.getConstructors()[0].newInstance(1,com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(keyType,"key",profile.id()),17);
+            com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(registry,"reset",java.util.List.of(vanillaEntry,foreign));
+            require(nativeTransport.restore(secondChange)==0,"Restore preserves a later mapping owned by another integration");
             try{terra.bedrockPreview().nativePlan(world);throw new AssertionError("Projected world must refuse native-only prototype");}catch(IllegalArgumentException expected){}
             var nativeWorld=new WorldCreator("terra2_native_biome_test").seed(42).generator("Terra2:HYDRAXIA").createWorld();require(nativeWorld!=null,"Native test world created");
-            var complete=terra.bedrockPreview().nativePlan(nativeWorld);require(complete.ids().size()>100,"All HYDRAXIA reference names resolve to real Bedrock definitions");nativeWorld.save();
+            var complete=terra.bedrockPreview().nativePlan(nativeWorld);require(nativeTransport.validateCodecs(complete)>0,"Complete HYDRAXIA biome packet encodes");require(complete.ids().size()>100,"All HYDRAXIA reference names resolve to real Bedrock definitions");nativeWorld.save();
             getLogger().info("TERRA2_NATIVE_BIOME_TRANSPORT_OK waterRGB=9B42FF liquid=VANILLA sessionCapture=true clientVisualTest=false");
             world.save();
             getLogger().info("TERRA2_OFFICIAL_GEYSER_PREVIEW_OK definitions="+definitions+" profile="+sample.profile());
