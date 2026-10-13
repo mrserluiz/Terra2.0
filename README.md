@@ -4,7 +4,9 @@
 
 Terra 2.0 is an independent continuation and modernization of the Terra world-generation engine for Paper, focused on **per-world generation**, **Community Pack compatibility**, safe world isolation, and a path toward native Minecraft datapack support.
 
-> **Current reference build:** `Terra2-bukkit-7.0.28-BETA.jar` (opt-in Bedrock grass position preview; full chunk projection remains incomplete)
+> **Current reference build:** `Terra2-bukkit-7.0.30-BETA.jar` — Paper 26.2, official local Geyser integration, persistent biome edits and per-world Bedrock activation.
+
+[Release notes: changes since 7.0.25](docs/releases/7.0.30-BETA.md) · [Bedrock setup and limits](docs/BEDROCK_BIOMES.md)
 
 Terra 2.0 is no longer only a recovery scaffold. The 7.0.25 line has an executable generation core, a Terra Community Pack compatibility backend, a first vanilla datapack importer, local TerraPacks, and per-world pack composition.
 
@@ -88,7 +90,7 @@ See [TERRAPACKS.md](terra2-engine/TERRAPACKS.md) for the exact supported subset 
 
 Terra2 does not attach generation globally. A target world must be explicitly authorized and bound to a generation plan. The server primary world and vanilla dimensions are protected by default. Active bindings reject changes to source, pack selection, dimension, seed, or height bounds.
 
-Only new chunks are generated. Terra2 does not rewrite existing chunks.
+Terrain generation applies to new chunks. The explicit `/terra2 setbiome` command can edit biome cells in existing loaded chunks without regenerating their blocks.
 
 ## Project layout
 
@@ -101,6 +103,8 @@ Only new chunks are generated. Terra2 does not rewrite existing chunks.
 - `BUILD-STATUS.md` — current reference-build status and limitations.
 
 ## Current limitations
+
+For the current build, consult [7.0.30 release notes](docs/releases/7.0.30-BETA.md). Native Bedrock visuals currently require CUSTOM worlds and official local Geyser-Spigot. Actual WorldEdit selection and Bedrock reconnect acceptance remain server tests; neither is claimed as CI client validation. The following paragraphs describe the older 7.0.14 converter milestone.
 
 7.0.14 is **not a universal vanilla datapack converter**. Complex noise/density/surface graphs, custom biome/dimension types, jigsaw/template execution, processors, world-scoped loot and other advanced resources are not complete in this reference build.
 
@@ -144,7 +148,7 @@ Keep official local Geyser-Spigot. `/terra2 bedrock prepare`, restart, accept th
 
 ### Teste Bedrock 7.0.29-BETA
 
-Ponte embutida para Geyser-Spigot oficial no Paper 26.2. O novo `/terra2 bedrock native` testa cores de água, grama e folhagem via client biomes, mantendo texturas e líquidos vanilla. Exige OP, mundo autorizado CUSTOM e pack aceito. Transporte/pacotes e reinício verificados na CI; renderização/aceitação tardia no cliente ainda experimental. Caminhar até chunks ainda não vistos, sem teleportar após ativar. Não atende VANILLA_COMPATIBLE nem recupera IDs Terra que outro plugin tenha substituído por biomas vanilla. [Procedimento e limites](docs/BEDROCK_BIOMES.md#biomas-visuais-nativos--7029-beta-experimental).
+Ponte embutida para Geyser-Spigot oficial no Paper 26.2. O novo `/terra2 bedrock native` testa cores de água, grama e folhagem via client biomes, mantendo texturas e líquidos vanilla. Exige OP, mundo autorizado CUSTOM e pack aceito. Transporte/pacotes e reinício verificados na CI; renderização/aceitação tardia no cliente ainda experimental. Esse procedimento descreve a 7.0.29; na 7.0.30 há reenvio de chunks próximos e teleporte dentro do mesmo mundo mantém a ativação. Não atende VANILLA_COMPATIBLE nem recupera IDs Terra que outro plugin tenha substituído por biomas vanilla. [Procedimento e limites](docs/BEDROCK_BIOMES.md#biomas-visuais-nativos--7029-beta-experimental).
 
 ### Build 7.0.30-BETA
 

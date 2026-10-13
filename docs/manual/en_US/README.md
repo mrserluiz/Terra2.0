@@ -1,6 +1,6 @@
 # User manual — Terra2.0
 
-**English (en_US)** · **7.0.14-BETA**
+**English (en_US)** · **Current build: 7.0.30-BETA** · initial chapters: historical 7.0.14 reference
 
 1. [Installation and configuration](01-installation.md)
 2. [Terra Community Packs](02-community-packs.md)
@@ -14,3 +14,6 @@
 7. [New commands (7.0.22-BETA)](07-world-commands.md)
 
 8. [Biome and structure discovery (7.0.23-BETA)](08-discovery.md)
+
+9. [7.0.30 release notes: changes since 7.0.25](../../releases/7.0.30-BETA.md#english)
+10. [Bedrock colors and persistent biome editing](../../BEDROCK_BIOMES.md) (Portuguese technical guide)

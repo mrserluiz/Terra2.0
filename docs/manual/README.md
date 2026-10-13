@@ -1,6 +1,6 @@
 # Manual do usuário — Terra2.0
 
-**Idioma:** Português (Brasil) · **Build de referência:** 7.0.14-BETA
+**Idioma:** Português (Brasil) · **Build atual:** 7.0.30-BETA · capítulos iniciais: referência histórica 7.0.14-BETA
 
 Este manual documenta o comportamento confirmado na documentação da build de referência. Se seu JAR for mais recente, confira as notas da versão correspondente. Recursos futuros estão identificados como **planejados**, e exemplos conceituais não são comandos válidos.
 
@@ -38,3 +38,8 @@ Referências técnicas: [BUILD-STATUS](../../BUILD-STATUS.md) · [TERRAPACKS](..
 8. [Identificar e localizar biomas e estruturas (7.0.23-BETA)](08-discovery.md)
 9. [API de clima por mundo e integração opcional com Aeternum (7.0.24-BETA)](../CLIMATE_API.md)
 10. [Biomas próprios persistentes e compatibilidade vanilla (7.0.25-BETA)](../BIOME_COMPATIBILITY.md)
+
+11. [Atualização 7.0.30: novidades desde a 7.0.25](../releases/7.0.30-BETA.md)
+12. [Cores Bedrock, persistência e edição com WorldEdit](../BEDROCK_BIOMES.md#persistência-e-edição--7030-beta)
+
+A ponte de cores nativas exige mundo CUSTOM. A edição de biomas funciona também em VANILLA_COMPATIBLE, mas não ativa a ponte visual nesse modo.
