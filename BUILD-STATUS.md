@@ -1,6 +1,10 @@
 # Recovered engine build status
 
-## Current reference: 7.0.30-BETA
+## Current reference: 7.3.0-BETA
+
+[CI 38354726746](https://github.com/mrserluiz/Terra2.0/actions/runs/38354726746) passed all jobs, including the engine, calibration tests, save/restart and official Geyser integration. [Release notes and checksums](docs/releases/7.3.0-BETA.md). Real WorldEdit selection and Java/Bedrock visual matching remain server acceptance tests.
+
+## Previous reference: 7.0.30-BETA
 
 The standalone engine targets Paper 26.2 / Java 25. [CI 38341188293](https://github.com/mrserluiz/Terra2.0/actions/runs/38341188293) passed engine compilation, native generation/save/restart, biome edit persistence and official local Geyser checks. The 26.3 check covers the thin controller only, not the native engine.
 

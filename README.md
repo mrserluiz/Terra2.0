@@ -4,7 +4,7 @@
 
 Terra 2.0 is an independent continuation and modernization of the Terra world-generation engine for Paper, focused on **per-world generation**, **Community Pack compatibility**, safe world isolation, and a path toward native Minecraft datapack support.
 
-> **Current candidate build:** `Terra2-bukkit-7.3.0-BETA.jar` — Paper 26.2, official local Geyser integration, persistent biome edits and per-world Bedrock activation.
+> **Current reference build:** `Terra2-bukkit-7.3.0-BETA.jar` — Paper 26.2, official local Geyser integration, persistent biome edits and per-world Bedrock activation.
 
 [7.3.0 release notes](docs/releases/7.3.0-BETA.md) · [Changes since 7.0.25](docs/releases/7.0.30-BETA.md) · [Bedrock setup and limits](docs/BEDROCK_BIOMES.md)
 

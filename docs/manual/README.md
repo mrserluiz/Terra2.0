@@ -1,6 +1,6 @@
 # Manual do usuário — Terra2.0
 
-**Idioma:** Português (Brasil) · **Build atual:** 7.0.30-BETA · capítulos iniciais: referência histórica 7.0.14-BETA
+**Idioma:** Português (Brasil) · **Build atual:** 7.3.0-BETA · capítulos iniciais: referência histórica 7.0.14-BETA
 
 Este manual documenta o comportamento confirmado na documentação da build de referência. Se seu JAR for mais recente, confira as notas da versão correspondente. Recursos futuros estão identificados como **planejados**, e exemplos conceituais não são comandos válidos.
 
@@ -43,3 +43,5 @@ Referências técnicas: [BUILD-STATUS](../../BUILD-STATUS.md) · [TERRAPACKS](..
 12. [Cores Bedrock, persistência e edição com WorldEdit](../BEDROCK_BIOMES.md#persistência-e-edição--7030-beta)
 
 A ponte de cores nativas exige mundo CUSTOM. A edição de biomas funciona também em VANILLA_COMPATIBLE, mas não ativa a ponte visual nesse modo.
+
+13. [Calibração Bedrock com Java como referência (7.3.0-BETA)](../releases/7.3.0-BETA.md)
