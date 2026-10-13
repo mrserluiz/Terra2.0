@@ -148,3 +148,7 @@ A edição funciona nos dois modos de armazenamento, mas a ponte Geyser nativa c
 A CI validou que a ativação Bedrock fica armazenada e reaparece depois do restart. Não conectou jogador Bedrock real nem executou uma seleção WorldEdit real; esses dois ciclos precisam da validação no servidor. A rota nativa da 7.0.29 teve confirmação visual do usuário (água transparente roxa e folhas roxas), mas isso não substitui o teste novo de reconexão/reenvio da 7.0.30.
 
 SHA-256 do JAR: `7fcb05e9115101a6e86ba7daa60c966dc3a37f9947cc8e6a8c202351f8fd3d54`. Pack da fixture: `09285c82dea3832e662a9f179ecc5fdd758cae3d69de76847a2f02d7bc2d3879`.
+
+## Calibração 7.3.0-BETA
+
+Ajustes exclusivos do cliente Bedrock, com Java como referência, em `bedrock/color-calibration.yml`. Valores neutros por padrão e sobrescritas por ID de bioma. [Configuração, procedimento e limites](releases/7.3.0-BETA.md#calibrar-as-cores). Corrigida a escolha da sobrecarga Player do BukkitAdapter usada na seleção WorldEdit.

@@ -92,7 +92,10 @@ public final class BedrockPreviewBridge implements Listener {
             if(provider.apiVersion()!=1)throw new IllegalArgumentException("Unsupported visual provider API");
             items.addAll(provider.profiles());
         }
-        BedrockVisualPack.index(items); // Reject collisions/limits before writing or registering anything.
+        BedrockVisualPack.index(items); // Reject source collisions before display calibration.
+        var calibration=BedrockColorCalibration.load(marker.getParent().resolve("color-calibration.yml"));
+        items.replaceAll(calibration::apply);
+        BedrockVisualPack.index(items);
         items.forEach(profile->profiles.put(profile.id(),profile));catalog=List.copyOf(items);
         BedrockVisualPack.write(pack,catalog);
         try(var zip=new java.util.zip.ZipFile(pack.toFile())) {

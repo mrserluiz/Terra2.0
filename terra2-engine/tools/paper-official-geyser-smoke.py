@@ -15,7 +15,7 @@ version=meta['version'];number=meta['build'];info=meta['downloads']['spigot']
 data=fetch(f'https://download.geysermc.org/v2/projects/geyser/versions/{version}/builds/{number}/downloads/spigot')
 assert hashlib.sha256(data).hexdigest()==info['sha256'];(PLUGINS/'Geyser-Spigot.jar').write_bytes(data)
 (SERVER/'geyser-release.json').write_text(json.dumps(meta,indent=2))
-terra=ROOT/'platforms/bukkit/build/libs/Terra2-bukkit-7.0.30-BETA.jar';shutil.copy(terra,PLUGINS/terra.name)
+terra=ROOT/'platforms/bukkit/build/libs/Terra2-bukkit-7.3.0-BETA.jar';shutil.copy(terra,PLUGINS/terra.name)
 td=PLUGINS/'Terra2';(td/'packs').mkdir(parents=True,exist_ok=True);(td/'bedrock').mkdir(exist_ok=True)
 shutil.copy(ROOT/'tools/fixtures/HYDRAXIA.zip',td/'packs/HYDRAXIA.zip')
 (td/'bedrock/preview.enabled').write_text('terra2-position-preview-v1')
