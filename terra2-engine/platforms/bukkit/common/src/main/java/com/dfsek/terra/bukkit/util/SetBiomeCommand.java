@@ -27,10 +27,12 @@ public final class SetBiomeCommand {
             var we=Bukkit.getPluginManager().getPlugin("WorldEdit");if(we==null)we=Bukkit.getPluginManager().getPlugin("FastAsyncWorldEdit");
             if(we==null || !we.isEnabled())throw new IllegalArgumentException("WorldEdit/FAWE não está disponível");
             var loader=we.getClass().getClassLoader();
-            Object adapted=call(Class.forName("com.sk89q.worldedit.bukkit.BukkitAdapter",false,loader),"adapt",player);
+            // Player also implements Entity: select the exact overload, not the first compatible one.
+            var adapter=Class.forName("com.sk89q.worldedit.bukkit.BukkitAdapter",false,loader);
+            Object adapted=adapter.getMethod("adapt",Player.class).invoke(null,player);
             Object engine=call(Class.forName("com.sk89q.worldedit.WorldEdit",false,loader),"getInstance");
             Object session=call(call(engine,"getSessionManager"),"get",adapted);
-            Object adaptedWorld=call(Class.forName("com.sk89q.worldedit.bukkit.BukkitAdapter",false,loader),"adapt",world);
+            Object adaptedWorld=adapter.getMethod("adapt",World.class).invoke(null,world);
             Object region=call(session,"getSelection",adaptedWorld);
             if(!Class.forName("com.sk89q.worldedit.regions.CuboidRegion",false,loader).isInstance(region))throw new IllegalArgumentException("Use uma seleção cuboide: //sel cuboid");
             Object min=call(region,"getMinimumPoint"),max=call(region,"getMaximumPoint");
