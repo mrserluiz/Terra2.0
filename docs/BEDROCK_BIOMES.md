@@ -1,4 +1,4 @@
-# Paleta visual genérica Bedrock — 7.0.29-BETA
+# Paleta visual genérica Bedrock — 7.0.30-BETA
 
 O Geyser oficial deve ser mantido. A build 7.0.26 usou a proposta experimental PR #6658 para validar cores de biomas; aquele Geyser não é requisito nem a solução escolhida para distribuição. A nova build não compila outro Geyser e `/terra2 bedrock install` recusa a instalação experimental.
 
@@ -140,3 +140,11 @@ Somente mundos Terra2 autorizados, até 4096 células de bioma (262144 blocos eq
 Atualiza o bioma real do Paper e um overlay de identidades persistente no PDC do chunk, com UUID, seed, fingerprint e checksum. Em CUSTOM escreve o ID Terra; em VANILLA_COMPATIBLE escreve a referência vanilla e guarda a identidade Terra. O leitor próprio e `/terra2 biome` priorizam essas edições, sem reconstruir células não editadas. Prepara todos os payloads antes das alterações e tenta reverter dados anteriores em caso de falha. Terreno, blocos, loot e estruturas não são regenerados. O overlay acompanha o save normal de chunks; os últimos dados ainda não salvos podem ser perdidos numa queda abrupta.
 
 A edição funciona nos dois modos de armazenamento, mas a ponte Geyser nativa continua exigindo CUSTOM. A projeção visual de VANILLA_COMPATIBLE a partir do leitor próprio ainda não foi implementada.
+
+### Validação 7.0.30
+
+[CI 38341188293](https://github.com/mrserluiz/Terra2.0/actions/runs/38341188293), fonte `14e0fc7e3c1822293995b150e34d0f4a9411b221`: todos os jobs passaram. Paper 26.2 + Geyser oficial 2.11.3 build 1251. Unitários de overlay persistente, store de ativações, isolamento de UUID/seed/fingerprint, CRC e manifesto `[7,0,30]`. Edição real de células nos modos CUSTOM e VANILLA_COMPATIBLE, bioma real e leitor próprio consistentes, blocos não regenerados, proteção do mundo principal, recusa de volumes excessivos, conservação da paleta original de geração e save/restart.
+
+A CI validou que a ativação Bedrock fica armazenada e reaparece depois do restart. Não conectou jogador Bedrock real nem executou uma seleção WorldEdit real; esses dois ciclos precisam da validação no servidor. A rota nativa da 7.0.29 teve confirmação visual do usuário (água transparente roxa e folhas roxas), mas isso não substitui o teste novo de reconexão/reenvio da 7.0.30.
+
+SHA-256 do JAR: `7fcb05e9115101a6e86ba7daa60c966dc3a37f9947cc8e6a8c202351f8fd3d54`. Pack da fixture: `09285c82dea3832e662a9f179ecc5fdd758cae3d69de76847a2f02d7bc2d3879`.

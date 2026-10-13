@@ -145,3 +145,9 @@ Keep official local Geyser-Spigot. `/terra2 bedrock prepare`, restart, accept th
 ### Teste Bedrock 7.0.29-BETA
 
 Ponte embutida para Geyser-Spigot oficial no Paper 26.2. O novo `/terra2 bedrock native` testa cores de água, grama e folhagem via client biomes, mantendo texturas e líquidos vanilla. Exige OP, mundo autorizado CUSTOM e pack aceito. Transporte/pacotes e reinício verificados na CI; renderização/aceitação tardia no cliente ainda experimental. Caminhar até chunks ainda não vistos, sem teleportar após ativar. Não atende VANILLA_COMPATIBLE nem recupera IDs Terra que outro plugin tenha substituído por biomas vanilla. [Procedimento e limites](docs/BEDROCK_BIOMES.md#biomas-visuais-nativos--7029-beta-experimental).
+
+### Build 7.0.30-BETA
+
+`/terra2 setbiome <ID>` aplica o bioma à seleção cuboide do WorldEdit/FAWE em mundos Terra2 autorizados, com identidade persistente no chunk, limite de volume e proteção do mundo principal. Não regenera terreno e não usa o undo do WorldEdit.
+
+`/terra2 bedrock native` passa a lembrar a ativação por UUID/seed/fingerprint do mundo e reaplicá-la aos jogadores Bedrock ao reconectar. Reenvio limitado de chunks carregados, manifesto versionado pela build e banner de grama no console. `/terra2 bedrock forget` remove a ativação persistente do mundo. Ponte nativa ainda exige CUSTOM. [Teste e limitações](docs/BEDROCK_BIOMES.md). [CI aprovada](https://github.com/mrserluiz/Terra2.0/actions/runs/38341188293); seleção WorldEdit real e reconexão do cliente Bedrock precisam de validação no servidor.
