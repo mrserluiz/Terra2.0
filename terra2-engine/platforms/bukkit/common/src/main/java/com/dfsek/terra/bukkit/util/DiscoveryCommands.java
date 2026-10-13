@@ -42,6 +42,7 @@ public final class DiscoveryCommands {
                     id = persisted.map(org.terra2.api.biome.BiomeIdentity::terraId).orElse("UNKNOWN (missing/invalid Terra2 chunk identity)");
                 } else id = wrapper.getPack().getBiomeProvider().getBiome(location.getBlockX(), location.getBlockY(), location.getBlockZ(), world.getSeed()).getID();
             } else id = world.getBiome(location).getKey().toString();
+            id=com.dfsek.terra.bukkit.compatibility.BiomeEditOverrides.at(world,location.getBlockX(),location.getBlockY(),location.getBlockZ()).map(org.terra2.api.biome.BiomeIdentity::terraId).orElse(id);
             message(sender, "discover-biome", world.getName(), id, world.getBiome(location).getKey()); return true;
         }
         boolean near = args[0].equalsIgnoreCase("structures");

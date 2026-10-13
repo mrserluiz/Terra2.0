@@ -22,5 +22,6 @@ dependencies {
 
 // Ship the same reviewable demo used in the documentation; never auto-authorize it.
 tasks.named<ProcessResources>("processResources") {
+    filesMatching("terra2/bedrock-build.properties") { expand(mapOf("version" to project.version.toString())) }
     from(rootProject.file("examples/datapacks")) { into("datapacks") }
 }

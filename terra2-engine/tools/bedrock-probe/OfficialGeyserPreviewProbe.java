@@ -68,6 +68,7 @@ public final class OfficialGeyserPreviewProbe extends JavaPlugin {
             Object terraEntry=entryType.getConstructors()[0].newInstance(1,com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(keyType,"key",profile.id()),-1);
             com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(registry,"reset",java.util.List.of(vanillaEntry,terraEntry));captured.registryCache=cache;
             var change=nativeTransport.install(captured,plan);
+            require(nativeTransport.ownedMappings(change)==1,"Native mapping ownership tracked");
             require(captured.packets.get(captured.packets.size()-1)==plan.packet(),"Native definition packet submitted before remapping chunks");
             var changed=(java.util.List<?>)com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(registry,"entries");
             require(changed.get(0)==vanillaEntry && changed.get(1)!=terraEntry,"Only native Terra entry changed, vanilla entry preserved");
@@ -76,12 +77,47 @@ public final class OfficialGeyserPreviewProbe extends JavaPlugin {
             var secondChange=nativeTransport.install(captured,plan);
             Object foreign=entryType.getConstructors()[0].newInstance(1,com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(keyType,"key",profile.id()),17);
             com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(registry,"reset",java.util.List.of(vanillaEntry,foreign));
+            require(!nativeTransport.canReapply(secondChange),"Automatic reapply refuses another integration's changed mapping");
             require(nativeTransport.restore(secondChange)==0,"Restore preserves a later mapping owned by another integration");
             try{terra.bedrockPreview().nativePlan(world);throw new AssertionError("Projected world must refuse native-only prototype");}catch(IllegalArgumentException expected){}
             var nativeWorld=new WorldCreator("terra2_native_biome_test").seed(42).generator("Terra2:HYDRAXIA").createWorld();require(nativeWorld!=null,"Native test world created");
             var complete=terra.bedrockPreview().nativePlan(nativeWorld);require(nativeTransport.validateCodecs(complete)>0,"Complete HYDRAXIA biome packet encodes");var nativeWrapper=(com.dfsek.terra.bukkit.generator.BukkitChunkGeneratorWrapper)nativeWorld.getGenerator();
             long expectedProfiles=nativeWrapper.getPack().getBiomeProvider().stream().map(biome->nativeWrapper.biomeCompatibility().identity(biome).registeredId()).distinct().count();
             require(expectedProfiles>0 && complete.ids().size()==expectedProfiles,"Every world biome resolves to a real Bedrock definition");nativeWorld.save();
+            Path nativeIdentity=getDataFolder().toPath().resolve("native-edits.sha256");
+            nativeWorld.getChunkAt(0,0);
+            if(Files.exists(nativeIdentity)) {
+                byte[] saved=nativeWorld.getChunkAt(0,0).getPersistentDataContainer().get(com.dfsek.terra.bukkit.compatibility.BiomeEditOverrides.KEY,org.bukkit.persistence.PersistentDataType.BYTE_ARRAY);
+                require(saved!=null,"Edited identities survive server restart");
+                String savedHash=java.util.HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(saved));
+                require(Files.readString(nativeIdentity).equals(savedHash),"Edit payload remains identical after save/restart");
+                var historical=terra.biomeService().at(nativeWorld,0,64,0).orElseThrow();
+                require(nativeWorld.getBiome(0,64,0).getKey().toString().equals(historical.registeredId()),"Actual edited biome survives restart alongside its identity");
+                require(terra.bedrockPreview().remembers(nativeWorld),"Native-world activation survives restart");
+            }
+            String target=nativeWrapper.getPack().getBiomeProvider().stream().findFirst().orElseThrow().getID();
+            var editor=new com.dfsek.terra.bukkit.util.SetBiomeCommand(terra);
+            var blockBefore=nativeWorld.getBlockAt(0,64,0).getBlockData().getAsString();
+            require(editor.apply(nativeWorld,target,0,64,0,3,67,3)==1,"A single actual Paper biome cell edited");
+            var edited=terra.biomeService().at(nativeWorld,0,64,0).orElseThrow();require(edited.terraId().equals(target),"Own reader resolves saved edits in CUSTOM worlds");
+            require(nativeWorld.getBiome(0,64,0).getKey().toString().equals(edited.registeredId()),"Actual Paper biome and own identity agree");
+            require(PositionVisualResolver.at(nativeWorld,0,64,0).orElseThrow().source().equals("PERSISTED_EDIT"),"Bedrock visual resolver follows edited identity");
+            require(nativeWorld.getBlockAt(0,64,0).getBlockData().getAsString().equals(blockBefore),"Biome edits do not regenerate blocks");
+            try{editor.apply(Bukkit.getWorld("world"),target,0,64,0,3,67,3);throw new AssertionError("Primary world edit must be refused");}catch(IllegalArgumentException expected){}
+            try{editor.apply(nativeWorld,target,0,64,0,1023,255,1023);throw new AssertionError("Oversized edit must be refused");}catch(IllegalArgumentException expected){}
+            byte[] editedData=nativeWorld.getChunkAt(0,0).getPersistentDataContainer().get(com.dfsek.terra.bukkit.compatibility.BiomeEditOverrides.KEY,org.bukkit.persistence.PersistentDataType.BYTE_ARRAY);
+            Files.writeString(nativeIdentity,java.util.HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(editedData)));
+            terra.bedrockPreview().rememberWorld(nativeWorld);require(terra.bedrockPreview().remembers(nativeWorld),"Rendering world explicitly remembered");
+            require(!terra.bedrockPreview().remembers(Bukkit.getWorld("world")),"Rendering main world remains unauthorized");
+            String projectedTarget=((com.dfsek.terra.bukkit.generator.BukkitChunkGeneratorWrapper)world.getGenerator()).getPack().getBiomeProvider().stream().findFirst().orElseThrow().getID();
+            require(editor.apply(world,projectedTarget,4,64,4,7,67,7)==1,"Projected worlds support identity-preserving biome editing");
+            var projectedEdit=terra.biomeService().at(world,4,64,4).orElseThrow();
+            require(world.getBiome(4,64,4).getKey().toString().equals(projectedEdit.vanillaReference()),"Projected world writes valid vanilla reference");
+            require(PositionVisualResolver.at(world,4,64,4).orElseThrow().source().equals("PERSISTED_EDIT"),"Projected edit resolves original Terra identity");
+            require(java.util.Arrays.equals(identity,world.getChunkAt(0,0).getPersistentDataContainer().get(com.dfsek.terra.bukkit.compatibility.PersistedBiomeService.KEY,org.bukkit.persistence.PersistentDataType.BYTE_ARRAY)),"Edits do not rewrite generation identity palette");
+            nativeWorld.save();nativeWorld.refreshChunk(0,0);
+            require(java.util.Arrays.equals(editedData,nativeWorld.getChunkAt(0,0).getPersistentDataContainer().get(com.dfsek.terra.bukkit.compatibility.BiomeEditOverrides.KEY,org.bukkit.persistence.PersistentDataType.BYTE_ARRAY)),"Refresh retains saved identity");
+            getLogger().info("TERRA2_EDIT_PERSISTENCE_OK primaryProtected=true nativeActivationStored=true realWorldEditSelectionTest=false realBedrockReconnectTest=false");
             getLogger().info("TERRA2_NATIVE_BIOME_TRANSPORT_OK waterRGB=9B42FF liquid=VANILLA sessionCapture=true clientVisualTest=false");
             world.save();
             getLogger().info("TERRA2_OFFICIAL_GEYSER_PREVIEW_OK definitions="+definitions+" profile="+sample.profile());

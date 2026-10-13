@@ -17,13 +17,13 @@ public final class CommandCompletion {
         if(command.equalsIgnoreCase("terra2reportlog")) {
             if(args.length == 1) options = List.of("start", "stop", "status");
         } else if(command.equalsIgnoreCase("terra2")) {
-            if(args.length == 1) options = List.of("help", "reload", "lis", "list", "unlock", "packs", "convert", "datapack", "loot", "biome", "structures", "locate", "bedrock");
+            if(args.length == 1) options = List.of("help", "reload", "lis", "list", "unlock", "packs", "convert", "datapack", "loot", "biome", "setbiome", "structures", "locate", "bedrock");
             else if(args.length == 2) options = switch(action) {
                 case "unlock" -> worlds;
                 case "lis", "list" -> List.of("Cpack", "Tpack", "all");
                 case "packs", "datapack" -> List.of("list", "inspect");
                 case "loot" -> List.of("status");
-                case "bedrock" -> List.of("status", "export", "pack", "prepare", "preview", "native", "stop", "disable");
+                case "bedrock" -> List.of("status", "export", "pack", "prepare", "preview", "native", "forget", "stop", "disable");
                 default -> List.of();
             };
             else if(args.length == 3) options = switch(action) {

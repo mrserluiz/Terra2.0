@@ -84,6 +84,20 @@ public final class GeyserNativeBiomeTransport {
         call(session,"sendUpstreamPacket",plan.packet());call(registry,"reset",entries);
         return new Change(registry,Map.copyOf(original),Map.copyOf(installed));
     }
+    public int ownedMappings(Change change) throws Exception {
+        var entries=(List<?>)call(change.registry(),"entries");int count=0;
+        for(var e:change.installed().entrySet())if(e.getKey()<entries.size() && entries.get(e.getKey())==e.getValue())count++;
+        return count;
+    }
+    public boolean canReapply(Change change) throws Exception {
+        var entries=(List<?>)call(change.registry(),"entries");
+        for(var e:change.installed().entrySet()) {
+            if(e.getKey()>=entries.size())return false;Object current=entries.get(e.getKey());
+            if(current==e.getValue())continue;Object original=change.original().get(e.getKey());
+            if(!Objects.equals(call(current,"key"),call(original,"key")) || !Objects.equals(call(current,"data"),call(original,"data")))return false;
+        }
+        return true;
+    }
     public int restore(Change change) throws Exception {
         var entries=new ArrayList<Object>((List<?>)call(change.registry(),"entries"));int restored=0;
         for(var e:change.installed().entrySet()) {

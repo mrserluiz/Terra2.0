@@ -7,7 +7,7 @@ website: "@WIKI@"
 api-version: "26.2"
 description: "@DESCRIPTION@"
 folia-supported: true
-softdepend: [Geyser-Spigot]
+softdepend: [Geyser-Spigot, WorldEdit, FastAsyncWorldEdit]
 
 commands:
   terra2reportlog:

@@ -245,6 +245,8 @@ public class TerraBukkitPlugin extends JavaPlugin {
             Bukkit.getPluginManager().disablePlugin(this);
         }
         if(isEnabled()) {
+            visualRefresh = new com.dfsek.terra.bukkit.util.ChunkVisualRefresh(this);
+            setBiomeCommand = new com.dfsek.terra.bukkit.util.SetBiomeCommand(this);
             bedrockPreview = new com.dfsek.terra.bukkit.bedrock.BedrockPreviewBridge(this);
             bedrockPreview.initialize();
             var configuredWorlds=generationSettings.getConfigurationSection("worlds");
@@ -253,11 +255,15 @@ public class TerraBukkitPlugin extends JavaPlugin {
         }
     }
 
+    private com.dfsek.terra.bukkit.util.ChunkVisualRefresh visualRefresh;
+    private com.dfsek.terra.bukkit.util.SetBiomeCommand setBiomeCommand;
+    public com.dfsek.terra.bukkit.util.ChunkVisualRefresh visualRefresh(){return visualRefresh;}
     private com.dfsek.terra.bukkit.bedrock.BedrockPreviewBridge bedrockPreview;
     public com.dfsek.terra.bukkit.bedrock.BedrockPreviewBridge bedrockPreview() { return bedrockPreview; }
 
     @Override
     public void onDisable() {
+        if(visualRefresh!=null)visualRefresh.close();
         if(bedrockPreview != null) bedrockPreview.close();
         Bukkit.getServicesManager().unregisterAll(this);
         if(structureIndexTask != null) structureIndexTask.cancel();
@@ -503,6 +509,7 @@ public class TerraBukkitPlugin extends JavaPlugin {
         boolean allowed = sender.hasPermission(command.getName().equalsIgnoreCase("terra2reportlog")
             ? "terra2.diagnostics.capture" : "terra2.settings.reload");
         if(!allowed || generationSettings == null || platform == null) return java.util.List.of();
+        if(command.getName().equalsIgnoreCase("terra2") && args.length==2 && args[0].equalsIgnoreCase("setbiome") && setBiomeCommand!=null)return setBiomeCommand.complete(sender,args[1]);
         if(command.getName().equalsIgnoreCase("terra2") && discovery != null && args.length > 1
             && java.util.Set.of("biome", "structures", "locate").contains(args[0].toLowerCase(java.util.Locale.ROOT)))
             return discovery.complete(sender, args);
@@ -562,6 +569,7 @@ public class TerraBukkitPlugin extends JavaPlugin {
             sender.sendMessage(message("permission", "terra2.settings.reload"));
             return true;
         }
+        if(setBiomeCommand!=null && setBiomeCommand.handle(sender,args))return true;
         if(discovery != null && discovery.handle(sender, args)) return true;
         if(com.dfsek.terra.bukkit.bedrock.BedrockCommands.handle(this, sender, args)) return true;
         if(args.length == 0 || (args.length == 1 && args[0].equalsIgnoreCase("help"))) {

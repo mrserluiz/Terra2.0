@@ -120,3 +120,23 @@ Motor e testes de geração/persistência/reinício: [run 38322434790](https://g
 Geyser oficial 2.11.3 build 1251 + Paper 26.2: passou em primeira inicialização e reinício, codificação nos codecs reais, cor de água 9B42FF, alpha herdado, registros globais preservados, cache de sessão isolado, restauração e preservação de uma alteração posterior de outra integração. Também validou todos os biomas do catálogo HYDRAXIA do mundo CUSTOM e a recusa de VANILLA_COMPATIBLE. O pack da fixture contém 328 definições de client biome. Sem cliente Bedrock real: aceitação tardia dos biomas e renderização continuam experimentais.
 
 JAR SHA-256: `cf6501e3f23b20476e81677d6cd201b12d065f559e5877df11a652aa5549e04e`. Pack da fixture SHA-256: `5ad37ee304f6ca40588d9e840cc00b079f60c119eed1e2deb47fdc8dd03848cf`. O catálogo local do operador determina o pack que será oferecido no servidor.
+
+## Persistência e edição — 7.0.30-BETA
+
+A versão numérica do manifesto e do módulo acompanha a build automaticamente (`[7,0,30]` nesta versão). O pack é compilado e oferecido pelo Terra2; remova somente a antiga cópia de teste Terra2 da pasta packs do Geyser para evitar conteúdo duplicado. Não remova packs de outros plugins.
+
+Como OP, `/terra2 bedrock native` ativa a ponte no mundo atual. Após sucesso, salva UUID, seed e fingerprint do mundo em `plugins/Terra2/bedrock/native-worlds.json`. Reaplica aos jogadores Bedrock locais que entrarem nesse mundo, sem exigir OP deles, após a sessão estar pronta. Não ativa mundos novos automaticamente, mundos recriados com outro UUID, nem mundos com fingerprint incompatível. Autorizações de geração e proteção do mundo principal são verificadas continuamente. Mantém a tradução ao caminhar e teleportar dentro do mesmo mundo; troca de mundo encerra a tradução anterior e aplica a autorização do destino.
+
+`/terra2 bedrock stop` pausa somente a conexão atual. Reconectar reativa a ponte se o mundo continua autorizado. `/terra2 bedrock forget` remove a ativação persistente do mundo atual para todos os participantes. `/terra2 bedrock disable` limpa todas as ativações nativas e retira o marcador da ponte. Limite de 128 mundos lembrados e 64 conexões nativas simultâneas. Registros da sessão são monitorados: reconfiguração normal do Geyser permite reaplicar; uma tradução diferente de outra integração gera conflito em vez de ser sobrescrita.
+
+Ao aplicar a tradução, reenvia a área 3x3 de chunks já carregados perto do jogador. Edições reenviam os chunks afetados. A fila elimina duplicatas e processa no máximo dois chunks por tick, com limite de 512 pendências. Usa refresh de pacotes do Paper, sem carregamento/geração/salvamento de chunks. O reenvio normal do Paper atende todos os jogadores que veem o chunk; cada sessão Geyser usa sua tradução própria. A aparência efetiva e o ciclo completo de reconexão continuam precisando de teste no cliente real.
+
+### Seleção WorldEdit
+
+`/terra2 setbiome <ID_DO_BIOMA>` usa a seleção cuboide atual de WorldEdit/FAWE no mundo do jogador, com a permissão administrativa existente `terra2.settings.reload` (OP). Tab lista os IDs do pack daquele mundo. Não integra a alteração ao histórico de undo do WorldEdit.
+
+Somente mundos Terra2 autorizados, até 4096 células de bioma (262144 blocos equivalentes) e 64 chunks já carregados. Biomas do Minecraft usam células 4x4x4: as bordas são arredondadas para essa grade e podem exceder a seleção em até três blocos. Não gera/carrega chunks faltantes. Seleção não cuboide, volume excessivo, bioma desconhecido ou mundo protegido são recusados antes de alterar dados.
+
+Atualiza o bioma real do Paper e um overlay de identidades persistente no PDC do chunk, com UUID, seed, fingerprint e checksum. Em CUSTOM escreve o ID Terra; em VANILLA_COMPATIBLE escreve a referência vanilla e guarda a identidade Terra. O leitor próprio e `/terra2 biome` priorizam essas edições, sem reconstruir células não editadas. Prepara todos os payloads antes das alterações e tenta reverter dados anteriores em caso de falha. Terreno, blocos, loot e estruturas não são regenerados. O overlay acompanha o save normal de chunks; os últimos dados ainda não salvos podem ser perdidos numa queda abrupta.
+
+A edição funciona nos dois modos de armazenamento, mas a ponte Geyser nativa continua exigindo CUSTOM. A projeção visual de VANILLA_COMPATIBLE a partir do leitor próprio ainda não foi implementada.

@@ -63,17 +63,26 @@ public final class BedrockVisualPack {
     }
     private static String hex(int rgb) { return "#%06X".formatted(rgb); }
     private static String texture(int rgb) { return "terra2_rgb_%06x".formatted(rgb); }
+    public static JsonArray version() throws IOException {
+        var properties=new Properties();
+        try(var stream=BedrockVisualPack.class.getResourceAsStream("/terra2/bedrock-build.properties")) {
+            if(stream==null)throw new IOException("Pack build version resource missing");properties.load(stream);
+        }
+        String[] parts=properties.getProperty("version","").split("[-+]",2)[0].split("\\.");
+        if(parts.length!=3)throw new IOException("Invalid visual pack build version");
+        var array=new JsonArray();try{for(String part:parts){int number=Integer.parseInt(part);if(number<0)throw new NumberFormatException();array.add(number);}}catch(NumberFormatException invalid){throw new IOException("Invalid visual pack build version",invalid);}return array;
+    }
     public static byte[] compile(Collection<VisualProfile> profiles) throws IOException {
-        var index = index(profiles); String identity = JSON.toJson(index);
+        var index = index(profiles);var version=version();index.add("pack_version",version);String identity = JSON.toJson(index);
         var manifest = new JsonObject(); manifest.addProperty("format_version", 2);
         var header = new JsonObject(); header.addProperty("name", "Terra2 Generic RGB Palette");
         header.addProperty("description", "RGB atlas for optional Terra2 position preview. No vanilla overrides.");
         header.addProperty("uuid", UUID.nameUUIDFromBytes(("header:"+identity).getBytes(StandardCharsets.UTF_8)).toString());
-        header.add("version", JsonParser.parseString("[1,0,0]")); header.add("min_engine_version", JsonParser.parseString("[1,21,40]"));
+        header.add("version", version.deepCopy()); header.add("min_engine_version", JsonParser.parseString("[1,21,40]"));
         manifest.add("header", header);
         var module = new JsonObject(); module.addProperty("type", "resources");
         module.addProperty("uuid", UUID.nameUUIDFromBytes(("module:"+identity).getBytes(StandardCharsets.UTF_8)).toString());
-        module.add("version", JsonParser.parseString("[1,0,0]")); var modules = new JsonArray(); modules.add(module); manifest.add("modules", modules);
+        module.add("version", version.deepCopy()); var modules = new JsonArray(); modules.add(module); manifest.add("modules", modules);
         var atlas = new JsonObject(); atlas.addProperty("resource_pack_name", "Terra2 Generic RGB Palette");
         atlas.addProperty("texture_name", "atlas.terrain"); atlas.addProperty("padding", 8); atlas.addProperty("num_mip_levels", 4);
         var textureData = new JsonObject();
