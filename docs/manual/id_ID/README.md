@@ -1,6 +1,6 @@
 # Panduan pengguna — Terra2.0
 
-**Bahasa Indonesia (id_ID)** · **7.0.14-BETA**
+**Bahasa Indonesia (id_ID)** · **7.3.0-BETA**
 
 1. [Instalasi dan konfigurasi](01-installation.md)
 2. [Paket komunitas Terra](02-community-packs.md)
@@ -14,3 +14,5 @@
 7. [Perintah baru (7.0.22-BETA)](07-world-commands.md)
 
 8. [Mengidentifikasi dan menemukan bioma dan struktur (7.0.23-BETA)](08-discovery.md)
+
+9. [Pembaruan Terra2 7.3.0](09-version-7.3.0.md)

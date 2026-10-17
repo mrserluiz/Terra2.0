@@ -1,6 +1,6 @@
 # Benutzerhandbuch — Terra2.0
 
-**Deutsch (de_DE)** · **7.0.14-BETA**
+**Deutsch (de_DE)** · **7.3.0-BETA**
 
 1. [Installation und Konfiguration](01-installation.md)
 2. [Terra-Community-Packs](02-community-packs.md)
@@ -14,3 +14,5 @@
 7. [Neue Befehle (7.0.22-BETA)](07-world-commands.md)
 
 8. [Biome und Strukturen erkennen und finden (7.0.23-BETA)](08-discovery.md)
+
+9. [Terra2 7.3.0 Aktualisierung](09-version-7.3.0.md)

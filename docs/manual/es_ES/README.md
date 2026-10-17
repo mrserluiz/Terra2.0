@@ -1,6 +1,6 @@
 # Manual del usuario — Terra2.0
 
-**Español (es_ES)** · **7.0.14-BETA**
+**Español (es_ES)** · **7.3.0-BETA**
 
 1. [Instalación y configuración](01-installation.md)
 2. [Packs comunitarios de Terra](02-community-packs.md)
@@ -14,3 +14,5 @@
 7. [Nuevos comandos (7.0.22-BETA)](07-world-commands.md)
 
 8. [Identificar y localizar biomas y estructuras (7.0.23-BETA)](08-discovery.md)
+
+9. [Actualización Terra2 7.3.0](09-version-7.3.0.md)

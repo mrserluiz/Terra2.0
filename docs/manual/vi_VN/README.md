@@ -1,6 +1,6 @@
 # Hướng dẫn sử dụng — Terra2.0
 
-**Tiếng Việt (vi_VN)** · **7.0.14-BETA**
+**Tiếng Việt (vi_VN)** · **7.3.0-BETA**
 
 1. [Cài đặt và cấu hình](01-installation.md)
 2. [Gói cộng đồng Terra](02-community-packs.md)
@@ -14,3 +14,5 @@
 7. [Lệnh mới (7.0.22-BETA)](07-world-commands.md)
 
 8. [Nhận diện và tìm biome và cấu trúc (7.0.23-BETA)](08-discovery.md)
+
+9. [Cập nhật Terra2 7.3.0](09-version-7.3.0.md)

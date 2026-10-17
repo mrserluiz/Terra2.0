@@ -1,6 +1,6 @@
 # Kullanıcı kılavuzu — Terra2.0
 
-**Türkçe (tr_TR)** · **7.0.14-BETA**
+**Türkçe (tr_TR)** · **7.3.0-BETA**
 
 1. [Kurulum ve yapılandırma](01-installation.md)
 2. [Terra topluluk paketleri](02-community-packs.md)
@@ -14,3 +14,5 @@
 7. [Yeni komutlar (7.0.22-BETA)](07-world-commands.md)
 
 8. [Biyom ve yapıları tanımlama ve bulma (7.0.23-BETA)](08-discovery.md)
+
+9. [Terra2 7.3.0 güncellemesi](09-version-7.3.0.md)

@@ -1,6 +1,6 @@
 # ユーザーマニュアル — Terra2.0
 
-**日本語 (ja_JP)** · **7.0.14-BETA**
+**日本語 (ja_JP)** · **7.3.0-BETA**
 
 1. [インストールと設定](01-installation.md)
 2. [Terra コミュニティパック](02-community-packs.md)
@@ -14,3 +14,5 @@
 7. [新しいコマンド（7.0.22-BETA）](07-world-commands.md)
 
 8. [バイオームと構造物の識別・検索 (7.0.23-BETA)](08-discovery.md)
+
+9. [Terra2 7.3.0 更新](09-version-7.3.0.md)

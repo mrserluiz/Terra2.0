@@ -1,6 +1,6 @@
 # Manual do usuário — Terra2.0
 
-**Idioma:** Português (Brasil) · **Build de referência:** 7.0.14-BETA
+**Idioma:** Português (Brasil) · **Build de referência:** 7.3.0-BETA
 
 Este manual documenta o comportamento confirmado na documentação da build de referência. Se seu JAR for mais recente, confira as notas da versão correspondente. Recursos futuros estão identificados como **planejados**, e exemplos conceituais não são comandos válidos.
 
@@ -36,3 +36,5 @@ Referências técnicas: [BUILD-STATUS](../../BUILD-STATUS.md) · [TERRAPACKS](..
 7. [Novos comandos (7.0.22-BETA)](07-world-commands.md)
 
 8. [Identificar e localizar biomas e estruturas (7.0.23-BETA)](08-discovery.md)
+
+9. [Atualização Terra2 7.3.0](09-version-7.3.0.md)
