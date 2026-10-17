@@ -7,7 +7,7 @@ on:
       binary_run:
         description: 'Build run with a successful engine job and identical engine source'
         required: true
-        default: '38322434790'
+        default: '39041592458'
 permissions:
   contents: read
   actions: read
@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ github.token }}
-      BINARY_RUN: ${{ inputs.binary_run || '38322434790' }}
+      BINARY_RUN: ${{ inputs.binary_run || '39041592458' }}
     steps:
       - uses: actions/checkout@v4
         with:

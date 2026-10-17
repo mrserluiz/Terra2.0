@@ -10,7 +10,7 @@ def fetch(url):
     with urllib.request.urlopen(req,timeout=90) as r:return r.read()
 build=next(b for b in json.loads(fetch('https://fill.papermc.io/v3/projects/paper/versions/26.2/builds')) if b['id']==133)
 download=build['downloads']['server:default'];data=fetch(download['url']);assert hashlib.sha256(data).hexdigest()==download['checksums']['sha256'];(SERVER/'paper.jar').write_bytes(data)
-meta=json.loads(fetch('https://download.geysermc.org/v2/projects/geyser/versions/latest/builds/latest'))
+meta=json.loads(fetch('https://download.geysermc.org/v2/projects/geyser/versions/2.11.3/builds/1251'))
 version=meta['version'];number=meta['build'];info=meta['downloads']['spigot']
 data=fetch(f'https://download.geysermc.org/v2/projects/geyser/versions/{version}/builds/{number}/downloads/spigot')
 assert hashlib.sha256(data).hexdigest()==info['sha256'];(PLUGINS/'Geyser-Spigot.jar').write_bytes(data)
