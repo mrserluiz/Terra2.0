@@ -1,6 +1,10 @@
 # Recovered engine build status
 
-## Current reference: 7.3.0-BETA
+## Current reference: 7.3.1-BETA
+
+Exact Bedrock color overrides, validated biome IDs, compiled-color reports and in-game debug are available. Engine validation: [39041592458](https://github.com/mrserluiz/Terra2.0/actions/runs/39041592458). Official Geyser 2.11.3 build 1251 startup/restart checks: [39042325373](https://github.com/mrserluiz/Terra2.0/actions/runs/39042325373), reusing the identical engine artifact after a source comparison. Geyser 2.12 changed registry contracts and is not declared compatible. [Release notes and checksum](docs/releases/7.3.1-BETA.md). Real client rendering remains a server acceptance test.
+
+## Previous reference: 7.3.0-BETA
 
 [CI 38354726746](https://github.com/mrserluiz/Terra2.0/actions/runs/38354726746) passed all jobs, including the engine, calibration tests, save/restart and official Geyser integration. [Release notes and checksums](docs/releases/7.3.0-BETA.md). Real WorldEdit selection and Java/Bedrock visual matching remain server acceptance tests.
 
