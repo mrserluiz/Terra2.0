@@ -23,6 +23,21 @@ public final class OfficialGeyserPreviewProbe extends JavaPlugin {
             require(terra!=null&&terra.isEnabled(),"Terra2 enabled with official Geyser");
             require(terra.bedrockPreview().status().startsWith("READY_OPT_IN"),terra.bedrockPreview().status());
             int definitions=terra.bedrockPreview().validateProtocol();require(definitions>0,"Real packet runtime IDs validated");
+            var colorReport=new org.bukkit.configuration.file.YamlConfiguration();colorReport.load(terra.getDataFolder().toPath().resolve("bedrock/color-report.yml").toFile());
+            boolean exactFound=false;
+            for(var row:colorReport.getMapList("profiles"))if("terra:hydraxia/hydraxia/autumnal_woodlands".equals(row.get("id"))) {
+                var color=(java.util.Map<?,?>)((java.util.Map<?,?>)row.get("colors")).get("foliage");
+                require("#FF6A19".equals(color.get("final"))&&"BIOME_COLOR".equals(color.get("origin")),"Exact YAML biome color reaches compiled report despite global HSV");exactFound=true;
+            }
+            require(exactFound,"Exact biome color report present");
+            var resource=terra.getDataFolder().toPath().resolve("bedrock/terra2-palette.mcpack");
+            require(java.util.HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(Files.readAllBytes(resource))).equals(colorReport.getString("pack.sha256")),"Frozen report SHA matches registered pack bytes");
+            try(var zip=new java.util.zip.ZipFile(resource.toFile())) {
+                String file="biomes/"+com.dfsek.terra.bukkit.bedrock.BedrockClientBiomes.name("terra:hydraxia/hydraxia/autumnal_woodlands").substring(7)+".client_biome.json";
+                var document=com.google.gson.JsonParser.parseString(new String(zip.getInputStream(zip.getEntry(file)).readAllBytes(),java.nio.charset.StandardCharsets.UTF_8)).getAsJsonObject();
+                require("#FF6A19".equals(document.getAsJsonObject("minecraft:client_biome").getAsJsonObject("components").getAsJsonObject("minecraft:foliage_appearance").get("color").getAsString()),"Exact YAML color compiled into actual registered client biome");
+            }
+            getLogger().info("TERRA2_EXACT_COLOR_OK report=true pack=true restartPhase="+Files.exists(getDataFolder().toPath().resolve("identity.sha256"))+" clientVisualTest=false");
             var transport=new com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport(Bukkit.getPluginManager().getPlugin("Geyser-Spigot").getClass().getClassLoader());
             Object update=terra.bedrockPreview().diagnosticPacket(-16,64,32);
             Object position=com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(update,"getBlockPosition");

@@ -22,7 +22,7 @@ class BedrockVisualPackTest {
             var index = JsonParser.parseString(new String(zip.getInputStream(zip.getEntry("terra2-palette.json")).readAllBytes(), java.nio.charset.StandardCharsets.UTF_8)).getAsJsonObject();
             assertEquals(2,index.getAsJsonObject("profiles").size());
             var manifest=JsonParser.parseString(new String(zip.getInputStream(zip.getEntry("manifest.json")).readAllBytes(),java.nio.charset.StandardCharsets.UTF_8)).getAsJsonObject();
-            assertEquals("[7,3,0]",manifest.getAsJsonObject("header").getAsJsonArray("version").toString());
+            assertEquals("[7,3,1]",manifest.getAsJsonObject("header").getAsJsonArray("version").toString());
             assertEquals(manifest.getAsJsonObject("header").get("version"),manifest.getAsJsonArray("modules").get(0).getAsJsonObject().get("version"));
             assertEquals("#FFD1EF",index.getAsJsonObject("profiles").getAsJsonObject("generator_b:frost").get("grass").getAsString());
             assertEquals(259,index.get("exact_color_count").getAsInt());

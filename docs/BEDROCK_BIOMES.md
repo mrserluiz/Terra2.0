@@ -152,3 +152,7 @@ SHA-256 do JAR: `7fcb05e9115101a6e86ba7daa60c966dc3a37f9947cc8e6a8c202351f8fd3d5
 ## Calibração 7.3.0-BETA
 
 Ajustes exclusivos do cliente Bedrock, com Java como referência, em `bedrock/color-calibration.yml`. Valores neutros por padrão e sobrescritas por ID de bioma. [Configuração, procedimento e limites](releases/7.3.0-BETA.md#calibrar-as-cores). Corrigida a escolha da sobrecarga Player do BukkitAdapter usada na seleção WorldEdit.
+
+## Cores explícitas e debug — 7.3.1-BETA
+
+`color: '#RRGGBB'` define a cor final por papel/bioma, com prioridade sobre HSV. IDs inexistentes são recusados. `/terra2 bedrock debug` e `bedrock/color-report.yml` mostram entrada, original, final, UUID/versão/hash do pack compilado; não confirmam renderização no cliente. [Exemplos e procedimento](releases/7.3.1-BETA.md).

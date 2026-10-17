@@ -23,7 +23,7 @@ public final class CommandCompletion {
                 case "lis", "list" -> List.of("Cpack", "Tpack", "all");
                 case "packs", "datapack" -> List.of("list", "inspect");
                 case "loot" -> List.of("status");
-                case "bedrock" -> List.of("status", "export", "pack", "prepare", "preview", "native", "forget", "stop", "disable");
+                case "bedrock" -> List.of("status", "debug", "export", "pack", "prepare", "preview", "native", "forget", "stop", "disable");
                 default -> List.of();
             };
             else if(args.length == 3) options = switch(action) {

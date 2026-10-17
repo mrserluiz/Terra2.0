@@ -38,6 +38,7 @@ public final class BedrockPreviewBridge implements Listener {
     private boolean listening;
     private List<VisualProfile> catalog;
     private UUID packId;
+    private BedrockColorReport colorReport;
     private final Path pack,marker;
     private record Pos(int x,int y,int z) {}
     private static final class Preview {
@@ -94,10 +95,14 @@ public final class BedrockPreviewBridge implements Listener {
         }
         BedrockVisualPack.index(items); // Reject source collisions before display calibration.
         var calibration=BedrockColorCalibration.load(marker.getParent().resolve("color-calibration.yml"));
+        calibration.validate(items);
+        var originals=List.copyOf(items);
         items.replaceAll(calibration::apply);
         BedrockVisualPack.index(items);
         items.forEach(profile->profiles.put(profile.id(),profile));catalog=List.copyOf(items);
         BedrockVisualPack.write(pack,catalog);
+        colorReport=new BedrockColorReport(originals,catalog,calibration,Files.readAllBytes(pack));
+        colorReport.write(pack.getParent().resolve("color-report.yml"));
         try(var zip=new java.util.zip.ZipFile(pack.toFile())) {
             var manifest=com.google.gson.JsonParser.parseString(new String(zip.getInputStream(zip.getEntry("manifest.json")).readAllBytes(),java.nio.charset.StandardCharsets.UTF_8)).getAsJsonObject();
             packId=UUID.fromString(manifest.getAsJsonObject("header").get("uuid").getAsString());
@@ -298,6 +303,21 @@ public final class BedrockPreviewBridge implements Listener {
         stopNative(player.getUniqueId());
         Preview state=players.remove(player.getUniqueId());if(state==null)return;state.active=false;state.epoch++;
         if(restore && player.getWorld().getUID().equals(state.world))for(Pos pos:state.overlay.keySet())restore(player,player.getWorld(),pos);
+    }
+    public List<String> colorDebug(Player player) {
+        var lines=new ArrayList<String>();
+        lines.add("Ponte: "+status()+"; "+playerStatus(player));
+        if(colorReport==null){lines.add("Nenhum catálogo/pack compilado nesta ponte; use prepare e reinicie.");return lines;}
+        lines.add(colorReport.metadata());
+        var location=player.getLocation();var world=player.getWorld();
+        lines.add("Mundo: "+world.getName()+"; Bukkit real: "+world.getBiome(location).getKey());
+        var sample=PositionVisualResolver.at(world,location.getBlockX(),location.getBlockY(),location.getBlockZ());
+        if(sample.isEmpty()){lines.add("Sem identidade Terra2 disponível nesta posição.");return lines;}
+        var found=sample.get();lines.add("ID: "+found.profile()+"; leitura: "+found.source());
+        lines.add("Client biome: "+BedrockClientBiomes.name(found.profile()));
+        lines.addAll(colorReport.details(found.profile()));
+        if(!world.getBiome(location).getKey().toString().equals(found.profile()))lines.add("ATENCAO: bioma Bukkit difere da identidade; o debug não comprova tradução efetiva deste chunk.");
+        lines.add("Snapshot da compilação; editar YAML exige reinício. Não confirma renderização/aceitação no cliente.");return lines;
     }
     public String playerStatus(Player player) {
         NativePreview nativeState=nativePlayers.get(player.getUniqueId());

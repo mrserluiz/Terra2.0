@@ -22,11 +22,17 @@ public final class BedrockCommands {
     }
     public static boolean handle(TerraBukkitPlugin plugin, CommandSender sender, String[] args) {
         if(args.length == 0 || !args[0].equalsIgnoreCase("bedrock")) return false;
-        if(args.length != 2 || !Set.of("status", "export", "install", "pack", "prepare", "preview", "native", "forget", "stop", "disable").contains(args[1].toLowerCase(Locale.ROOT))) {
-            sender.sendMessage("Uso: /terra2 bedrock <status|export|pack|prepare|preview|native|forget|stop|disable>"); return true;
+        if(args.length != 2 || !Set.of("status", "debug", "export", "install", "pack", "prepare", "preview", "native", "forget", "stop", "disable").contains(args[1].toLowerCase(Locale.ROOT))) {
+            sender.sendMessage("Uso: /terra2 bedrock <status|debug|export|pack|prepare|preview|native|forget|stop|disable>"); return true;
         }
         Plugin geyser = Bukkit.getPluginManager().getPlugin("Geyser-Spigot");
         var bridge=plugin.bedrockPreview();
+        if(args[1].equalsIgnoreCase("debug")) {
+            if(sender instanceof org.bukkit.entity.Player player && bridge!=null) {
+                try{bridge.colorDebug(player).forEach(sender::sendMessage);}catch(Exception error){sender.sendMessage("Debug indisponível: "+error.getMessage());}
+            }else sender.sendMessage("Execute em jogo; relatório em plugins/Terra2/bedrock/color-report.yml após compilação da ponte.");
+            return true;
+        }
         if(Set.of("prepare","preview","native","forget","stop","disable").contains(args[1].toLowerCase(Locale.ROOT))) {
             try {
                 if(bridge==null)throw new IllegalStateException("Preview module not initialized");
@@ -56,7 +62,11 @@ public final class BedrockCommands {
                     profiles.addAll(provider.profiles());
                 }
                 var target = plugin.getDataFolder().toPath().resolve("bedrock/terra2-palette.mcpack");
+                BedrockVisualPack.index(profiles);
+                var calibration=BedrockColorCalibration.load(target.getParent().resolve("color-calibration.yml"));calibration.validate(profiles);
+                var original=java.util.List.copyOf(profiles);profiles.replaceAll(calibration::apply);
                 BedrockVisualPack.write(target, profiles);
+                new BedrockColorReport(original,profiles,calibration,java.nio.file.Files.readAllBytes(target)).write(target.getParent().resolve("color-report.yml"));
                 var index = BedrockVisualPack.index(profiles);
                 sender.sendMessage("Paleta RGB gerada: " + target + "; cores exatas: " + index.get("exact_color_count")
                     + "; perfis: " + index.getAsJsonObject("profiles").size());

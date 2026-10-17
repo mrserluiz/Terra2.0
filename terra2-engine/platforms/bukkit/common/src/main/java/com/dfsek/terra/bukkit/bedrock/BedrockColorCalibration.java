@@ -8,12 +8,15 @@ import java.util.*;
 
 /** Bedrock-only display adjustments. Source pack profiles and Java biomes remain untouched. */
 public final class BedrockColorCalibration {
-    public record Adjustment(double saturation,double brightness,double hueDegrees) {
+    public record Adjustment(double saturation,double brightness,double hueDegrees,Integer color) {
+        public Adjustment(double saturation,double brightness,double hueDegrees){this(saturation,brightness,hueDegrees,null);}
         public Adjustment {
+            if(color!=null && (color<0 || color>0xFFFFFF))throw new IllegalArgumentException("Invalid RGB color");
             if(!Double.isFinite(saturation)||saturation<0||saturation>2 || !Double.isFinite(brightness)||brightness<0||brightness>2 || !Double.isFinite(hueDegrees)||Math.abs(hueDegrees)>30)
                 throw new IllegalArgumentException("Calibration: saturation/brightness must be 0..2; hue-degrees -30..30");
         }
         public int apply(int rgb) {
+            if(color!=null)return color;
             if(saturation==1 && brightness==1 && hueDegrees==0)return rgb;
             float[] hsv=Color.RGBtoHSB((rgb>>16)&255,(rgb>>8)&255,rgb&255,null);
             float hue=(float)((hsv[0]+hueDegrees/360.0+1)%1);
@@ -33,6 +36,7 @@ public final class BedrockColorCalibration {
                 # Bedrock display only. Java and original pack colors remain unchanged.
                 # Start neutral; calibrate against Java screenshots at the same position/time.
                 # Supported roles: foliage, grass, water. Per-biome overrides use exact registered IDs.
+                # Optional color: "#FF6A19" sets final RGB directly, bypassing HSV adjustments.
                 roles:
                   foliage: {saturation: 1.0, brightness: 1.0, hue-degrees: 0.0}
                   grass: {saturation: 1.0, brightness: 1.0, hue-degrees: 0.0}
@@ -40,24 +44,51 @@ public final class BedrockColorCalibration {
                 biomes: {}
                 """,StandardOpenOption.CREATE_NEW);
         if(Files.isSymbolicLink(path)||Files.size(path)>65536)throw new IllegalArgumentException("Invalid calibration file");
-        var yaml=new YamlConfiguration();yaml.load(path.toFile());var roles=readRoles(yaml.getConfigurationSection("roles"));
+        var yaml=new YamlConfiguration();yaml.options().pathSeparator('|');yaml.load(path.toFile());
+        for(String key:yaml.getKeys(false))if(!Set.of("roles","biomes").contains(key))throw new IllegalArgumentException("Unknown calibration root key (check indentation): "+key);
+        for(String key:Set.of("roles","biomes"))if(yaml.contains(key)&&!yaml.isConfigurationSection(key))throw new IllegalArgumentException("Expected calibration section: "+key);
+        var roles=readRoles(yaml.getConfigurationSection("roles"));
         var overrides=new HashMap<String,Map<String,Adjustment>>();var section=yaml.getConfigurationSection("biomes");
-        if(section!=null)for(String id:section.getKeys(false))overrides.put(id,readRoles(section.getConfigurationSection(id)));
+        if(section!=null)for(String id:section.getKeys(false)) {
+            if(section.getConfigurationSection(id)==null)throw new IllegalArgumentException("Expected biome section: "+id);
+            overrides.put(id,readRoles(section.getConfigurationSection(id)));
+        }
         return new BedrockColorCalibration(roles,overrides);
+    }
+    public void validate(Collection<VisualProfile> catalog) {
+        var ids=new HashSet<String>();catalog.forEach(p->ids.add(p.id()));
+        for(String id:biomes.keySet())if(!ids.contains(id))throw new IllegalArgumentException("Unknown calibration biome ID: "+id+"; use the exact registered ID from /terra2 biome");
+    }
+    public Adjustment adjustment(String id,String role) {return biomes.getOrDefault(id,Map.of()).getOrDefault(role,roles.getOrDefault(role,IDENTITY));}
+    public String origin(String id,String role) {
+        String scope=biomes.getOrDefault(id,Map.of()).containsKey(role)?"BIOME":roles.containsKey(role)?"GLOBAL":"ORIGINAL";
+        return scope+(adjustment(id,role).color()!=null?"_COLOR":"_HSV");
     }
     private static Map<String,Adjustment> readRoles(org.bukkit.configuration.ConfigurationSection section) {
         var result=new HashMap<String,Adjustment>();if(section==null)return result;
         for(String role:section.getKeys(false)) {
             if(!Set.of("foliage","grass","water").contains(role))throw new IllegalArgumentException("Unknown calibration role: "+role);
             var value=section.getConfigurationSection(role);if(value==null)throw new IllegalArgumentException("Invalid calibration role: "+role);
-            for(String key:value.getKeys(false))if(!Set.of("saturation","brightness","hue-degrees").contains(key)||!value.isDouble(key)&&!value.isInt(key)&&!value.isLong(key))throw new IllegalArgumentException("Invalid calibration number: "+role+"."+key);
-            result.put(role,new Adjustment(value.getDouble("saturation",1),value.getDouble("brightness",1),value.getDouble("hue-degrees",0)));
+            for(String key:value.getKeys(false)) {
+                if(key.equals("color"))continue;
+                if(!Set.of("saturation","brightness","hue-degrees").contains(key)||!(value.get(key) instanceof Number))throw new IllegalArgumentException("Invalid calibration number: "+role+"."+key);
+            }
+            Integer color=null;
+            if(value.getKeys(false).contains("color")) {
+                Object raw=value.get("color");
+                if(!(raw instanceof String hex)||!hex.matches("#[0-9a-fA-F]{6}"))throw new IllegalArgumentException("Invalid color for "+role+": use quoted '#RRGGBB'");
+                color=Integer.parseInt(((String)raw).substring(1),16);
+            }
+            result.put(role,new Adjustment(value.getDouble("saturation",1),value.getDouble("brightness",1),value.getDouble("hue-degrees",0),color));
         }
         return result;
     }
     public VisualProfile apply(VisualProfile source) {
         var colors=new TreeMap<>(source.colors());
-        colors.replaceAll((role,rgb)->biomes.getOrDefault(source.id(),Map.of()).getOrDefault(role,roles.getOrDefault(role,IDENTITY)).apply(rgb));
+        colors.replaceAll((role,rgb)->adjustment(source.id(),role).apply(rgb));
+        for(String role:Set.of("foliage","grass","water")) {
+            Integer exact=adjustment(source.id(),role).color();if(exact!=null)colors.put(role,exact);
+        }
         return new VisualProfile(source.id(),colors);
     }
 }
