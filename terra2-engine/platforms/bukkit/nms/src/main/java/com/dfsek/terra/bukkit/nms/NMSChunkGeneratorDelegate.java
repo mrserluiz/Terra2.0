@@ -83,7 +83,12 @@ public class NMSChunkGeneratorDelegate extends ChunkGenerator {
     @Override
     public void applyBiomeDecoration(@NotNull WorldGenLevel world, @NotNull ChunkAccess chunk,
                                      @NotNull StructureManager structureAccessor) {
-        if(!pack.getContext().get(PreLoadCompatibilityOptions.class).vanillaFeatures()) return;
+        if(!pack.getContext().get(PreLoadCompatibilityOptions.class).vanillaFeatures()) {
+            // Paper's false flag skips native decoration but still executes Bukkit populators.
+            // Returning here would also suppress Terra's own vegetation and structure stages.
+            super.applyBiomeDecoration(world, chunk, structureAccessor, false);
+            return;
+        }
         if(nativeExecutor == null && !terraBiomes.vanillaCompatible()) vanilla.applyBiomeDecoration(world, chunk, structureAccessor);
         else { if(nativeExecutor != null) nativeExecutor.verify(world.getLevel()); super.applyBiomeDecoration(world, chunk, structureAccessor); }
     }

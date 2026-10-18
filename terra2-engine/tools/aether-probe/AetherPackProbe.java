@@ -44,6 +44,7 @@ public final class AetherPackProbe extends JavaPlugin {
    trees.merge(biome,logs,Integer::sum);
    if(land)solids++;else voids++;
   }
+  if(trees.values().stream().mapToInt(Integer::intValue).sum()==0)throw new IllegalStateException("Terra vegetation stages did not run");
   if(solids==0||voids==0||starts!=0)throw new IllegalStateException("Expected island/void without native structures: "+solids+"/"+voids+" starts="+starts);
   String checkpoint=world.getUID()+"|"+HexFormat.of().formatHex(digest.digest());
   if(Files.exists(state)&&!Files.readString(state).equals(checkpoint))throw new IllegalStateException("Saved terrain/biomes changed after restart");
