@@ -5,6 +5,7 @@ Adaptation of the supplied AETHER 0.1.2 pack. Inspired by The Aether; not an off
 - Four surface biomes: Skyroot Meadow, Grove, Forest and Woodland.
 - Floating-island density around Y=96, now with a horizontal mask creating void gaps.
 - Only vanilla block states. AMBROSIUM_VEIN -> gold_ore, ZANITE_VEIN -> diamond_ore, GRAVITITE_VEIN -> deepslate_diamond_ore. These are internal structure IDs, not mod block requirements.
+- Random ore locators use height and amount ranges required by the engine.
 - Separate feature and vein identifiers, qualified ore config type, explicit weighted references.
 - Golden Oak uses oak foliage for biome tint; birch trunk retained.
 - Structures/dungeons and a complete Aether mod conversion are not included.
