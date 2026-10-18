@@ -10,5 +10,5 @@ colors:
   fog: 0xe8fff7
   sky: 0x91ddff
 features:
-  trees: [ SKYROOT_TREES, GOLDEN_OAK_TREES ]
+  trees: [ SKYROOT_TREES ]
   flora: [ AETHER_GRASS, AETHER_FLOWERS_DENSE ]

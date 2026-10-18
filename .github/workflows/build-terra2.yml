@@ -105,7 +105,7 @@ jobs:
           gradle-version: '9.7.1'
 
       - name: Compile and test the Paper engine
-        run: gradle --no-daemon --stacktrace :platforms:bukkit:build :common:implementation:terra2-core:test :common:implementation:vanilla-adapter:test :platforms:bukkit:common:test :platforms:bukkit:nms:test :common:implementation:base:test :common:addons:biome-query-api:test
+        run: gradle --no-daemon --stacktrace :platforms:bukkit:build :common:implementation:terra2-core:test :common:implementation:vanilla-adapter:test :platforms:bukkit:common:test :platforms:bukkit:nms:test :common:implementation:base:test :common:addons:biome-query-api:test :common:addons:config-noise-function:test
 
       - name: Inspect native worldgen adapter signatures
         if: success()
@@ -119,12 +119,26 @@ jobs:
         if: success()
         run: python3 tools/paper-biome-smoke.py
 
+      - name: Validate Aether density, isolation and save/restart
+        if: success()
+        run: python3 tools/paper-aether-smoke.py
+
+      - name: Upload AETHER pack and diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: AETHER-pack-validation
+          path: |
+            terra2-engine/build/aether-smoke/plugins/Terra2/packs/AETHER-0.2.0-terra2.zip
+            terra2-engine/build/aether-smoke/*.log
+            terra2-engine/build/aether-smoke/plugins/Terra2/reports/**
+
       - name: Upload experimental engine JAR
         if: success()
         uses: actions/upload-artifact@v4
         with:
           name: Terra2-engine-experimental-26.2
-          path: terra2-engine/platforms/bukkit/build/libs/Terra2-bukkit-7.3.2-BETA.jar
+          path: terra2-engine/platforms/bukkit/build/libs/Terra2-bukkit-7.3.3-BETA.jar
           if-no-files-found: error
 
       - name: Upload real registry biome mappings

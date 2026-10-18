@@ -31,6 +31,13 @@ import com.dfsek.terra.api.tectonic.LoaderRegistrar;
 public interface Platform extends LoaderRegistrar {
     boolean reload();
 
+    /** Minecraft's native density operator, seeded by RandomState, without a fallback approximation. */
+    default com.dfsek.seismic.type.sampler.Sampler oldBlendedNoise(double xzScale, double yScale,
+            double xzFactor, double yFactor, double smearScaleMultiplier) {
+        throw new UnsupportedOperationException("MINECRAFT_OLD_BLENDED_NOISE requires a supported native Paper backend");
+    }
+
+
     /** Observer for successful structure feature placements; no world reads or blocking I/O. */
     default void recordStructurePlacement(com.dfsek.terra.api.world.chunk.generation.ProtoWorld world,
                                          String stage, String feature, int x, int y, int z) {}

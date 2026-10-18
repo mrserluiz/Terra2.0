@@ -8,7 +8,7 @@ locator:
   type: AND
   locators:
     - type: TOP
-      range: &range { min: 48, max: 180 }
+      range: &range { min: 8, max: 129 }
     - type: PATTERN
       range: *range
       pattern: { type: MATCH_SET, blocks: [ minecraft:grass_block ], offset: -1 }

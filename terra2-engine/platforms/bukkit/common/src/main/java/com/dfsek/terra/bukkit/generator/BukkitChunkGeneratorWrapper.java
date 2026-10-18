@@ -124,7 +124,7 @@ public class BukkitChunkGeneratorWrapper extends org.bukkit.generator.ChunkGener
 
     @Override
     public boolean shouldGenerateStructures() {
-        return true;
+        return pack.getContext().get(com.dfsek.terra.bukkit.config.PreLoadCompatibilityOptions.class).vanillaStructures();
     }
 
     public ConfigPack getPack() {

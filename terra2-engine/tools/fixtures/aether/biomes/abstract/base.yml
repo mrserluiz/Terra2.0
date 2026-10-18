@@ -16,10 +16,6 @@ palette:
   - AETHER_SURFACE: 319
 
 features:
-  ores:
-    - AMBROSIUM_ORE
-    - ZANITE_ORE
-    - GRAVITITE_ORE
   flora:
     - AETHER_GRASS
     - AETHER_FLOWERS

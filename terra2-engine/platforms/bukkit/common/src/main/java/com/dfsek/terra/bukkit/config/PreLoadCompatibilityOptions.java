@@ -42,6 +42,13 @@ public class PreLoadCompatibilityOptions implements ConfigTemplate, Properties {
     @Default
     private double airThreshold = -0.5;
 
+    @Value("minecraft.vanilla-features") @Default
+    private boolean vanillaFeatures = true;
+    @Value("minecraft.vanilla-structures") @Default
+    private boolean vanillaStructures = true;
+    public boolean vanillaFeatures() { return vanillaFeatures; }
+    public boolean vanillaStructures() { return vanillaStructures; }
+
     public boolean useVanillaBiomes() {
         return vanillaBiomes;
     }

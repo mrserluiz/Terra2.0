@@ -1,5 +1,5 @@
 id: AETHER
-version: 0.1.3-terra2
+version: 0.2.0-terra2
 author: "EtherCraft / adaptation from The Aether worldgen"
 generator: NOISE_3D
 
@@ -32,19 +32,17 @@ biomes:
     stages: []
 
 stages:
-  - id: ores
-    type: FEATURE
   - id: trees
     type: FEATURE
     blend:
-      amplitude: 20
+      amplitude: 0
       sampler:
         type: GAUSSIAN
         salt: 2583
   - id: flora
     type: FEATURE
     blend:
-      amplitude: 18
+      amplitude: 0
       sampler:
         type: GAUSSIAN
         salt: 2934
@@ -71,3 +69,10 @@ blend:
     amplitude: 2
     sampler:
       type: WHITE_NOISE
+
+# Isolate this dimension; do not decorate it using its vanilla biome equivalents.
+minecraft:
+  vanilla-features: false
+  vanilla-structures: false
+  beard:
+    enable: false

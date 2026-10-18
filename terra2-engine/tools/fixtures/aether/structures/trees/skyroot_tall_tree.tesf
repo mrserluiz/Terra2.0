@@ -1,0 +1,15 @@
+// Terra2 vanilla-block stand-in; not a byte-for-byte Aether tree feature port.
+num h = 8+randomInt(3);
+for(num y=0; y<h; y=y+1) { block(0,y,0,"minecraft:oak_log"); }
+for(num y=h-3; y<=h; y=y+1) {
+    num radius = 3;
+    if(y==h) radius=1;
+    for(num x=-radius; x<=radius; x=x+1) {
+        for(num z=-radius; z<=radius; z=z+1) {
+            if(abs(x)+abs(z)<=radius+1) {
+                block(x,y,z,"minecraft:oak_leaves[distance=1,persistent=false]",false);
+            }
+        }
+    }
+}
+block(0,-1,0,"minecraft:dirt");

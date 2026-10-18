@@ -7,7 +7,7 @@ build=next(b for b in json.loads(fetch('https://fill.papermc.io/v3/projects/pape
 info=build['downloads']['server:default'];data=fetch(info['url']);assert hashlib.sha256(data).hexdigest()==info['checksums']['sha256'];(SERVER/'paper.jar').write_bytes(data)
 terra=next((ROOT/'platforms/bukkit/build/libs').glob('Terra2-bukkit-*-BETA.jar'));shutil.copy(terra,PLUGINS/terra.name)
 td=PLUGINS/'Terra2';(td/'packs').mkdir(parents=True,exist_ok=True)
-pack=td/'packs/AETHER-0.1.3-terra2.zip'
+pack=td/'packs/AETHER-0.2.0-terra2.zip'
 with zipfile.ZipFile(pack,'w',zipfile.ZIP_DEFLATED) as z:
  for path in sorted((ROOT/'tools/fixtures/aether').rglob('*')):
   if path.is_file():z.write(path,path.relative_to(ROOT/'tools/fixtures/aether').as_posix())

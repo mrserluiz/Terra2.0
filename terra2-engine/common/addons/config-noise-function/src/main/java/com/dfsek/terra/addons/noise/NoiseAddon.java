@@ -121,6 +121,10 @@ public class NoiseAddon implements AddonInitializer {
 
                 noiseRegistry.register(addon.key("OPEN_SIMPLEX_2"), () -> new SimpleNoiseTemplate<>(OpenSimplex2Sampler.class));
                 noiseRegistry.register(addon.key("OPEN_SIMPLEX_2S"), () -> new SimpleNoiseTemplate<>(OpenSimplex2SSampler.class));
+                noiseRegistry.register(addon.key("MINECRAFT_OLD_BLENDED_NOISE"),
+                    () -> new com.dfsek.terra.addons.noise.config.templates.OldBlendedNoiseTemplate(plugin));
+                noiseRegistry.register(addon.key("MINECRAFT_INTERPOLATED"),
+                    com.dfsek.terra.addons.noise.config.templates.MinecraftInterpolatedTemplate::new);
                 noiseRegistry.register(addon.key("PERLIN"), () -> new SimpleNoiseTemplate<>(PerlinSampler.class));
                 noiseRegistry.register(addon.key("SIMPLEX"), () -> new SimpleNoiseTemplate<>(SimplexSampler.class));
                 noiseRegistry.register(addon.key("GABOR"), GaborNoiseTemplate::new);

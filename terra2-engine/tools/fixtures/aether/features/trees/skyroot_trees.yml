@@ -9,7 +9,7 @@ locator:
   type: AND
   locators:
     - type: TOP
-      range: &range { min: 48, max: 180 }
+      range: &range { min: 8, max: 129 }
     - type: PATTERN
       range: *range
       pattern:
@@ -23,5 +23,7 @@ locator:
         blocks: [ minecraft:air ]
         offset: 0
 structures:
-  distribution: { type: CONSTANT }
-  structures: skyroot_tree
+  distribution: { type: WHITE_NOISE }
+  structures:
+    - skyroot_tree: 4
+    - golden_oak_tree: 1

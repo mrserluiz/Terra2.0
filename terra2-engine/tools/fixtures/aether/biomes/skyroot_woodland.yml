@@ -10,4 +10,4 @@ colors:
   fog: 0xd7fbff
   sky: 0x82d5ff
 features:
-  trees: [ SKYROOT_TREES_DENSE ]
+  trees: [ SKYROOT_TREES_WOODLAND ]

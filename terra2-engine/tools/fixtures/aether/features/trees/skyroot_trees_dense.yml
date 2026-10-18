@@ -2,14 +2,14 @@ id: SKYROOT_TREES_DENSE
 type: FEATURE
 distributor:
   type: PADDED_GRID
-  width: 8
+  width: 7
   padding: 3
   salt: 18272
 locator:
   type: AND
   locators:
     - type: TOP
-      range: &range { min: 48, max: 180 }
+      range: &range { min: 8, max: 129 }
     - type: PATTERN
       range: *range
       pattern:
@@ -23,5 +23,8 @@ locator:
         blocks: [ minecraft:air ]
         offset: 0
 structures:
-  distribution: { type: CONSTANT }
-  structures: skyroot_tree
+  distribution: { type: WHITE_NOISE }
+  structures:
+    - skyroot_tree: 3
+    - skyroot_tall_tree: 2
+    - golden_oak_tree: 1

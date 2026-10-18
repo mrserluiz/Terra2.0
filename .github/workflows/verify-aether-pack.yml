@@ -1,7 +1,6 @@
 name: Validate AETHER Community Pack
 on:
-  push:
-    paths: ['terra2-engine/tools/fixtures/aether/**', 'terra2-engine/tools/aether-probe/**', 'terra2-engine/tools/paper-aether-smoke.py', '.github/workflows/verify-aether-pack.yml']
+  workflow_dispatch:
 permissions:
   contents: read
   actions: read
@@ -14,12 +13,12 @@ jobs:
         with:
           distribution: temurin
           java-version: '25'
-      - uses: actions/download-artifact@v4
+      - uses: gradle/actions/setup-gradle@v4
         with:
-          name: Terra2-engine-experimental-26.2
-          path: terra2-engine/platforms/bukkit/build/libs
-          run-id: 39158002948
-          github-token: ${{ github.token }}
+          gradle-version: '9.7.1'
+      - name: Build matching native engine
+        working-directory: terra2-engine
+        run: gradle --no-daemon :platforms:bukkit:build :platforms:bukkit:nms:test :common:addons:config-noise-function:test
       - name: Resolve Paper API for the runtime probe
         run: |
           mkdir -p /tmp/terra2-probe-api
@@ -33,6 +32,6 @@ jobs:
         with:
           name: AETHER-pack-validation
           path: |
-            terra2-engine/build/aether-smoke/plugins/Terra2/packs/AETHER-0.1.3-terra2.zip
+            terra2-engine/build/aether-smoke/plugins/Terra2/packs/AETHER-0.2.0-terra2.zip
             terra2-engine/build/aether-smoke/*.log
             terra2-engine/build/aether-smoke/plugins/Terra2/reports/**
