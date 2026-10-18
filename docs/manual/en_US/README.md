@@ -1,6 +1,6 @@
 # User manual — Terra2.0
 
-**English (en_US)** · **Current build: 7.3.1-BETA** · initial chapters: historical 7.0.14 reference
+**English (en_US)** · **Current build: 7.3.2-BETA** · initial chapters: historical 7.0.14 reference
 
 1. [Installation and configuration](01-installation.md)
 2. [Terra Community Packs](02-community-packs.md)
@@ -21,3 +21,5 @@
 11. [Bedrock color calibration against Java (7.3.0-BETA)](../../releases/7.3.0-BETA.md) (Portuguese setup guide)
 
 12. [Exact biome colors and Bedrock debug (7.3.1-BETA)](../../releases/7.3.1-BETA.md) (Portuguese setup guide; official Geyser 2.11.3 build 1251, not 2.12)
+
+13. [Base colors with global and per-biome HSV (7.3.2-BETA)](../../releases/7.3.2-BETA.md) (Portuguese setup guide)

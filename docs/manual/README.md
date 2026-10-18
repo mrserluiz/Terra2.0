@@ -1,6 +1,6 @@
 # Manual do usuário — Terra2.0
 
-**Idioma:** Português (Brasil) · **Build atual:** 7.3.1-BETA · capítulos iniciais: referência histórica 7.0.14-BETA
+**Idioma:** Português (Brasil) · **Build atual:** 7.3.2-BETA · capítulos iniciais: referência histórica 7.0.14-BETA
 
 Este manual documenta o comportamento confirmado na documentação da build de referência. Se seu JAR for mais recente, confira as notas da versão correspondente. Recursos futuros estão identificados como **planejados**, e exemplos conceituais não são comandos válidos.
 
@@ -47,3 +47,5 @@ A ponte de cores nativas exige mundo CUSTOM. A edição de biomas funciona tamb�
 13. [Calibração Bedrock com Java como referência (7.3.0-BETA)](../releases/7.3.0-BETA.md)
 
 14. [Cores finais por bioma e debug Bedrock (7.3.1-BETA)](../releases/7.3.1-BETA.md)
+
+15. [Cor-base e ajustes globais/por bioma (7.3.2-BETA)](../releases/7.3.2-BETA.md)
