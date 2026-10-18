@@ -29,6 +29,7 @@ class AetherDensityParityTest {
         JsonObject squeeze = JsonParser.parseString(density).getAsJsonObject();
         JsonElement unsqueezed = squeeze.getAsJsonObject("argument").get("argument");
         router.add("final_density", unsqueezed); // blend_density is identity on SinglePointContext, new chunks only.
+        router.addProperty("preliminary_surface_level",0); // Required by Paper 26.2; not used by this density.
         router.addProperty("temperature",0); router.addProperty("vegetation",0);
         var expectedSettings = NoiseGeneratorSettings.DIRECT_CODEC.parse(RegistryOps.create(JsonOps.INSTANCE,registries), original).getOrThrow();
         var actual = new NativeOldBlendedNoise(registries,0.25,0.25,80,160,8);

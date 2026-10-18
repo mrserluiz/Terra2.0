@@ -40,7 +40,7 @@ public final class NativeOldBlendedNoise implements Sampler {
          "noise":{"height":128,"min_y":0,"size_horizontal":2,"size_vertical":1},
          "noise_router":{"barrier":0,"continents":0,"depth":0,"erosion":0,"final_density":0,
           "fluid_level_floodedness":0,"fluid_level_spread":0,"initial_density_without_jaggedness":0,
-          "lava":0,"ridges":0,"temperature":0,"vegetation":0,"vein_gap":0,"vein_ridged":0,"vein_toggle":0},
+          "preliminary_surface_level":0,"lava":0,"ridges":0,"temperature":0,"vegetation":0,"vein_gap":0,"vein_ridged":0,"vein_toggle":0},
          "ore_veins_enabled":false,"sea_level":-64,"spawn_target":[],
          "surface_rule":{"type":"minecraft:block","result_state":{"Name":"minecraft:stone"}}}
         """;
