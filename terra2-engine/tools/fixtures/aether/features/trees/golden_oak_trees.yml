@@ -1,0 +1,17 @@
+id: GOLDEN_OAK_TREES
+type: FEATURE
+distributor:
+  type: SAMPLER
+  sampler: { type: POSITIVE_WHITE_NOISE, salt: 91827 }
+  threshold: 0.006
+locator:
+  type: AND
+  locators:
+    - type: TOP
+      range: &range { min: 48, max: 180 }
+    - type: PATTERN
+      range: *range
+      pattern: { type: MATCH_SET, blocks: [ minecraft:grass_block ], offset: -1 }
+structures:
+  distribution: { type: CONSTANT }
+  structures: golden_oak_tree

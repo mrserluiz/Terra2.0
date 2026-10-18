@@ -1,0 +1,5 @@
+id: GRAVITITE_VEIN
+type: config-ore:ORE
+material: minecraft:deepslate_diamond_ore
+replace: [ minecraft:calcite ]
+size: 4

@@ -1,0 +1,73 @@
+id: AETHER
+version: 0.1.3-terra2
+author: "EtherCraft / adaptation from The Aether worldgen"
+generator: NOISE_3D
+
+addons:
+  biome-provider-pipeline: "2.+"
+  chunk-generator-noise-3d: "1.+"
+  config-biome: "1.+"
+  config-palette: "1.+"
+  config-feature: "1.+"
+  config-noise-function: "1.+"
+  config-ore: "1.+"
+  config-distributors: "1.+"
+  config-locators: "1.+"
+  structure-terrascript-loader: "1.+"
+  language-yaml: "1.+"
+  generation-stage-feature: "1.+"
+  palette-block-shortcut: "1.+"
+  structure-block-shortcut: "1.+"
+  terrascript-function-sampler: "1.+"
+
+biomes:
+  type: PIPELINE
+  resolution: 4
+  initial-size: 8
+  blend:
+    sampler:
+      type: CONSTANT
+  pipeline:
+    source: $biome_distribution/source/aether.yml:source
+    stages: []
+
+stages:
+  - id: ores
+    type: FEATURE
+  - id: trees
+    type: FEATURE
+    blend:
+      amplitude: 20
+      sampler:
+        type: GAUSSIAN
+        salt: 2583
+  - id: flora
+    type: FEATURE
+    blend:
+      amplitude: 18
+      sampler:
+        type: GAUSSIAN
+        salt: 2934
+
+samplers:
+  simplex2:
+    dimensions: 2
+    type: FBM
+    octaves: 4
+    sampler:
+      type: OPEN_SIMPLEX_2
+      frequency: 0.0075
+  simplex3:
+    dimensions: 3
+    type: FBM
+    octaves: 4
+    sampler:
+      type: OPEN_SIMPLEX_2
+      frequency: 0.0075
+
+blend:
+  palette:
+    resolution: 2
+    amplitude: 2
+    sampler:
+      type: WHITE_NOISE

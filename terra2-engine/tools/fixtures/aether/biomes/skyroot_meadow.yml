@@ -1,0 +1,14 @@
+id: SKYROOT_MEADOW
+type: BIOME
+extends: [ AETHER_BASE ]
+vanilla: minecraft:meadow
+colors:
+  grass: 0x50ead9
+  foliage: 0xf8d56b
+  water: 0xd9e7a2
+  water-fog: 0xc6d58e
+  fog: 0xf4ffe9
+  sky: 0x9ee4ff
+features:
+  trees: [ SKYROOT_TREES_SPARSE ]
+  flora: [ AETHER_GRASS, AETHER_FLOWERS_DENSE ]

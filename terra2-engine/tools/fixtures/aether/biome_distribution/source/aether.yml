@@ -1,0 +1,12 @@
+source:
+  type: SAMPLER
+  biomes:
+    - SKYROOT_FOREST: 5
+    - SKYROOT_GROVE: 4
+    - SKYROOT_MEADOW: 3
+    - SKYROOT_WOODLAND: 5
+  sampler:
+    dimensions: 2
+    type: CELLULAR
+    return: CellValue
+    frequency: 0.0022

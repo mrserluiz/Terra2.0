@@ -1,0 +1,14 @@
+id: GRAVITITE_ORE
+type: FEATURE
+distributor:
+  type: SAMPLER
+  sampler: { type: POSITIVE_WHITE_NOISE, salt: 62103 }
+  threshold: 0.004
+locator:
+  type: RANDOM
+  amount: 1
+  range: { min: 72, max: 112 }
+structures:
+  distribution: { type: CONSTANT }
+  structures:
+    - GRAVITITE_VEIN: 1

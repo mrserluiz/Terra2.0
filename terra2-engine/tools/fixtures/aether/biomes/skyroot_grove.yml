@@ -1,0 +1,14 @@
+id: SKYROOT_GROVE
+type: BIOME
+extends: [ AETHER_BASE ]
+vanilla: minecraft:flower_forest
+colors:
+  grass: 0x42ead7
+  foliage: 0xffd45c
+  water: 0xb8f2df
+  water-fog: 0x89ddd0
+  fog: 0xe8fff7
+  sky: 0x91ddff
+features:
+  trees: [ SKYROOT_TREES, GOLDEN_OAK_TREES ]
+  flora: [ AETHER_GRASS, AETHER_FLOWERS_DENSE ]

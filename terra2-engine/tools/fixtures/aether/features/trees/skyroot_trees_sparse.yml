@@ -1,0 +1,27 @@
+id: SKYROOT_TREES_SPARSE
+type: FEATURE
+distributor:
+  type: PADDED_GRID
+  width: 20
+  padding: 3
+  salt: 18273
+locator:
+  type: AND
+  locators:
+    - type: TOP
+      range: &range { min: 48, max: 180 }
+    - type: PATTERN
+      range: *range
+      pattern:
+        type: MATCH_SET
+        blocks: [ minecraft:grass_block, minecraft:dirt ]
+        offset: -1
+    - type: PATTERN
+      range: *range
+      pattern:
+        type: MATCH_SET
+        blocks: [ minecraft:air ]
+        offset: 0
+structures:
+  distribution: { type: CONSTANT }
+  structures: skyroot_tree

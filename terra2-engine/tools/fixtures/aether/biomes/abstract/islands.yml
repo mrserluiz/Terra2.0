@@ -1,0 +1,21 @@
+id: EQ_AETHER_ISLANDS
+type: BIOME
+abstract: true
+terrain:
+  sampler:
+    dimensions: 3
+    type: EXPRESSION
+    expression: islandMask(x,z) - 0.12 - ((y-center)/thickness)^2 + simplex3(x,y,z)*0.12
+    variables:
+      center: 96
+      thickness: 19
+    samplers:
+      islandMask:
+        dimensions: 2
+        type: OPEN_SIMPLEX_2
+        frequency: 0.0045
+        salt: 77100
+  sampler-2d:
+    dimensions: 2
+    type: CONSTANT
+    value: 0

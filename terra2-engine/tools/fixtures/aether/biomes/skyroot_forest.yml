@@ -1,0 +1,13 @@
+id: SKYROOT_FOREST
+type: BIOME
+extends: [ AETHER_BASE ]
+vanilla: minecraft:forest
+colors:
+  grass: 0x35e8d3
+  foliage: 0xf6c94c
+  water: 0xa9eee0
+  water-fog: 0x7fd8d1
+  fog: 0xdffcff
+  sky: 0x8bdcff
+features:
+  trees: [ SKYROOT_TREES_DENSE, GOLDEN_OAK_TREES ]

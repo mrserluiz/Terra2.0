@@ -1,0 +1,13 @@
+id: SKYROOT_WOODLAND
+type: BIOME
+extends: [ AETHER_BASE ]
+vanilla: minecraft:birch_forest
+colors:
+  grass: 0x2fdacb
+  foliage: 0xeebf3f
+  water: 0x9de7dc
+  water-fog: 0x72cec7
+  fog: 0xd7fbff
+  sky: 0x82d5ff
+features:
+  trees: [ SKYROOT_TREES_DENSE ]

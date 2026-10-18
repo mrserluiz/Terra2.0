@@ -1,0 +1,14 @@
+id: ZANITE_ORE
+type: FEATURE
+distributor:
+  type: SAMPLER
+  sampler: { type: POSITIVE_WHITE_NOISE, salt: 62102 }
+  threshold: 0.009
+locator:
+  type: RANDOM
+  amount: 1
+  range: { min: 72, max: 112 }
+structures:
+  distribution: { type: CONSTANT }
+  structures:
+    - ZANITE_VEIN: 1
