@@ -1,6 +1,6 @@
 # User manual — Terra2.0
 
-**English (en_US)** · **Current build: 7.3.2-BETA** · initial chapters: historical 7.0.14 reference
+**English (en_US)** · **Current build: 7.3.3-BETA** · initial chapters: historical 7.0.14 reference
 
 1. [Installation and configuration](01-installation.md)
 2. [Terra Community Packs](02-community-packs.md)
@@ -23,3 +23,5 @@
 12. [Exact biome colors and Bedrock debug (7.3.1-BETA)](../../releases/7.3.1-BETA.md) (Portuguese setup guide; official Geyser 2.11.3 build 1251, not 2.12)
 
 13. [Base colors with global and per-biome HSV (7.3.2-BETA)](../../releases/7.3.2-BETA.md) (Portuguese setup guide)
+
+14. [Native Minecraft density and AETHER 0.2.0 (7.3.3-BETA)](../../releases/7.3.3-BETA.md) · [Pack installation and limitations](../../../terra2-engine/tools/fixtures/aether/README.md)

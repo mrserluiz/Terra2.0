@@ -1,6 +1,10 @@
 # Recovered engine build status
 
-## Current reference: 7.3.2-BETA
+## Current reference: 7.3.3-BETA
+
+[CI 39176448652](https://github.com/mrserluiz/Terra2.0/actions/runs/39176448652) passed all jobs, including native old-blended noise, Aether I density translation, island/void generation, pack isolation, save/restart, existing biome persistence, official Geyser 2.11.3 build 1251 and the optional climate receiver fixture. See [release notes](docs/releases/7.3.3-BETA.md) and [AETHER validation](docs/testing/AETHER_PACK_0.2.0.md). Native target remains Paper 26.2 / Java 25; Geyser remains official 2.11.3 build 1251. Aether biome layout, vegetation and materials are still compatibility approximations; full mod parity is not claimed.
+
+## Previous reference: 7.3.2-BETA
 
 [CI 39158002948](https://github.com/mrserluiz/Terra2.0/actions/runs/39158002948) passed all jobs: engine build, unit tests, native generation/save/restart, biome persistence, official Geyser 2.11.3 build 1251 and climate fixture. Explicit base colors now receive effective HSV with field-by-field global inheritance. The report/debug shows original, base and final RGB. [Migration, limits and checksum](docs/releases/7.3.2-BETA.md). Bedrock rendering remains a real-client acceptance test; Geyser 2.12 is not supported.
 
