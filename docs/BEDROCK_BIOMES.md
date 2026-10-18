@@ -156,3 +156,7 @@ Ajustes exclusivos do cliente Bedrock, com Java como referência, em `bedrock/co
 ## Cores explícitas e debug — 7.3.1-BETA
 
 `color: '#RRGGBB'` define a cor final por papel/bioma, com prioridade sobre HSV. IDs inexistentes são recusados. `/terra2 bedrock debug` e `bedrock/color-report.yml` mostram entrada, original, final, UUID/versão/hash do pack compilado; não confirmam renderização no cliente. [Exemplos e procedimento](releases/7.3.1-BETA.md).
+
+## Cor-base seguida de HSV — 7.3.2-BETA
+
+`color` passa a ser a base para os ajustes, e cada campo ausente no bioma herda o global. O debug/relatório (schema 2) mostra original, base, final e HSV efetivo. Entradas antigas com apenas color passam a receber os ajustes globais; defina HSV neutro para manter o RGB exato. [Configuração e migração](releases/7.3.2-BETA.md).

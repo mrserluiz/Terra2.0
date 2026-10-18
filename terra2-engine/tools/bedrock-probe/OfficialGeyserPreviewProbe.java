@@ -27,7 +27,7 @@ public final class OfficialGeyserPreviewProbe extends JavaPlugin {
             boolean exactFound=false;
             for(var row:colorReport.getMapList("profiles"))if("terra:hydraxia/hydraxia/autumnal_woodlands".equals(row.get("id"))) {
                 var color=(java.util.Map<?,?>)((java.util.Map<?,?>)row.get("colors")).get("foliage");
-                require("#FF6A19".equals(color.get("final"))&&"BIOME_COLOR".equals(color.get("origin")),"Exact YAML biome color reaches compiled report despite global HSV");exactFound=true;
+                require("#400000".equals(color.get("final"))&&"#800000".equals(color.get("base"))&&"BIOME_BASE_COLOR_HSV".equals(color.get("origin")),"Base color plus inherited global brightness reaches compiled report");exactFound=true;
             }
             require(exactFound,"Exact biome color report present");
             var resource=terra.getDataFolder().toPath().resolve("bedrock/terra2-palette.mcpack");
@@ -35,7 +35,7 @@ public final class OfficialGeyserPreviewProbe extends JavaPlugin {
             try(var zip=new java.util.zip.ZipFile(resource.toFile())) {
                 String file="biomes/"+com.dfsek.terra.bukkit.bedrock.BedrockClientBiomes.name("terra:hydraxia/hydraxia/autumnal_woodlands").substring(7)+".client_biome.json";
                 var document=com.google.gson.JsonParser.parseString(new String(zip.getInputStream(zip.getEntry(file)).readAllBytes(),java.nio.charset.StandardCharsets.UTF_8)).getAsJsonObject();
-                require("#FF6A19".equals(document.getAsJsonObject("minecraft:client_biome").getAsJsonObject("components").getAsJsonObject("minecraft:foliage_appearance").get("color").getAsString()),"Exact YAML color compiled into actual registered client biome");
+                require("#400000".equals(document.getAsJsonObject("minecraft:client_biome").getAsJsonObject("components").getAsJsonObject("minecraft:foliage_appearance").get("color").getAsString()),"Adjusted base color compiled into actual registered client biome");
             }
             getLogger().info("TERRA2_EXACT_COLOR_OK report=true pack=true restartPhase="+Files.exists(getDataFolder().toPath().resolve("identity.sha256"))+" clientVisualTest=false");
             var transport=new com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport(Bukkit.getPluginManager().getPlugin("Geyser-Spigot").getClass().getClassLoader());

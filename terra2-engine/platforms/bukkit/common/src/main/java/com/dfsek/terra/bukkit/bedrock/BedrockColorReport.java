@@ -23,15 +23,15 @@ public final class BedrockColorReport {
         if(manifest==null)throw new IOException("Missing pack manifest");var header=manifest.getAsJsonObject("header");
         String hash=HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(pack));
         metadata="Pack version="+header.get("version")+"; UUID="+header.get("uuid").getAsString()+"; SHA-256="+hash;
-        var report=new YamlConfiguration();report.set("schema",1);report.set("pack.version",header.get("version").toString());report.set("pack.uuid",header.get("uuid").getAsString());report.set("pack.sha256",hash);report.set("client-rendering-confirmed",false);
+        var report=new YamlConfiguration();report.set("schema",2);report.set("color-pipeline","BASE_THEN_EFFECTIVE_HSV");report.set("pack.version",header.get("version").toString());report.set("pack.uuid",header.get("uuid").getAsString());report.set("pack.sha256",hash);report.set("client-rendering-confirmed",false);
         var rows=new ArrayList<Map<String,Object>>();var debug=new TreeMap<String,List<String>>();
         for(var profile:calibrated) {
             var original=source.get(profile.id());var lines=new ArrayList<String>();var colors=new TreeMap<String,Object>();
             for(String role:List.of("foliage","grass","water")) {
                 Integer before=original.colors().get(role),after=profile.colors().get(role);if(before==null&&after==null)continue;
                 var adjustment=calibration.adjustment(profile.id(),role);String from=calibration.origin(profile.id(),role);
-                var values=new LinkedHashMap<String,Object>();values.put("original",hex(before));values.put("final",hex(after));values.put("origin",from);values.put("saturation",adjustment.saturation());values.put("brightness",adjustment.brightness());values.put("hue-degrees",adjustment.hueDegrees());colors.put(role,values);
-                lines.add(role+": original="+hex(before)+"; final="+hex(after)+"; "+from+"; S="+adjustment.saturation()+" V="+adjustment.brightness()+" H="+adjustment.hueDegrees());
+                var values=new LinkedHashMap<String,Object>();values.put("original",hex(before));values.put("base",hex(adjustment.color()==null?before:adjustment.color()));values.put("final",hex(after));values.put("origin",from);values.put("saturation",adjustment.saturation());values.put("brightness",adjustment.brightness());values.put("hue-degrees",adjustment.hueDegrees());colors.put(role,values);
+                lines.add(role+": original="+hex(before)+"; base="+hex(adjustment.color()==null?before:adjustment.color())+"; final="+hex(after)+"; "+from+"; S="+adjustment.saturation()+" V="+adjustment.brightness()+" H="+adjustment.hueDegrees());
             }
             rows.add(Map.of("id",profile.id(),"client-biome",BedrockClientBiomes.name(profile.id()),"colors",colors));debug.put(profile.id(),List.copyOf(lines));
         }
