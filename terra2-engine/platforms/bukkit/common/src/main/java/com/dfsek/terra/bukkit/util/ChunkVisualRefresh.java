@@ -11,18 +11,31 @@ public final class ChunkVisualRefresh {
     private record Key(UUID world,int x,int z) {}
     private final TerraBukkitPlugin plugin;private final Set<Key> queue=new LinkedHashSet<>();private BukkitTask task;
     public ChunkVisualRefresh(TerraBukkitPlugin plugin){this.plugin=plugin;}
-    public void request(World world,int x,int z) {
-        if(!world.isChunkLoaded(x,z) || queue.size()>=512)return;
-        queue.add(new Key(world.getUID(),x,z));
+    public boolean request(World world,int x,int z) {
+        if(!world.isChunkLoaded(x,z))return false;
+        var key=new Key(world.getUID(),x,z);if(queue.contains(key))return true;
+        if(queue.size()>=512)return false;
+        queue.add(key);
         if(task==null)task=Bukkit.getScheduler().runTaskTimer(plugin,this::tick,1L,1L);
+        return true;
     }
     public void around(org.bukkit.entity.Player player) {
         int x=player.getLocation().getBlockX()>>4,z=player.getLocation().getBlockZ()>>4;
-        // A chunk resend includes every vertical section, not a player-height window.
-        int radius=Math.max(1,Math.min(8,Math.min(player.getClientViewDistance(),player.getWorld().getViewDistance())));
-        for(int ring=0;ring<=radius;ring++)for(int dx=-ring;dx<=ring;dx++)for(int dz=-ring;dz<=ring;dz++)
-            if(Math.max(Math.abs(dx),Math.abs(dz))==ring)request(player.getWorld(),x+dx,z+dz);
+        for(int dx=-1;dx<=1;dx++)for(int dz=-1;dz<=1;dz++)request(player.getWorld(),x+dx,z+dz);
     }
+    /** Incremental full-height resends. The per-session set is bounded by the visible square. */
+    public void visible(org.bukkit.entity.Player player,Set<Long> sent) {
+        int x=player.getLocation().getBlockX()>>4,z=player.getLocation().getBlockZ()>>4;
+        int radius=Math.max(1,Math.min(8,Math.min(player.getClientViewDistance(),player.getWorld().getViewDistance())));
+        var visible=new HashSet<Long>();
+        for(int ring=0;ring<=radius;ring++)for(int dx=-ring;dx<=ring;dx++)for(int dz=-ring;dz<=ring;dz++) {
+            if(Math.max(Math.abs(dx),Math.abs(dz))!=ring)continue;
+            int cx=x+dx,cz=z+dz;long key=((long)cx<<32)|(cz&0xffffffffL);visible.add(key);
+            if(!sent.contains(key) && request(player.getWorld(),cx,cz))sent.add(key);
+        }
+        sent.retainAll(visible);
+    }
+
     private void tick() {
         var iterator=queue.iterator();int count=0;
         while(iterator.hasNext() && count++<2) {

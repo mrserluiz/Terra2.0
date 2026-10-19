@@ -29,6 +29,7 @@ public final class BedrockPreviewBridge implements Listener {
     private static final class NativePreview {
         final UUID world;final Object session;final int count;final GeyserNativeBiomeTransport.Plan plan;volatile boolean active=true,checking;
         volatile GeyserNativeBiomeTransport.Change change;volatile String result="PENDING_EVENT_LOOP";
+        final Set<Long> refreshed=new HashSet<>();
         long started,lastRefresh;int chunkX=Integer.MIN_VALUE,chunkZ=Integer.MIN_VALUE;
 
         NativePreview(UUID world,Object session,GeyserNativeBiomeTransport.Plan plan){this.world=world;this.session=session;this.plan=plan;this.count=plan.ids().size();}
@@ -244,7 +245,7 @@ public final class BedrockPreviewBridge implements Listener {
                 if(transport.connection(id)!=state.session){stopNative(id);continue;}
                 if(state.result.startsWith("NATIVE_PERSISTENT")) {
                     int cx=player.getLocation().getBlockX()>>4,cz=player.getLocation().getBlockZ()>>4;
-                    if(cx!=state.chunkX || cz!=state.chunkZ || nativeTick-state.lastRefresh>=30)refreshNative(player,state);
+                    if(cx!=state.chunkX || cz!=state.chunkZ || nativeTick-state.lastRefresh>=2)refreshNative(player,state);
                 }
                 if(state.change!=null && !state.checking && state.result.startsWith("NATIVE_PERSISTENT")) {
                     state.checking=true;call(state.session,"executeInEventLoop",(Runnable)()->{
@@ -255,7 +256,7 @@ public final class BedrockPreviewBridge implements Listener {
                                 if(!nativeTransport.canReapply(state.session,state.change)){state.result="NATIVE_MAPPING_CONFLICT";return;}
                                 nativeTransport.restore(state.change);
                                 state.change=nativeTransport.install(state.session,state.plan);state.result="NATIVE_PERSISTENT_REAPPLIED";
-                                Bukkit.getScheduler().runTask(plugin,()->{if(state.active && state.world.equals(player.getWorld().getUID()))plugin.visualRefresh().around(player);});
+                                Bukkit.getScheduler().runTask(plugin,()->{if(state.active && state.world.equals(player.getWorld().getUID())){state.refreshed.clear();refreshNative(player,state);}});
                             }
                         }catch(Exception error){state.result="NATIVE_REAPPLY_FAILED: "+error.getMessage();}
                         finally{state.checking=false;}
@@ -293,7 +294,7 @@ public final class BedrockPreviewBridge implements Listener {
     }
     private void refreshNative(Player player,NativePreview state) {
         state.chunkX=player.getLocation().getBlockX()>>4;state.chunkZ=player.getLocation().getBlockZ()>>4;
-        state.lastRefresh=nativeTick;plugin.visualRefresh().around(player);
+        state.lastRefresh=nativeTick;plugin.visualRefresh().visible(player,state.refreshed);
     }
     private void restore(Player player,World world,Pos pos) {
         if(world.isChunkLoaded(pos.x>>4,pos.z>>4))player.sendBlockChange(new Location(world,pos.x,pos.y,pos.z),world.getBlockAt(pos.x,pos.y,pos.z).getBlockData());
