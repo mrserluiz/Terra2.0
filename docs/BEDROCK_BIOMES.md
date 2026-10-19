@@ -1,3 +1,11 @@
+# Bedrock — ativação automática e recuperação (7.3.4-BETA)
+
+Com a ponte habilitada (`prepare` e reinício feitos uma vez), jogadores Geyser recebem aplicação nativa automaticamente nos mundos Terra2 CUSTOM autorizados, sem OP e sem repetir `native`. A recuperação inclui backoff de falhas transitórias, troca do registro da conexão e reenvio incremental das colunas visíveis carregadas em toda a altura. O raio é limitado a 8 chunks e à distância de visão real. `forget` exclui o mundo persistentemente; `stop` pausa apenas a sessão até reentrar. A calibração continua em `color-calibration.yml`; o manifesto do pack gerado usa `[7,3,4]`.
+
+[Instalação, limites e validação da 7.3.4](releases/7.3.4-BETA.md). A oferta do recurso continua no login e depende do Geyser oficial/aceitação do cliente; o loop recupera a tradução, não força download após uma recusa. Mundo VANILLA_COMPATIBLE não é convertido automaticamente.
+
+As seções abaixo registram a evolução dos protótipos; a prévia antiga de grama continua com raio/altura limitados e não representa a ponte nativa atual.
+
 # Paleta visual genérica Bedrock — 7.0.30-BETA
 
 O Geyser oficial deve ser mantido. A build 7.0.26 usou a proposta experimental PR #6658 para validar cores de biomas; aquele Geyser não é requisito nem a solução escolhida para distribuição. A nova build não compila outro Geyser e `/terra2 bedrock install` recusa a instalação experimental.

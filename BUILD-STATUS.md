@@ -1,6 +1,10 @@
 # Recovered engine build status
 
-## Current reference: 7.3.3-BETA
+## Current reference: 7.3.4-BETA
+
+[CI 39339281309](https://github.com/mrserluiz/Terra2.0/actions/runs/39339281309) passed all jobs: automatic Bedrock session recovery, bounded retry/backoff, persistent world exclusions, registry replacement recovery and incremental full-height loaded-window refresh. Generation, biome persistence and AETHER 0.2.0 remain covered. [Installation, validation and checksum](docs/releases/7.3.4-BETA.md). Paper 26.2 / Java 25; official local Geyser 2.11.3 build 1251. A real Bedrock reconnect/rendering acceptance test remains necessary.
+
+## Previous reference: 7.3.3-BETA
 
 [CI 39176448652](https://github.com/mrserluiz/Terra2.0/actions/runs/39176448652) passed all jobs, including native old-blended noise, Aether I density translation, island/void generation, pack isolation, save/restart, existing biome persistence, official Geyser 2.11.3 build 1251 and the optional climate receiver fixture. See [release notes](docs/releases/7.3.3-BETA.md) and [AETHER validation](docs/testing/AETHER_PACK_0.2.0.md). Native target remains Paper 26.2 / Java 25; Geyser remains official 2.11.3 build 1251. Aether biome layout, vegetation and materials are still compatibility approximations; full mod parity is not claimed.
 
