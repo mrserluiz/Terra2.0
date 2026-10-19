@@ -227,7 +227,7 @@ public final class BedrockPreviewBridge implements Listener {
             }
         }
         if(nativeWorlds!=null)for(Player player:Bukkit.getOnlinePlayers()) {
-            if(nativePlayers.containsKey(player.getUniqueId()) || nativePaused.contains(player.getUniqueId()) || nativePlayers.size()>=64 || !reconnect.ready(player.getUniqueId(),nativeTick))continue;
+            if(nativePlayers.containsKey(player.getUniqueId()) || players.containsKey(player.getUniqueId()) || nativePaused.contains(player.getUniqueId()) || nativePlayers.size()>=64 || !reconnect.ready(player.getUniqueId(),nativeTick))continue;
             var world=player.getWorld();
             if(nativeWorlds.excluded(world.getUID()))continue;
             if(!(world.getGenerator() instanceof com.dfsek.terra.bukkit.generator.BukkitChunkGeneratorWrapper wrapper) || wrapper.biomeCompatibility()==null || wrapper.biomeCompatibility().vanilla)continue;

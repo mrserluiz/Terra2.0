@@ -145,6 +145,23 @@ public final class OfficialGeyserPreviewProbe extends JavaPlugin {
             require(world.getBiome(4,64,4).getKey().toString().equals(projectedEdit.vanillaReference()),"Projected world writes valid vanilla reference");
             require(PositionVisualResolver.at(world,4,64,4).orElseThrow().source().equals("PERSISTED_EDIT"),"Projected edit resolves original Terra identity");
             require(java.util.Arrays.equals(identity,world.getChunkAt(0,0).getPersistentDataContainer().get(com.dfsek.terra.bukkit.compatibility.PersistedBiomeService.KEY,org.bukkit.persistence.PersistentDataType.BYTE_ARRAY)),"Edits do not rewrite generation identity palette");
+            var viewerLocation=new java.util.concurrent.atomic.AtomicReference<>(new Location(nativeWorld,0,64,0));
+            org.bukkit.entity.Player viewer=(org.bukkit.entity.Player)java.lang.reflect.Proxy.newProxyInstance(
+                org.bukkit.entity.Player.class.getClassLoader(),new Class[]{org.bukkit.entity.Player.class},(proxy,method,args)->switch(method.getName()) {
+                    case "getWorld" -> nativeWorld;
+                    case "getLocation" -> viewerLocation.get();
+                    case "getClientViewDistance" -> 8;
+                    default -> throw new UnsupportedOperationException(method.getName());
+                });
+            int loadedBefore=nativeWorld.getLoadedChunks().length;
+            var sent=new java.util.HashSet<Long>();terra.visualRefresh().visible(viewer,sent);
+            require(!sent.isEmpty() && sent.size()<=289,"Visible full-column refresh is bounded and covers loaded chunks");
+            var sameWindow=new java.util.HashSet<>(sent);terra.visualRefresh().visible(viewer,sent);
+            require(sameWindow.equals(sent),"Stationary window is deduplicated");
+            viewerLocation.set(new Location(nativeWorld,0,nativeWorld.getMaxHeight()-1,0));terra.visualRefresh().visible(viewer,sent);
+            require(sameWindow.equals(sent),"Coverage does not shrink at tall canopy height");
+            require(nativeWorld.getLoadedChunks().length==loadedBefore,"Visual refresh never loads new chunks");
+            getLogger().info("TERRA2_VISIBLE_REFRESH_OK fullHeight=true bounded=true noChunkLoads=true realClientTest=false");
             nativeWorld.save();nativeWorld.refreshChunk(0,0);
             require(java.util.Arrays.equals(editedData,nativeWorld.getChunkAt(0,0).getPersistentDataContainer().get(com.dfsek.terra.bukkit.compatibility.BiomeEditOverrides.KEY,org.bukkit.persistence.PersistentDataType.BYTE_ARRAY)),"Refresh retains saved identity");
             getLogger().info("TERRA2_EDIT_PERSISTENCE_OK primaryProtected=true nativeActivationStored=true realWorldEditSelectionTest=false realBedrockReconnectTest=false");
