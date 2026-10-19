@@ -21,11 +21,16 @@ public final class BedrockPreviewBridge implements Listener {
     private final TerraBukkitPlugin plugin;
     private final Map<UUID,Preview> players=new HashMap<>();
     private NativeWorldStore nativeWorlds;
+    private final NativeReconnectPolicy reconnect=new NativeReconnectPolicy();
+    private long nativeTick;
+
     private final Set<UUID> nativePaused=new HashSet<>();
     private final Map<UUID,NativePreview> nativePlayers=new HashMap<>();
     private static final class NativePreview {
         final UUID world;final Object session;final int count;final GeyserNativeBiomeTransport.Plan plan;volatile boolean active=true,checking;
         volatile GeyserNativeBiomeTransport.Change change;volatile String result="PENDING_EVENT_LOOP";
+        long started,lastRefresh;int chunkX=Integer.MIN_VALUE,chunkZ=Integer.MIN_VALUE;
+
         NativePreview(UUID world,Object session,GeyserNativeBiomeTransport.Plan plan){this.world=world;this.session=session;this.plan=plan;this.count=plan.ids().size();}
     }
     private final Map<Integer,Object> colors=new TreeMap<>();
@@ -186,41 +191,49 @@ public final class BedrockPreviewBridge implements Listener {
         Object session=transport.connection(player.getUniqueId());if(session==null)return "Use um jogador conectado pelo Geyser local.";
         if(nativePlayers.size()>=64 && !nativePlayers.containsKey(player.getUniqueId()))return "Limite: 64 conexões na ponte nativa.";
         var plan=nativePlan(player.getWorld());stop(player,true);nativePaused.remove(player.getUniqueId());
-        var state=new NativePreview(player.getWorld().getUID(),session,plan);nativePlayers.put(player.getUniqueId(),state);
+        var state=new NativePreview(player.getWorld().getUID(),session,plan);state.started=nativeTick;nativePlayers.put(player.getUniqueId(),state);
         call(session,"executeInEventLoop",(Runnable)()->{
             if(!state.active)return;
             try {
                 if((Boolean)call(session,"isClosed") || !(Boolean)call(session,"isSpawned"))throw new IllegalStateException("Geyser session closed");
-                state.change=new GeyserNativeBiomeTransport(transport).install(session,plan);state.result="NATIVE_INSTALLED_EXPERIMENTAL";
+                state.change=new GeyserNativeBiomeTransport(transport).install(session,plan);
+                if(!state.active){new GeyserNativeBiomeTransport(transport).restore(state.change);return;}
+                state.result="NATIVE_INSTALLED_EXPERIMENTAL";
                 Bukkit.getScheduler().runTask(plugin,()->{
                     if(!state.active || !state.world.equals(player.getWorld().getUID()))return;
                     try {
                         var world=player.getWorld();plugin.assertGenerationAuthorized(world.getName(),"PACKS");
                         var wrapper=(com.dfsek.terra.bukkit.generator.BukkitChunkGeneratorWrapper)world.getGenerator();
-                        if(remember)rememberWorld(world);
-                        state.result="NATIVE_PERSISTENT";plugin.visualRefresh().around(player);
-                    }catch(Exception error){state.result="NATIVE_NOT_PERSISTED: "+error.getMessage();player.sendMessage(state.result);}
+                        if(remember && !remembers(world))rememberWorld(world);
+                        state.result="NATIVE_PERSISTENT";reconnect.clear(player.getUniqueId());
+                        refreshNative(player,state);
+                    }catch(Exception error){state.result="NATIVE_NOT_PERSISTED: "+error.getMessage();}
                 });
-            }catch(Exception | LinkageError error){state.result="NATIVE_FAILED: "+error.getMessage();
-                Bukkit.getScheduler().runTask(plugin,()->{
-                    player.sendMessage(state.result);
-                    com.dfsek.terra.bukkit.util.GenerationReport.failure("Bedrock native biomes",player.getWorld().getName(),"CLIENT_BIOMES",error);
-                });
-            }
+            }catch(Exception | LinkageError error){state.result="NATIVE_FAILED: "+error.getMessage();}
+
         });
         return "Ponte nativa solicitada. Após sucesso, este mundo será lembrado e aplicado aos jogadores Bedrock ao reconectar. A área próxima será reenviada sem regeneração. Use status; forget remove a ativação persistente deste mundo.";
     }
     private void tick() {
         if(!status.equals("READY_OPT_IN"))return;
+        nativeTick++;
+        // Failed/incomplete installations must leave the active map so the next scan can retry.
+        for(UUID id:List.copyOf(nativePlayers.keySet())) {
+            var state=nativePlayers.get(id);
+            if(state.result.startsWith("NATIVE_FAILED") || state.result.startsWith("NATIVE_NOT_PERSISTED")
+                || state.result.startsWith("NATIVE_REAPPLY_FAILED") || (state.change==null && nativeTick-state.started>=15)) {
+                reconnect.failed(id,nativeTick,state.result);stopNative(id);
+            }
+        }
         if(nativeWorlds!=null)for(Player player:Bukkit.getOnlinePlayers()) {
-            if(nativePlayers.containsKey(player.getUniqueId()) || nativePaused.contains(player.getUniqueId()) || nativePlayers.size()>=64)continue;
+            if(nativePlayers.containsKey(player.getUniqueId()) || nativePaused.contains(player.getUniqueId()) || nativePlayers.size()>=64 || !reconnect.ready(player.getUniqueId(),nativeTick))continue;
             var world=player.getWorld();
+            if(nativeWorlds.excluded(world.getUID()))continue;
             if(!(world.getGenerator() instanceof com.dfsek.terra.bukkit.generator.BukkitChunkGeneratorWrapper wrapper) || wrapper.biomeCompatibility()==null || wrapper.biomeCompatibility().vanilla)continue;
-            if(!nativeWorlds.matches(world.getUID(),world.getSeed(),wrapper.biomeCompatibility().fingerprint))continue;
             try {
                 plugin.assertGenerationAuthorized(world.getName(),"PACKS");Object session=transport.connection(player.getUniqueId());
-                if(session!=null && !(Boolean)call(session,"isClosed") && (Boolean)call(session,"isSpawned"))startNative(player,false);
-            }catch(Exception refused){nativePaused.add(player.getUniqueId());}
+                if(session!=null && !(Boolean)call(session,"isClosed") && (Boolean)call(session,"isSpawned"))startNative(player,true);
+            }catch(Exception refused){reconnect.failed(player.getUniqueId(),nativeTick,refused.getMessage());}
         }
         for(UUID id:List.copyOf(nativePlayers.keySet())) {
             Player player=Bukkit.getPlayer(id);NativePreview state=nativePlayers.get(id);
@@ -229,13 +242,17 @@ public final class BedrockPreviewBridge implements Listener {
                 if(!state.world.equals(player.getWorld().getUID())){stopNative(id);continue;}
                 plugin.assertGenerationAuthorized(player.getWorld().getName(),"PACKS");
                 if(transport.connection(id)!=state.session){stopNative(id);continue;}
+                if(state.result.startsWith("NATIVE_PERSISTENT")) {
+                    int cx=player.getLocation().getBlockX()>>4,cz=player.getLocation().getBlockZ()>>4;
+                    if(cx!=state.chunkX || cz!=state.chunkZ || nativeTick-state.lastRefresh>=30)refreshNative(player,state);
+                }
                 if(state.change!=null && !state.checking && state.result.startsWith("NATIVE_PERSISTENT")) {
                     state.checking=true;call(state.session,"executeInEventLoop",(Runnable)()->{
                         try {
                             if(!state.active || (Boolean)call(state.session,"isClosed"))return;
                             var nativeTransport=new GeyserNativeBiomeTransport(transport);
-                            if(nativeTransport.ownedMappings(state.change)!=state.change.installed().size()) {
-                                if(!nativeTransport.canReapply(state.change)){state.result="NATIVE_MAPPING_CONFLICT";return;}
+                            if(!nativeTransport.isCurrent(state.session,state.change) || nativeTransport.ownedMappings(state.change)!=state.change.installed().size()) {
+                                if(!nativeTransport.canReapply(state.session,state.change)){state.result="NATIVE_MAPPING_CONFLICT";return;}
                                 nativeTransport.restore(state.change);
                                 state.change=nativeTransport.install(state.session,state.plan);state.result="NATIVE_PERSISTENT_REAPPLIED";
                                 Bukkit.getScheduler().runTask(plugin,()->{if(state.active && state.world.equals(player.getWorld().getUID()))plugin.visualRefresh().around(player);});
@@ -244,7 +261,7 @@ public final class BedrockPreviewBridge implements Listener {
                         finally{state.checking=false;}
                     });
                 }
-            }catch(Exception refused){stopNative(id);}
+            }catch(Exception refused){reconnect.failed(id,nativeTick,refused.getMessage());stopNative(id);}
         }
         for(UUID id:List.copyOf(players.keySet())) {
             Player player=Bukkit.getPlayer(id);Preview state=players.get(id);
@@ -273,6 +290,10 @@ public final class BedrockPreviewBridge implements Listener {
                 });
             } catch(Exception | LinkageError error){stop(player,true);fail(error);return;}
         }
+    }
+    private void refreshNative(Player player,NativePreview state) {
+        state.chunkX=player.getLocation().getBlockX()>>4;state.chunkZ=player.getLocation().getBlockZ()>>4;
+        state.lastRefresh=nativeTick;plugin.visualRefresh().around(player);
     }
     private void restore(Player player,World world,Pos pos) {
         if(world.isChunkLoaded(pos.x>>4,pos.z>>4))player.sendBlockChange(new Location(world,pos.x,pos.y,pos.z),world.getBlockAt(pos.x,pos.y,pos.z).getBlockData());
@@ -321,16 +342,18 @@ public final class BedrockPreviewBridge implements Listener {
     }
     public String playerStatus(Player player) {
         NativePreview nativeState=nativePlayers.get(player.getUniqueId());
-        if(nativeState!=null)return "Biomas nativos: "+nativeState.result+"; perfis="+nativeState.count+"; cliente/renderização não confirmados";
+        if(nativeState!=null)return "Biomas nativos: "+nativeState.result+"; perfis="+nativeState.count+"; refresh=FULL_HEIGHT_VISIBLE_LOADED; cliente/renderização não confirmados";
+        if(nativePaused.contains(player.getUniqueId()))return "AUTO_PAUSED_EXPLICIT_STOP";
+        if(!reconnect.status(player.getUniqueId()).equals("AUTO_READY"))return reconnect.status(player.getUniqueId());
         Preview state=players.get(player.getUniqueId());return state==null?"Prévia desligada":"Blocos em prévia="+state.overlay.size()+"; updates submetidos="+state.submitted+" (não confirma renderização no cliente)";
     }
-    @EventHandler public void quit(PlayerQuitEvent event){stop(event.getPlayer(),false);nativePaused.remove(event.getPlayer().getUniqueId());}
+    @EventHandler public void quit(PlayerQuitEvent event){stop(event.getPlayer(),false);nativePaused.remove(event.getPlayer().getUniqueId());reconnect.clear(event.getPlayer().getUniqueId());}
     @EventHandler(priority=EventPriority.MONITOR,ignoreCancelled=true) public void teleport(PlayerTeleportEvent event){
         var player=event.getPlayer();
         if(event.getTo()==null || !player.getWorld().equals(event.getTo().getWorld())){stop(player,true);nativePaused.remove(player.getUniqueId());}
         else {var grass=players.remove(player.getUniqueId());if(grass!=null){grass.active=false;grass.epoch++;for(Pos pos:grass.overlay.keySet())restore(player,player.getWorld(),pos);}}
     }
-    @EventHandler public void changedWorld(PlayerChangedWorldEvent event){stop(event.getPlayer(),false);nativePaused.remove(event.getPlayer().getUniqueId());}
+    @EventHandler public void changedWorld(PlayerChangedWorldEvent event){stop(event.getPlayer(),false);nativePaused.remove(event.getPlayer().getUniqueId());reconnect.clear(event.getPlayer().getUniqueId());}
     private void fail(Throwable error) {
         if(status.equals("FAILED_DISABLED"))return;status="FAILED_DISABLED";
         while(error instanceof java.lang.reflect.InvocationTargetException && error.getCause()!=null)error=error.getCause();
@@ -345,6 +368,7 @@ public final class BedrockPreviewBridge implements Listener {
         if(Bukkit.isPrimaryThread())cleanup.run();else Bukkit.getScheduler().runTask(plugin,cleanup);
     }
     public void close() {
+        reconnect.clear();
         for(UUID id:List.copyOf(nativePlayers.keySet()))stopNative(id);
         players.values().forEach(state->state.active=false);
         for(UUID id:List.copyOf(players.keySet())){Player player=Bukkit.getPlayer(id);if(player!=null)stop(player,true);}

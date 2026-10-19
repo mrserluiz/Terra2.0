@@ -18,7 +18,10 @@ public final class ChunkVisualRefresh {
     }
     public void around(org.bukkit.entity.Player player) {
         int x=player.getLocation().getBlockX()>>4,z=player.getLocation().getBlockZ()>>4;
-        for(int dx=-1;dx<=1;dx++)for(int dz=-1;dz<=1;dz++)request(player.getWorld(),x+dx,z+dz);
+        // A chunk resend includes every vertical section, not a player-height window.
+        int radius=Math.max(1,Math.min(8,Math.min(player.getClientViewDistance(),player.getWorld().getViewDistance())));
+        for(int ring=0;ring<=radius;ring++)for(int dx=-ring;dx<=ring;dx++)for(int dz=-ring;dz<=ring;dz++)
+            if(Math.max(Math.abs(dx),Math.abs(dz))==ring)request(player.getWorld(),x+dx,z+dz);
     }
     private void tick() {
         var iterator=queue.iterator();int count=0;

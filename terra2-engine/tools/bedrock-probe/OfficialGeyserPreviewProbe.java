@@ -94,6 +94,21 @@ public final class OfficialGeyserPreviewProbe extends JavaPlugin {
             com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(registry,"reset",java.util.List.of(vanillaEntry,foreign));
             require(!nativeTransport.canReapply(secondChange),"Automatic reapply refuses another integration's changed mapping");
             require(nativeTransport.restore(secondChange)==0,"Restore preserves a later mapping owned by another integration");
+            // A respawn/reconnect may replace the registry object, not merely reset its entries.
+            var replacementCache=transport.type("org.geysermc.geyser.session.cache.RegistryCache").getConstructors()[0].newInstance(new Object[]{null});
+            var replacementRegistry=com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(replacementCache,"registry",key);
+            com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(registry,"reset",java.util.List.of(vanillaEntry,terraEntry));
+            captured.registryCache=cache;var beforeReplacement=nativeTransport.install(captured,plan);
+            com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(replacementRegistry,"reset",java.util.List.of(vanillaEntry,terraEntry));
+            captured.registryCache=replacementCache;
+            require(!nativeTransport.isCurrent(captured,beforeReplacement),"Replaced connection registry is detected");
+            require(nativeTransport.canReapply(captured,beforeReplacement),"Clean replacement registry is eligible for automatic repair");
+            com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(replacementRegistry,"reset",java.util.List.of(vanillaEntry,foreign));
+            require(!nativeTransport.canReapply(captured,beforeReplacement),"Replacement registry owned by another integration is preserved");
+            com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(replacementRegistry,"reset",java.util.List.of(vanillaEntry,terraEntry));
+            var replacementChange=nativeTransport.install(captured,plan);
+            require(nativeTransport.isCurrent(captured,replacementChange) && nativeTransport.ownedMappings(replacementChange)==1,"Replacement connection repaired using official registry API");
+            nativeTransport.restore(replacementChange);nativeTransport.restore(beforeReplacement);
             try{terra.bedrockPreview().nativePlan(world);throw new AssertionError("Projected world must refuse native-only prototype");}catch(IllegalArgumentException expected){}
             var nativeWorld=new WorldCreator("terra2_native_biome_test").seed(42).generator("Terra2:HYDRAXIA").createWorld();require(nativeWorld!=null,"Native test world created");
             var complete=terra.bedrockPreview().nativePlan(nativeWorld);require(nativeTransport.validateCodecs(complete)>0,"Complete HYDRAXIA biome packet encodes");var nativeWrapper=(com.dfsek.terra.bukkit.generator.BukkitChunkGeneratorWrapper)nativeWorld.getGenerator();

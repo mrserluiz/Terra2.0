@@ -68,9 +68,7 @@ public final class GeyserNativeBiomeTransport {
         if(count==0)throw new IllegalStateException("No supported biome codecs");return count;
     }
     public Change install(Object session,Plan plan) throws Exception {
-        Object cache=call(session,"getRegistryCache");
-        Object key=transport.type("org.geysermc.geyser.session.cache.registry.JavaRegistries").getField("BIOME").get(null);
-        Object registry=call(cache,"registry",key);
+        Object registry=registry(session);
         var entries=new ArrayList<Object>((List<?>)call(registry,"entries"));
         var original=new HashMap<Integer,Object>();var installed=new HashMap<Integer,Object>();
         for(int i=0;i<entries.size();i++) {
@@ -83,6 +81,23 @@ public final class GeyserNativeBiomeTransport {
         // Definitions must precede chunks referring to their IDs. Late acceptance requires a real-client test.
         call(session,"sendUpstreamPacket",plan.packet());call(registry,"reset",entries);
         return new Change(registry,Map.copyOf(original),Map.copyOf(installed));
+    }
+    private Object registry(Object session) throws Exception {
+        Object cache=call(session,"getRegistryCache");
+        Object key=transport.type("org.geysermc.geyser.session.cache.registry.JavaRegistries").getField("BIOME").get(null);
+        return call(cache,"registry",key);
+    }
+    public boolean isCurrent(Object session,Change change) throws Exception {return registry(session)==change.registry();}
+    public boolean canReapply(Object session,Change change) throws Exception {
+        if(isCurrent(session,change))return canReapply(change);
+        var entries=(List<?>)call(registry(session),"entries");
+        for(var e:change.original().entrySet()) {
+            if(e.getKey()>=entries.size())return false;
+            Object current=entries.get(e.getKey());
+            if(!Objects.equals(call(current,"key"),call(e.getValue(),"key")) ||
+               !Objects.equals(call(current,"data"),call(e.getValue(),"data")))return false;
+        }
+        return true;
     }
     public int ownedMappings(Change change) throws Exception {
         var entries=(List<?>)call(change.registry(),"entries");int count=0;
