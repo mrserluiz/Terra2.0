@@ -1,6 +1,6 @@
 # User manual — Terra2.0
 
-**English (en_US)** · **Current build: 7.3.4-BETA** · initial chapters: historical 7.0.14 reference
+**English (en_US)** · **Current build: 7.3.5-BETA** · initial chapters: historical 7.0.14 reference
 
 1. [Installation and configuration](01-installation.md)
 2. [Terra Community Packs](02-community-packs.md)
@@ -27,3 +27,5 @@
 14. [Native Minecraft density and AETHER 0.2.0 (7.3.3-BETA)](../../releases/7.3.3-BETA.md) · [Pack installation and limitations](../../../terra2-engine/tools/fixtures/aether/README.md)
 
 15. [Automatic Bedrock recovery and full-height visible chunk refresh (7.3.4-BETA)](../../releases/7.3.4-BETA.md)
+
+16. [7.3.5 — saved biome recovery, actual-chunk diagnostics and FAWE](../../releases/7.3.5-BETA.md)

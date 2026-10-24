@@ -1,6 +1,10 @@
 # Recovered engine build status
 
-## Current reference: 7.3.4-BETA
+## Current reference: 7.3.5-BETA
+
+[CI 40092905140](https://github.com/mrserluiz/Terra2.0/actions/runs/40092905140) passed all five jobs. Explicit saved biome edits survive compatible pack fingerprint changes; restoration writes only saved cells; CUSTOM visual diagnostics read actual chunk biomes. Paper generation, save/restart, native/vanilla biome projection, AETHER density and official Geyser checks passed. The official FAWE 2.16.1 cuboid adapter was tested at runtime; real player sessions, FastAsyncVoxelSniper brushes and client color rendering remain acceptance tests. [Installation, recovery, limits and checksum](docs/releases/7.3.5-BETA.md). Native target: Paper 26.2 / Java 25; Geyser 2.11.3 build 1251. The climate job remains an experimental receiver fixture.
+
+## Previous reference: 7.3.4-BETA
 
 [CI 39339281309](https://github.com/mrserluiz/Terra2.0/actions/runs/39339281309) passed all jobs: automatic Bedrock session recovery, bounded retry/backoff, persistent world exclusions, registry replacement recovery and incremental full-height loaded-window refresh. Generation, biome persistence and AETHER 0.2.0 remain covered. [Installation, validation and checksum](docs/releases/7.3.4-BETA.md). Paper 26.2 / Java 25; official local Geyser 2.11.3 build 1251. A real Bedrock reconnect/rendering acceptance test remains necessary.
 

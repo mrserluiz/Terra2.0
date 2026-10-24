@@ -1,6 +1,6 @@
 # Manual do usuário — Terra2.0
 
-**Idioma:** Português (Brasil) · **Build atual:** 7.3.4-BETA · capítulos iniciais: referência histórica 7.0.14-BETA
+**Idioma:** Português (Brasil) · **Build atual:** 7.3.5-BETA · capítulos iniciais: referência histórica 7.0.14-BETA
 
 Este manual documenta o comportamento confirmado na documentação da build de referência. Se seu JAR for mais recente, confira as notas da versão correspondente. Recursos futuros estão identificados como **planejados**, e exemplos conceituais não são comandos válidos.
 
@@ -53,3 +53,5 @@ A ponte de cores nativas exige mundo CUSTOM. A edição de biomas funciona tamb�
 16. [Densidade nativa Minecraft e AETHER 0.2.0 (7.3.3-BETA)](../releases/7.3.3-BETA.md) · [Instalação do pack](../../terra2-engine/tools/fixtures/aether/README.md)
 
 17. [Ativação automática Bedrock e reenvio de copas/colunas completas (7.3.4-BETA)](../releases/7.3.4-BETA.md)
+
+18. [7.3.5 — recuperação de setbiome, diagnóstico por altura e FAWE](../releases/7.3.5-BETA.md)

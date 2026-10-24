@@ -4,9 +4,9 @@
 
 Terra 2.0 is an independent continuation and modernization of the Terra world-generation engine for Paper, focused on **per-world generation**, **Community Pack compatibility**, safe world isolation, and a path toward native Minecraft datapack support.
 
-> **Current reference build:** `Terra2-bukkit-7.3.4-BETA.jar` — Paper 26.2, automatic Bedrock session recovery and full-height visible chunk refresh, native density operators and AETHER 0.2.0.
+> **Current reference build:** `Terra2-bukkit-7.3.5-BETA.jar` — Paper 26.2, recovery of explicit biome edits across compatible pack updates, actual-chunk diagnostics, automatic Bedrock session recovery, native density operators and AETHER 0.2.0.
 
-[7.3.4 release notes](docs/releases/7.3.4-BETA.md) · [7.3.3 / AETHER](docs/releases/7.3.3-BETA.md) · [AETHER 0.2.0 installation and limits](terra2-engine/tools/fixtures/aether/README.md) (native Bedrock bridge verified with official Geyser 2.11.3 build 1251; 2.12 not supported) · [Changes since 7.0.25](docs/releases/7.0.30-BETA.md) · [Bedrock setup and limits](docs/BEDROCK_BIOMES.md)
+[7.3.5 release notes](docs/releases/7.3.5-BETA.md) · [7.3.4 release notes](docs/releases/7.3.4-BETA.md) · [7.3.3 / AETHER](docs/releases/7.3.3-BETA.md) · [AETHER 0.2.0 installation and limits](terra2-engine/tools/fixtures/aether/README.md) (native Bedrock bridge verified with official Geyser 2.11.3 build 1251; 2.12 not supported) · [Changes since 7.0.25](docs/releases/7.0.30-BETA.md) · [Bedrock setup and limits](docs/BEDROCK_BIOMES.md)
 
 Terra 2.0 is no longer only a recovery scaffold. The 7.0.25 line has an executable generation core, a Terra Community Pack compatibility backend, a first vanilla datapack importer, local TerraPacks, and per-world pack composition.
 

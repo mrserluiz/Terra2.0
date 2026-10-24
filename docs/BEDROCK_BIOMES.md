@@ -1,3 +1,9 @@
+# Edições de bioma e diagnóstico — 7.3.5-BETA
+
+O registro explícito de `/terra2 setbiome` é preservado entre versões do pack quando seus IDs continuam válidos no mesmo mundo. Chunks carregados recuperam somente essas células salvas, sem recalcular o terreno. `/terra2 biome debug` mostra o bioma real e a faixa de altura editada; `/terra2 biome restore` recupera o overlay do chunk atual. O registro do Terra2 prevalece no próximo carregamento caso uma ferramenta externa altere as mesmas células. Sem registro salvo, não há reconstrução automática.
+
+Em mundos CUSTOM, o leitor visual consulta o bioma real do chunk, em vez de prever o passado com o gerador atual. A seleção cuboide continua tridimensional: folhas acima dela não recebem a edição. O manifesto da nova build usa `[7,3,5]`; a calibração global e por bioma é mantida. [Notas, instalação e limites](releases/7.3.5-BETA.md).
+
 # Bedrock — ativação automática e recuperação (7.3.4-BETA)
 
 Com a ponte habilitada (`prepare` e reinício feitos uma vez), jogadores Geyser recebem aplicação nativa automaticamente nos mundos Terra2 CUSTOM autorizados, sem OP e sem repetir `native`. A recuperação inclui backoff de falhas transitórias, troca do registro da conexão e reenvio incremental das colunas visíveis carregadas em toda a altura. O raio é limitado a 8 chunks e à distância de visão real. `forget` exclui o mundo persistentemente; `stop` pausa apenas a sessão até reentrar. A calibração continua em `color-calibration.yml`; o manifesto do pack gerado usa `[7,3,4]`.
