@@ -25,6 +25,7 @@ public final class BiomeIdentityChunk {
         this.pack=Objects.requireNonNull(pack); this.fingerprint=Objects.requireNonNull(fingerprint);
         this.palette=List.copyOf(palette); this.cells=cells.clone();
     }
+    public List<BiomeIdentity> palette() { return palette; }
     public Optional<BiomeIdentity> at(int bx, int by, int bz) {
         if((bx >> 4) != x || (bz >> 4) != z || by < minY || by >= minY + height) return Optional.empty();
         int index = ((by - minY) >> 2) * 16 + ((bz & 15) >> 2) * 4 + ((bx & 15) >> 2);

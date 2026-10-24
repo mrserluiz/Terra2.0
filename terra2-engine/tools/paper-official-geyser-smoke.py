@@ -15,7 +15,12 @@ version=meta['version'];number=meta['build'];info=meta['downloads']['spigot']
 data=fetch(f'https://download.geysermc.org/v2/projects/geyser/versions/{version}/builds/{number}/downloads/spigot')
 assert hashlib.sha256(data).hexdigest()==info['sha256'];(PLUGINS/'Geyser-Spigot.jar').write_bytes(data)
 (SERVER/'geyser-release.json').write_text(json.dumps(meta,indent=2))
-terra=ROOT/'platforms/bukkit/build/libs/Terra2-bukkit-7.3.4-BETA.jar';shutil.copy(terra,PLUGINS/terra.name)
+# Official published FAWE binary, pinned and verified; no WorldEdit fork maintained here.
+fawe=fetch('https://cdn.modrinth.com/data/z4HZZnLr/versions/b9Fl6Ct5/FastAsyncWorldEdit-Bukkit-2.16.1.jar')
+assert hashlib.sha512(fawe).hexdigest()=='239344f1e906aac37ffed4939ea30a5ba1a1a3935dd4930067e25b8f9864b081ce3ad72473f4a93af8235a70824900649c4450983b2b3dda57d2df655ea3cb4b'
+(PLUGINS/'FastAsyncWorldEdit.jar').write_bytes(fawe)
+
+terra=ROOT/'platforms/bukkit/build/libs/Terra2-bukkit-7.3.5-BETA.jar';shutil.copy(terra,PLUGINS/terra.name)
 td=PLUGINS/'Terra2';(td/'packs').mkdir(parents=True,exist_ok=True);(td/'bedrock').mkdir(exist_ok=True)
 shutil.copy(ROOT/'tools/fixtures/HYDRAXIA.zip',td/'packs/HYDRAXIA.zip')
 (td/'bedrock/preview.enabled').write_text('terra2-position-preview-v1')

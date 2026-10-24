@@ -21,7 +21,7 @@ public final class SetBiomeCommand {
     }
     public boolean handle(CommandSender sender,String[] args) {
         if(args.length==0 || !args[0].equalsIgnoreCase("setbiome"))return false;
-        if(args.length!=2 || !(sender instanceof Player player)){sender.sendMessage("Uso em jogo: /terra2 setbiome <ID_DO_BIOMA> usando uma seleção cuboide do WorldEdit.");return true;}
+        if(args.length!=2 || !(sender instanceof Player player)){DiagnosticMessages.send(sender,"Uso em jogo: /terra2 setbiome <ID_DO_BIOMA> usando uma seleção cuboide do WorldEdit.");return true;}
         try {
             var world=player.getWorld();plugin.assertGenerationAuthorized(world.getName(),"PACKS");
             var we=Bukkit.getPluginManager().getPlugin("WorldEdit");if(we==null)we=Bukkit.getPluginManager().getPlugin("FastAsyncWorldEdit");
@@ -34,14 +34,19 @@ public final class SetBiomeCommand {
             Object session=call(call(engine,"getSessionManager"),"get",adapted);
             Object adaptedWorld=adapter.getMethod("adapt",World.class).invoke(null,world);
             Object region=call(session,"getSelection",adaptedWorld);
-            if(!Class.forName("com.sk89q.worldedit.regions.CuboidRegion",false,loader).isInstance(region))throw new IllegalArgumentException("Use uma seleção cuboide: //sel cuboid");
-            Object min=call(region,"getMinimumPoint"),max=call(region,"getMaximumPoint");
-            int changed=apply(world,args[1],coordinate(min,"X"),coordinate(min,"Y"),coordinate(min,"Z"),coordinate(max,"X"),coordinate(max,"Y"),coordinate(max,"Z"));
-            sender.sendMessage("Bioma aplicado e identidade persistida: "+args[1]+"; células 4x4x4: "+changed+". Bordas são ajustadas à grade de biomas. Atualização visual enfileirada; terreno/estruturas não são regenerados.");
-        }catch(Exception error){Throwable cause=error;while(cause instanceof java.lang.reflect.InvocationTargetException && cause.getCause()!=null)cause=cause.getCause();sender.sendMessage("Setbiome recusado/falhou: "+cause.getMessage());}
+            var bounds=selectionBounds(region,loader);
+            int changed=apply(world,args[1],bounds.minX(),bounds.minY(),bounds.minZ(),bounds.maxX(),bounds.maxY(),bounds.maxZ());
+            DiagnosticMessages.send(sender,"Bioma aplicado e identidade persistida: "+args[1]+"; células 4x4x4: "+changed+". Bordas são ajustadas à grade de biomas. Atualização visual enfileirada; terreno/estruturas não são regenerados.");
+        }catch(Exception error){Throwable cause=error;while(cause instanceof java.lang.reflect.InvocationTargetException && cause.getCause()!=null)cause=cause.getCause();DiagnosticMessages.send(sender,"Setbiome recusado/falhou: "+cause.getMessage());}
         return true;
     }
-    private int coordinate(Object vector,String axis) throws Exception {return (Integer)call(vector,"getBlock"+axis);}
+    public record Bounds(int minX,int minY,int minZ,int maxX,int maxY,int maxZ) {}
+    public static Bounds selectionBounds(Object region,ClassLoader loader) throws ReflectiveOperationException {
+        if(!Class.forName("com.sk89q.worldedit.regions.CuboidRegion",false,loader).isInstance(region))throw new IllegalArgumentException("Use uma seleção cuboide: //sel cuboid");
+        Object min=call(region,"getMinimumPoint"),max=call(region,"getMaximumPoint");
+        return new Bounds(coordinate(min,"X"),coordinate(min,"Y"),coordinate(min,"Z"),coordinate(max,"X"),coordinate(max,"Y"),coordinate(max,"Z"));
+    }
+    private static int coordinate(Object vector,String axis) throws ReflectiveOperationException {return (Integer)call(vector,"getBlock"+axis);}
     private record Cell(int x,int y,int z,org.bukkit.block.Biome old) {}
     private record ChunkKey(int x,int z) {}
     public int apply(World world,String id,int minX,int minY,int minZ,int maxX,int maxY,int maxZ) throws Exception {
@@ -66,7 +71,7 @@ public final class SetBiomeCommand {
         var oldPayloads=new HashMap<ChunkKey,byte[]>();var payloads=new LinkedHashMap<ChunkKey,byte[]>();
         for(var e:edits.entrySet()) {
             var chunk=world.getChunkAt(e.getKey().x(),e.getKey().z());byte[] previous=chunk.getPersistentDataContainer().get(BiomeEditOverrides.KEY,PersistentDataType.BYTE_ARRAY);oldPayloads.put(e.getKey(),previous);
-            payloads.put(e.getKey(),BiomeEditOverrides.edit(previous,world.getUID(),world.getSeed(),chunk.getX(),chunk.getZ(),world.getMinHeight(),world.getMaxHeight()-world.getMinHeight(),wrapper.getPack().getID(),wrapper.biomeCompatibility().fingerprint,e.getValue()).encode());
+            payloads.put(e.getKey(),BiomeEditOverrides.edit(previous,world.getUID(),world.getSeed(),chunk.getX(),chunk.getZ(),world.getMinHeight(),world.getMaxHeight()-world.getMinHeight(),wrapper.getPack().getID(),wrapper.biomeCompatibility().fingerprint,e.getValue(),wrapper.biomeCompatibility().identities()).encode());
         }
         int written=0;
         try {

@@ -127,12 +127,43 @@ public final class OfficialGeyserPreviewProbe extends JavaPlugin {
             }
             String target=nativeWrapper.getPack().getBiomeProvider().stream().findFirst().orElseThrow().getID();
             var editor=new com.dfsek.terra.bukkit.util.SetBiomeCommand(terra);
+            var fawe=Bukkit.getPluginManager().getPlugin("FastAsyncWorldEdit");require(fawe!=null && fawe.isEnabled(),"Official FAWE 2.16.1 loads alongside Terra2");
+            var faweLoader=fawe.getClass().getClassLoader();
+            var adapter=Class.forName("com.sk89q.worldedit.bukkit.BukkitAdapter",false,faweLoader);
+            Object adaptedWorld=adapter.getMethod("adapt",org.bukkit.World.class).invoke(null,nativeWorld);
+            var vec=Class.forName("com.sk89q.worldedit.math.BlockVector3",false,faweLoader);
+            Object low=vec.getMethod("at",int.class,int.class,int.class).invoke(null,-8,64,-4),high=vec.getMethod("at",int.class,int.class,int.class).invoke(null,3,67,3);
+            var regionType=Class.forName("com.sk89q.worldedit.regions.CuboidRegion",false,faweLoader);
+            Object selection=regionType.getConstructor(Class.forName("com.sk89q.worldedit.world.World",false,faweLoader),vec,vec).newInstance(adaptedWorld,low,high);
+            var bounds=com.dfsek.terra.bukkit.util.SetBiomeCommand.selectionBounds(selection,faweLoader);
+            require(bounds.minX()==-8 && bounds.minY()==64 && bounds.minZ()==-4 && bounds.maxX()==3 && bounds.maxY()==67 && bounds.maxZ()==3,"Real FAWE cuboid selection adapter retains coordinates and vertical range");
+            getLogger().info("TERRA2_FAWE_SELECTION_OK version="+fawe.getDescription().getVersion()+" realPlayerSession=false voxelSniperTest=false");
             var blockBefore=nativeWorld.getBlockAt(0,64,0).getBlockData().getAsString();
             require(editor.apply(nativeWorld,target,0,64,0,3,67,3)==1,"A single actual Paper biome cell edited");
             var edited=terra.biomeService().at(nativeWorld,0,64,0).orElseThrow();require(edited.terraId().equals(target),"Own reader resolves saved edits in CUSTOM worlds");
             require(nativeWorld.getBiome(0,64,0).getKey().toString().equals(edited.registeredId()),"Actual Paper biome and own identity agree");
             require(PositionVisualResolver.at(nativeWorld,0,64,0).orElseThrow().source().equals("PERSISTED_EDIT"),"Bedrock visual resolver follows edited identity");
             require(nativeWorld.getBlockAt(0,64,0).getBlockData().getAsString().equals(blockBefore),"Biome edits do not regenerate blocks");
+            String untouched=nativeWorld.getBiome(4,64,0).getKey().toString();
+            nativeWorld.setBiome(0,64,0,org.bukkit.block.Biome.DESERT);
+            require(terra.biomeEditRestorer().restore(nativeWorld.getChunkAt(0,0))==1,"Saved edit restores actual Paper biome without provider sampling");
+            require(nativeWorld.getBiome(0,64,0).getKey().toString().equals(edited.registeredId()),"Restored custom biome is real on Java/Paper");
+            require(nativeWorld.getBiome(4,64,0).getKey().toString().equals(untouched),"Restoration leaves unedited cells intact");
+            require(terra.biomeEditRestorer().restore(nativeWorld.getChunkAt(0,0))==0,"Matching overlay never rewrites a chunk repeatedly");
+            nativeWorld.setBiome(4,64,0,org.bukkit.block.Biome.DESERT);
+            require(PositionVisualResolver.at(nativeWorld,4,64,0).isEmpty(),"Resolver refuses a false custom prediction for an actual vanilla chunk cell");
+            nativeWorld.setBiome(4,64,0,org.bukkit.Registry.BIOME.get(org.bukkit.NamespacedKey.fromString(untouched)));
+            require(PositionVisualResolver.at(nativeWorld,4,64,0).orElseThrow().source().equals("ACTUAL_CHUNK"),"Unedited custom biomes read the saved chunk, never the current provider");
+            var overlayPdc=nativeWorld.getChunkAt(0,0).getPersistentDataContainer();
+            var overlay=com.dfsek.terra.bukkit.compatibility.BiomeIdentityChunk.decode(overlayPdc.get(com.dfsek.terra.bukkit.compatibility.BiomeEditOverrides.KEY,org.bukkit.persistence.PersistentDataType.BYTE_ARRAY));
+            // Re-encode the same sparse saved cells with an older fingerprint, as after a pack version update.
+            var oldEdits=new java.util.HashMap<Integer,org.terra2.api.biome.BiomeIdentity>();
+            oldEdits.put(((64-overlay.minY)>>2)*16,edited);
+            byte[] older=com.dfsek.terra.bukkit.compatibility.BiomeEditOverrides.edit(null,nativeWorld.getUID(),42,0,0,overlay.minY,overlay.height,nativeWrapper.getPack().getID(),"older-pack-signature",oldEdits).encode();
+            overlayPdc.set(com.dfsek.terra.bukkit.compatibility.BiomeEditOverrides.KEY,org.bukkit.persistence.PersistentDataType.BYTE_ARRAY,older);
+            require(terra.biomeService().at(nativeWorld,0,64,0).orElseThrow().equals(edited),"Compatible saved edit survives pack signature change");
+            require(nativeWorld.getBlockAt(0,64,0).getBlockData().getAsString().equals(blockBefore),"Restoration does not touch terrain blocks");
+            getLogger().info("TERRA2_EDIT_RECOVERY_OK oldFingerprint=true actualChunk=true uneditedCellsPreserved=true");
             try{editor.apply(Bukkit.getWorld("world"),target,0,64,0,3,67,3);throw new AssertionError("Primary world edit must be refused");}catch(IllegalArgumentException expected){}
             try{editor.apply(nativeWorld,target,0,64,0,1023,255,1023);throw new AssertionError("Oversized edit must be refused");}catch(IllegalArgumentException expected){}
             byte[] editedData=nativeWorld.getChunkAt(0,0).getPersistentDataContainer().get(com.dfsek.terra.bukkit.compatibility.BiomeEditOverrides.KEY,org.bukkit.persistence.PersistentDataType.BYTE_ARRAY);

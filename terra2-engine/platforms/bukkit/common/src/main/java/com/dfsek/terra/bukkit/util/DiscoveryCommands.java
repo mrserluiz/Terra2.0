@@ -13,10 +13,11 @@ public final class DiscoveryCommands {
     private final Set<UUID> busy = ConcurrentHashMap.newKeySet();
     public DiscoveryCommands(TerraBukkitPlugin plugin) { this.plugin = plugin; }
     private void message(CommandSender sender, String key, Object... values) {
-        sender.sendMessage(CommandMessages.text(plugin.generationSettings().getString("language", "pt_BR"), key, values));
+        DiagnosticMessages.send(sender,CommandMessages.text(plugin.generationSettings().getString("language", "pt_BR"), key, values));
     }
     public List<String> complete(CommandSender sender, String[] args) {
         if(args.length == 1) return filter(List.of("biome", "structures", "locate"), args[0]);
+        if(args[0].equalsIgnoreCase("biome") && args.length==2)return filter(List.of("debug","restore"),args[1]);
         if(!args[0].equalsIgnoreCase("locate")) return List.of();
         if(args.length == 2) return filter(List.of("biome", "structure"), args[1]);
         if(args.length != 3 || !(sender instanceof Player player)) return List.of();
@@ -34,16 +35,35 @@ public final class DiscoveryCommands {
         if(args.length == 0 || !Set.of("biome", "structures", "locate").contains(args[0].toLowerCase(Locale.ROOT))) return false;
         if(!(sender instanceof Player player)) { message(sender, "discover-player"); return true; }
         var world = player.getWorld(); var location = player.getLocation();
-        if(args[0].equalsIgnoreCase("biome") && args.length == 1) {
-            String id;
-            if(world.getGenerator() instanceof BukkitChunkGeneratorWrapper wrapper) {
-                if(wrapper.biomeCompatibility() != null && wrapper.biomeCompatibility().vanilla) {
-                    var persisted = plugin.biomeService().at(world, location.getBlockX(), location.getBlockY(), location.getBlockZ());
-                    id = persisted.map(org.terra2.api.biome.BiomeIdentity::terraId).orElse("UNKNOWN (missing/invalid Terra2 chunk identity)");
-                } else id = wrapper.getPack().getBiomeProvider().getBiome(location.getBlockX(), location.getBlockY(), location.getBlockZ(), world.getSeed()).getID();
-            } else id = world.getBiome(location).getKey().toString();
-            id=com.dfsek.terra.bukkit.compatibility.BiomeEditOverrides.at(world,location.getBlockX(),location.getBlockY(),location.getBlockZ()).map(org.terra2.api.biome.BiomeIdentity::terraId).orElse(id);
-            message(sender, "discover-biome", world.getName(), id, world.getBiome(location).getKey()); return true;
+        if(args[0].equalsIgnoreCase("biome") && (args.length==1 || args.length==2 && args[1].equalsIgnoreCase("debug"))) {
+            var sample=com.dfsek.terra.bukkit.bedrock.PositionVisualResolver.at(world,location.getBlockX(),location.getBlockY(),location.getBlockZ());
+            message(sender,"discover-biome",world.getName(),sample.map(s->s.profile()+" ["+s.source()+"]").orElse("UNKNOWN"),world.getBiome(location).getKey());
+            if(args.length==2) {
+                DiagnosticMessages.send(sender,"Posição: "+location.getBlockX()+", "+location.getBlockY()+", "+location.getBlockZ()+"; o bioma é tridimensional (células 4x4x4).");
+                var pdc=world.getChunkAt(location).getPersistentDataContainer();
+                if(pdc.has(com.dfsek.terra.bukkit.compatibility.BiomeEditOverrides.KEY,org.bukkit.persistence.PersistentDataType.BYTE_ARRAY)) {
+                    try {
+                        var data=com.dfsek.terra.bukkit.compatibility.BiomeEditOverrides.read(world.getChunkAt(location));
+                        int count=0,min=Integer.MAX_VALUE,max=Integer.MIN_VALUE;
+                        for(int y=data.minY;y<data.minY+data.height;y+=4)for(int z=0;z<16;z+=4)for(int x=0;x<16;x+=4) {
+                            var id=data.at((data.x<<4)+x,y,(data.z<<4)+z).orElseThrow();
+                            if(!com.dfsek.terra.bukkit.compatibility.BiomeEditOverrides.isUnset(id)){count++;min=Math.min(min,y);max=Math.max(max,y+3);}
+                        }
+                        DiagnosticMessages.send(sender,"Overlay válido: "+count+" células; Y="+min+".."+max+"; assinatura salva="+data.fingerprint);
+                    }catch(java.io.IOException invalid){DiagnosticMessages.send(sender,"Overlay recusado: "+invalid.getMessage()+"; dados preservados.");}
+                } else DiagnosticMessages.send(sender,"Sem overlay setbiome salvo neste chunk; não será reconstruído pelo gerador.");
+                var target=player.getTargetBlockExact(64);
+                if(target!=null) {
+                    var at=com.dfsek.terra.bukkit.bedrock.PositionVisualResolver.at(world,target.getX(),target.getY(),target.getZ());
+                    DiagnosticMessages.send(sender,"Bloco mirado Y="+target.getY()+"; Bukkit="+world.getBiome(target.getLocation()).getKey()+"; Terra2="+at.map(Object::toString).orElse("UNKNOWN"));
+                }
+            }
+            return true;
+        }
+        if(args[0].equalsIgnoreCase("biome") && args.length==2 && args[1].equalsIgnoreCase("restore")) {
+            try{DiagnosticMessages.send(sender,"Células restauradas do overlay salvo neste chunk: "+plugin.biomeEditRestorer().restore(world.getChunkAt(location))+". Terreno não regenerado.");}
+            catch(java.io.IOException | IllegalArgumentException error){DiagnosticMessages.send(sender,"Restauração recusada: "+error.getMessage());}
+            return true;
         }
         boolean near = args[0].equalsIgnoreCase("structures");
         if((near && args.length > 2) || (!near && (!args[0].equalsIgnoreCase("locate") || args.length < 3 || args.length > 4))) {

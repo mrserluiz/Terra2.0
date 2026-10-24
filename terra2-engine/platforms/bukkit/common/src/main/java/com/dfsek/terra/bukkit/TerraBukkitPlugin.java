@@ -246,6 +246,9 @@ public class TerraBukkitPlugin extends JavaPlugin {
         }
         if(isEnabled()) {
             visualRefresh = new com.dfsek.terra.bukkit.util.ChunkVisualRefresh(this);
+            biomeEditRestorer = new com.dfsek.terra.bukkit.compatibility.BiomeEditRestorer(this);
+            Bukkit.getPluginManager().registerEvents(biomeEditRestorer,this);
+            for(var loadedWorld:Bukkit.getWorlds())for(var loadedChunk:loadedWorld.getLoadedChunks())biomeEditRestorer.enqueue(loadedChunk);
             setBiomeCommand = new com.dfsek.terra.bukkit.util.SetBiomeCommand(this);
             bedrockPreview = new com.dfsek.terra.bukkit.bedrock.BedrockPreviewBridge(this);
             bedrockPreview.initialize();
@@ -256,6 +259,8 @@ public class TerraBukkitPlugin extends JavaPlugin {
     }
 
     private com.dfsek.terra.bukkit.util.ChunkVisualRefresh visualRefresh;
+    private com.dfsek.terra.bukkit.compatibility.BiomeEditRestorer biomeEditRestorer;
+    public com.dfsek.terra.bukkit.compatibility.BiomeEditRestorer biomeEditRestorer(){return biomeEditRestorer;}
     private com.dfsek.terra.bukkit.util.SetBiomeCommand setBiomeCommand;
     public com.dfsek.terra.bukkit.util.ChunkVisualRefresh visualRefresh(){return visualRefresh;}
     private com.dfsek.terra.bukkit.bedrock.BedrockPreviewBridge bedrockPreview;
@@ -263,6 +268,7 @@ public class TerraBukkitPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if(biomeEditRestorer!=null)biomeEditRestorer.close();
         if(visualRefresh!=null)visualRefresh.close();
         if(bedrockPreview != null) bedrockPreview.close();
         Bukkit.getServicesManager().unregisterAll(this);

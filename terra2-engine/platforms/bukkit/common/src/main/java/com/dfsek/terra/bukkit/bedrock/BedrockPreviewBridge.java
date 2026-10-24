@@ -329,15 +329,15 @@ public final class BedrockPreviewBridge implements Listener {
     public List<String> colorDebug(Player player) {
         var lines=new ArrayList<String>();
         lines.add("Ponte: "+status()+"; "+playerStatus(player));
-        if(colorReport==null){lines.add("Nenhum catálogo/pack compilado nesta ponte; use prepare e reinicie.");return lines;}
-        lines.add(colorReport.metadata());
+        if(colorReport!=null)lines.add(colorReport.metadata());
         var location=player.getLocation();var world=player.getWorld();
         lines.add("Mundo: "+world.getName()+"; Bukkit real: "+world.getBiome(location).getKey());
         var sample=PositionVisualResolver.at(world,location.getBlockX(),location.getBlockY(),location.getBlockZ());
         if(sample.isEmpty()){lines.add("Sem identidade Terra2 disponível nesta posição.");return lines;}
         var found=sample.get();lines.add("ID: "+found.profile()+"; leitura: "+found.source());
         lines.add("Client biome: "+BedrockClientBiomes.name(found.profile()));
-        lines.addAll(colorReport.details(found.profile()));
+        if(colorReport!=null)lines.addAll(colorReport.details(found.profile()));
+        else lines.add("Nenhum catálogo Bedrock compilado; o bioma Bukkit acima é a evidência do chunk para Java.");
         if(!world.getBiome(location).getKey().toString().equals(found.profile()))lines.add("ATENCAO: bioma Bukkit difere da identidade; o debug não comprova tradução efetiva deste chunk.");
         lines.add("Snapshot da compilação; editar YAML exige reinício. Não confirma renderização/aceitação no cliente.");return lines;
     }

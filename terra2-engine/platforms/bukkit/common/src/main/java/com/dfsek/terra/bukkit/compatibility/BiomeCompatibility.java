@@ -65,6 +65,10 @@ public final class BiomeCompatibility {
             return new BiomeCompatibility(vanilla,hash,token,identities,refs);
         }catch(java.security.NoSuchAlgorithmException impossible){throw new IllegalStateException(impossible);}
     }
+    public Collection<BiomeIdentity> identities() { return identities.values(); }
+    public Optional<BiomeIdentity> identity(String registeredId) {
+        return identities.values().stream().filter(id -> id.registeredId().equals(registeredId)).findFirst();
+    }
     public BiomeIdentity identity(Biome biome) { return Objects.requireNonNull(identities.get(biome), "Unregistered Terra biome"); }
     public org.bukkit.block.Biome reference(Biome biome) { return Objects.requireNonNull(references.get(biome), "Unregistered reference"); }
     public void bind(Path folder, UUID uuid, long seed, String name) throws java.io.IOException {

@@ -21,9 +21,10 @@ public final class PositionVisualResolver {
             var service=Bukkit.getServicesManager().load(WorldBiomeService.class);
             return service==null ? Optional.empty() : service.at(world,x,y,z).map(id->new Sample(id.registeredId(),"PERSISTED_IDENTITY"));
         }
-        // CUSTOM worlds have no PDC palette. This is explicitly a prediction from their bound provider.
-        var biome=wrapper.getPack().getBiomeProvider().getBiome(x,y,z,world.getSeed());
-        var key=((BukkitPlatformBiome)biome.getPlatformBiome()).getContext().get(BukkitBiomeInfo.class).biomeKey();
-        return Optional.of(new Sample(key.toString(),"BOUND_PROVIDER_PREDICTION"));
+        // CUSTOM chunks already contain their historical identity, including external edits.
+        // Never replace that evidence with a prediction from today's pack distribution.
+        String actual=world.getBiome(x,y,z).getKey().toString();
+        return wrapper.biomeCompatibility()==null ? Optional.empty() : wrapper.biomeCompatibility().identity(actual)
+            .map(id->new Sample(id.registeredId(),"ACTUAL_CHUNK"));
     }
 }
