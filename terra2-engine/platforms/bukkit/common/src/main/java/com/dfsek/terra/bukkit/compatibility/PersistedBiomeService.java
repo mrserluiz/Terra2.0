@@ -14,8 +14,7 @@ public final class PersistedBiomeService implements WorldBiomeService {
         if(world==null || y<world.getMinHeight() || y>=world.getMaxHeight() || !world.isChunkLoaded(x>>4,z>>4))return Optional.empty();
         var edit=BiomeEditOverrides.at(world,x,y,z);if(edit.isPresent())return edit;
         if(!(world.getGenerator() instanceof com.dfsek.terra.bukkit.generator.BukkitChunkGeneratorWrapper wrapper)
-                || wrapper.biomeCompatibility()==null)return Optional.empty();
-        if(!wrapper.biomeCompatibility().vanilla)return wrapper.biomeCompatibility().identity(world.getBiome(x,y,z).getKey().toString());
+                || wrapper.biomeCompatibility()==null || !wrapper.biomeCompatibility().vanilla)return Optional.empty();
         var bytes=world.getChunkAt(x>>4,z>>4).getPersistentDataContainer().get(KEY,PersistentDataType.BYTE_ARRAY);
         try {
             var data=BiomeIdentityChunk.decode(bytes);
