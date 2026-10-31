@@ -44,9 +44,12 @@ public final class NativeJsonMigration {
                 config.addProperty("replaceable", "#minecraft:supports_small_dripleaf");
         }
         // 26.3 loot codecs use typed conditions/modifiers; inline lists retain all/sequence semantics.
-        String function=id(object,"function");
+        String function=object.has("function") ? id(object,"function") : id(object,"type");
         if(object.has("function"))rename(object,"function","type");
-        if(object.has("condition") && object.get("condition").isJsonPrimitive())rename(object,"condition","type");
+        // Modern untyped loot pools can reference a predicate directly in "condition".
+        // That is not the old discriminator and must survive repeated migration.
+        if(!object.has("entries") && !object.has("pools") && !object.has("rolls")
+            && object.has("condition") && object.get("condition").isJsonPrimitive())rename(object,"condition","type");
         if(!function.equals("minecraft:sequence"))rename(object,"functions","modifier");
         rename(object,"conditions","condition");
         var result = new JsonObject(); object.entrySet().forEach(entry -> result.add(entry.getKey(), visit(entry.getValue()))); return result;

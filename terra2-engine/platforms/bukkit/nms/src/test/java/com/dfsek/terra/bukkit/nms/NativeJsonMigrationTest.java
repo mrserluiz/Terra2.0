@@ -5,6 +5,23 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class NativeJsonMigrationTest {
+    @Test void preservesModernLootPoolReferencesAndSequenceOnRepeatedMigration() {
+        var source=JsonParser.parseString("""
+            {"type":"minecraft:chest","pools":[{"rolls":1,"condition":"example:eligible",
+              "entries":[{"type":"minecraft:item","name":"minecraft:stone",
+                "modifier":{"type":"minecraft:sequence","functions":[
+                  {"type":"minecraft:set_count","count":3}]}}]}]}
+            """);
+        assertEquals(source,NativeJsonMigration.migrate(source));
+        var legacy=JsonParser.parseString("""
+            {"function":"minecraft:sequence","functions":[
+              {"function":"minecraft:set_count","count":3}]}
+            """);
+        var migrated=NativeJsonMigration.migrate(legacy);
+        assertTrue(migrated.getAsJsonObject().has("functions"));
+        assertEquals(migrated,NativeJsonMigration.migrate(migrated));
+        assertTrue(legacy.getAsJsonObject().has("function"));
+    }
     @Test void migratesNestedEntityChecksWithoutRenamingFeatureOrItemTypes() {
         var source = JsonParser.parseString("""
             {"condition":"entity_properties","entity":"this","predicate":{
