@@ -15,6 +15,10 @@ public final class NativeJsonMigration {
         if(json.isJsonArray()) { var out = new JsonArray(); json.getAsJsonArray().forEach(value -> out.add(visit(value))); return out; }
         if(!json.isJsonObject()) return json;
         var object = json.getAsJsonObject();
+        // Legacy serialized block states occur in processors, state providers and features.
+        if(object.has("Name") && object.keySet().stream().allMatch(key -> key.equals("Name") || key.equals("Properties"))) {
+            rename(object,"Name","id");rename(object,"Properties","properties");
+        }
         String densityType=id(object,"type");
         if(densityType.equals("minecraft:y_clamped_gradient")) {
             object.addProperty("type","minecraft:gradient");object.addProperty("axis","y");

@@ -82,6 +82,18 @@ class NativeResourceGraphTest {
         assertFalse(graph.report().valid());
         assertThrows(IllegalStateException.class, () -> graph.resource(Registries.STRUCTURE, "test:dungeon"));
     }
+    @Test void decodesLegacyProcessorOutputBlockStates() throws Exception {
+        fixtures();
+        write("data/test/worldgen/processor_list/gold.json", """
+            {"processors":[{"processor_type":"minecraft:rule","rules":[{
+              "input_predicate":{"predicate_type":"minecraft:block_match","block":"minecraft:stone_bricks"},
+              "location_predicate":{"predicate_type":"minecraft:always_true"},
+              "output_state":{"Name":"minecraft:gold_block"}}]}]}
+            """);
+        var graph=new NativeResourceGraph(ResourceBundle.read(directory),vanilla());
+        assertTrue(graph.report().valid(),()->String.join("\\n",graph.report().errors()));
+        assertNotNull(graph.resource(Registries.PROCESSOR_LIST,"test:gold").value());
+    }
     private java.util.List<net.minecraft.world.item.ItemStack> roll(String table, NativeResourceGraph graph) throws Exception {
         var configuration = new io.papermc.paper.configuration.GlobalConfiguration();
         configuration.misc = configuration.new Misc();
