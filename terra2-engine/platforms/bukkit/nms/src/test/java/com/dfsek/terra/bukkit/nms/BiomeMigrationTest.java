@@ -22,6 +22,7 @@ class BiomeMigrationTest {
         assertNotNull(Reflection.CHUNKMAP);
         assertNotNull(Reflection.MAPPED_REGISTRY);
         assertNotNull(Reflection.VILLAGER_TYPE);
+        assertNotNull(Reflection.SERVER_LEVEL);
     }
     @Test void parsesLegacyAndModernBlockParticleOptions() throws Exception {
         var legacy=com.dfsek.terra.bukkit.nms.config.BiomeParticleConfigTemplate.parse(

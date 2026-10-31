@@ -16,6 +16,17 @@ public final class BiomeCompatibilityProbe extends JavaPlugin {
             var world=new WorldCreator("terra2_biome_compat").seed(42).generator("Terra2:HYDRAXIA").createWorld();
             var control=new WorldCreator("terra2_biome_control").seed(42).generator("Terra2:HYDRAXIA").createWorld();
             require(world!=null&&control!=null,"Both fixture worlds created");
+            for(var target:List.of(world,control)) {
+                var wrapper=(com.dfsek.terra.bukkit.generator.BukkitChunkGeneratorWrapper)target.getGenerator();
+                var policy=wrapper.biomeCompatibility();
+                var biome=wrapper.getPack().getBiomeProvider().getBiome(1600000,64,1600000,target.getSeed());
+                var original=policy.identity(biome);
+                String expected=policy.vanilla?original.vanillaReference():original.registeredId();
+                require(!target.isChunkLoaded(100000,100000),"Unloaded resolver fixture stays unloaded");
+                require(target.getBiome(1600000,64,1600000).getKey().toString().equals(expected),"Unloaded resolver follows bound generator");
+                require(!target.isChunkLoaded(100000,100000),"Biome resolver did not load a chunk");
+            }
+            getLogger().info("TERRA2_UNLOADED_RESOLVER_OK custom=true vanillaProjection=true noChunkLoad=true");
             java.util.concurrent.CompletableFuture.allOf(world.getChunkAtAsync(0,0,true),control.getChunkAtAsync(0,0,true),world.getChunkAtAsync(-1,-2,true))
                 .orTimeout(240,java.util.concurrent.TimeUnit.SECONDS).whenComplete((unused,error)->
                     Bukkit.getScheduler().runTask(this,()->{

@@ -29,6 +29,7 @@ public class Reflection {
     public static final MappedRegistryProxy MAPPED_REGISTRY;
     public static final MappedRegistryTagSetProxy MAPPED_REGISTRY_TAG_SET;
     public static final StructureManagerProxy STRUCTURE_MANAGER;
+    public static final ServerLevelProxy SERVER_LEVEL;
 
     public static final ReferenceProxy REFERENCE;
 
@@ -47,6 +48,7 @@ public class Reflection {
         MAPPED_REGISTRY = reflectionProxyFactory.reflectionProxy(MappedRegistryProxy.class);
         MAPPED_REGISTRY_TAG_SET = reflectionProxyFactory.reflectionProxy(MappedRegistryTagSetProxy.class);
         STRUCTURE_MANAGER = reflectionProxyFactory.reflectionProxy(StructureManagerProxy.class);
+        SERVER_LEVEL = reflectionProxyFactory.reflectionProxy(ServerLevelProxy.class);
         REFERENCE = reflectionProxyFactory.reflectionProxy(ReferenceProxy.class);
         CHUNKMAP = reflectionProxyFactory.reflectionProxy(ChunkMapProxy.class);
         HOLDER_REFERENCE = reflectionProxyFactory.reflectionProxy(HolderReferenceProxy.class);
@@ -84,6 +86,13 @@ public class Reflection {
     public interface StructureManagerProxy {
         @FieldGetter("level")
         LevelAccessor getLevel(StructureManager instance);
+    }
+
+    @Proxies(net.minecraft.server.level.ServerLevel.class)
+    public interface ServerLevelProxy {
+        @FieldSetter("uncachedBiomeResolver")
+        void setUncachedBiomeResolver(net.minecraft.server.level.ServerLevel instance,
+            net.minecraft.world.level.biome.BiomeResolver resolver);
     }
 
 

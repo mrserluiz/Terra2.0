@@ -55,6 +55,11 @@ public class NMSInjectListener implements Listener {
             ChunkMap chunkMap = serverWorld.getChunkSource().chunkMap;
             WorldGenContext worldGenContext = Reflection.CHUNKMAP.getWorldGenContext(chunkMap);
             NativeWorldExecutor nativeExecutor = ((NMSPlatform) plugin.platform()).nativeRuntime().bind(serverWorld, worldGenContext.structureManager());
+            var oldResolver=serverWorld.uncachedBiomeResolver();
+            var resolver=provider.createResolver(serverWorld.getChunkSource().randomState()
+                .createClimateSampler(net.minecraft.world.level.levelgen.densityfunction.SamplerContext.EMPTY_UNCACHED));
+            try {
+            Reflection.SERVER_LEVEL.setUncachedBiomeResolver(serverWorld,resolver);
             Reflection.CHUNKMAP.setWorldGenContext(chunkMap, new WorldGenContext(
                 worldGenContext.level(),
                 new NMSChunkGeneratorDelegate(vanilla, pack, provider, craftWorld.getSeed(), bukkitChunkGeneratorWrapper.getHandle(), nativeExecutor),
@@ -63,6 +68,13 @@ public class NMSInjectListener implements Listener {
                 worldGenContext.mainThreadExecutor(),
                 worldGenContext.unsavedListener()
             ));
+            } catch(RuntimeException | LinkageError failed) {
+                try {
+                    Reflection.CHUNKMAP.setWorldGenContext(chunkMap,worldGenContext);
+                    Reflection.SERVER_LEVEL.setUncachedBiomeResolver(serverWorld,oldResolver);
+                } catch(RuntimeException | LinkageError rollback) { failed.addSuppressed(rollback); }
+                throw failed;
+            }
 
             bukkitChunkGeneratorWrapper.markNativeBiomesBound();
             LOGGER.info("Successfully injected into world.");

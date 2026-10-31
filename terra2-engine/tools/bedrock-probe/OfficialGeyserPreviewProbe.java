@@ -9,11 +9,39 @@ public final class OfficialGeyserPreviewProbe extends JavaPlugin {
     public static final class CaptureSession {
         public Object registryCache;
         public Object getRegistryCache(){return registryCache;}
+        public Object javaRegistries(){return registryCache;}
         public final java.util.List<Object> packets=new java.util.ArrayList<>();
         public boolean isClosed(){return false;}
         public boolean isSpawned(){return true;}
         public void executeInEventLoop(Runnable task){task.run();}
         public void sendUpstreamPacket(Object packet){packets.add(packet);}
+    }
+    public static final class RegistryProvider {
+        private final Object registry;
+        public RegistryProvider(Object registry){this.registry=registry;}
+        public Object registry(Object key){return registry;}
+    }
+    private Object registryKey(com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport transport)throws Exception {
+        return transport.type("org.geysermc.geyser.registry.java.JavaRegistries").getField("BIOME").get(null);
+    }
+    private Object newRegistry(com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport transport,Object key)throws Exception {
+        return transport.type("org.geysermc.geyser.registry.java.SimpleJavaRegistry").getConstructors()[0].newInstance(key);
+    }
+    private Object entry(com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport transport,Object key,int id,String name,int data)throws Exception {
+        var registry=newRegistry(transport,key);
+        Object resource=com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(transport.type("org.geysermc.geyser.util.MinecraftKey"),"key",name);
+        com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(registry,"register",id,resource,data);
+        com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(registry,"freeze");
+        return ((java.util.Optional<?>)com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(registry,"getById",id)).orElseThrow();
+    }
+    private java.util.List<?> entries(Object registry)throws Exception {
+        var entries=new java.util.ArrayList<Object>();
+        com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(registry,"forEachEntry",(java.util.function.Consumer<Object>)entries::add);return entries;
+    }
+    private void reset(Object registry,java.util.List<?> entries)throws Exception {
+        com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(registry,"clear");
+        for(Object entry:entries)com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(registry,"register",entry);
+        com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(registry,"freeze");
     }
     public void onEnable(){Bukkit.getScheduler().runTaskLater(this,this::check,100L);}
     void require(boolean value,String message){if(!value)throw new IllegalStateException(message);}
@@ -74,38 +102,35 @@ public final class OfficialGeyserPreviewProbe extends JavaPlugin {
             Object base=baselineDefinitions.get("minecraft:plains");
             require(water.getAlpha()==((java.awt.Color)com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(base,"getMapWaterColor")).getAlpha(),"Water opacity inherited from vanilla");
             require(baselineDefinitions.equals(com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(baseline,"getDefinitions")),"Global Geyser biome definitions untouched");
-            var cache=transport.type("org.geysermc.geyser.session.cache.RegistryCache").getConstructors()[0].newInstance(new Object[]{null});
-            Object key=transport.type("org.geysermc.geyser.session.cache.registry.JavaRegistries").getField("BIOME").get(null);
-            Object registry=com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(cache,"registry",key);
-            var entryType=transport.type("org.geysermc.geyser.session.cache.registry.RegistryEntryData");
-            var keyType=transport.type("org.geysermc.geyser.util.MinecraftKey");
-            Object vanillaEntry=entryType.getConstructors()[0].newInstance(0,com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(keyType,"key","minecraft:plains"),1);
-            Object terraEntry=entryType.getConstructors()[0].newInstance(1,com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(keyType,"key",profile.id()),-1);
-            com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(registry,"reset",java.util.List.of(vanillaEntry,terraEntry));captured.registryCache=cache;
+            Object key=registryKey(transport);Object registry=newRegistry(transport,key);
+            var cache=new RegistryProvider(registry);
+            Object vanillaEntry=entry(transport,key,0,"minecraft:plains",1);
+            Object terraEntry=entry(transport,key,1,profile.id(),-1);
+            reset(registry,java.util.List.of(vanillaEntry,terraEntry));captured.registryCache=cache;
             var change=nativeTransport.install(captured,plan);
             require(nativeTransport.ownedMappings(change)==1,"Native mapping ownership tracked");
             require(captured.packets.get(captured.packets.size()-1)==plan.packet(),"Native definition packet submitted before remapping chunks");
-            var changed=(java.util.List<?>)com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(registry,"entries");
+            var changed=(java.util.List<?>)entries(registry);
             require(changed.get(0)==vanillaEntry && changed.get(1)!=terraEntry,"Only native Terra entry changed, vanilla entry preserved");
             require(nativeTransport.restore(change)==1,"Session mapping restored");
-            require(((java.util.List<?>)com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(registry,"entries")).get(1)==terraEntry,"Original Terra entry restored exactly");
+            require(((java.util.List<?>)entries(registry)).get(1)==terraEntry,"Original Terra entry restored exactly");
             var secondChange=nativeTransport.install(captured,plan);
-            Object foreign=entryType.getConstructors()[0].newInstance(1,com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(keyType,"key",profile.id()),17);
-            com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(registry,"reset",java.util.List.of(vanillaEntry,foreign));
+            Object foreign=entry(transport,key,1,profile.id(),17);
+            reset(registry,java.util.List.of(vanillaEntry,foreign));
             require(!nativeTransport.canReapply(secondChange),"Automatic reapply refuses another integration's changed mapping");
             require(nativeTransport.restore(secondChange)==0,"Restore preserves a later mapping owned by another integration");
             // A respawn/reconnect may replace the registry object, not merely reset its entries.
-            var replacementCache=transport.type("org.geysermc.geyser.session.cache.RegistryCache").getConstructors()[0].newInstance(new Object[]{null});
-            var replacementRegistry=com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(replacementCache,"registry",key);
-            com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(registry,"reset",java.util.List.of(vanillaEntry,terraEntry));
+            Object replacementRegistry=newRegistry(transport,key);
+            var replacementCache=new RegistryProvider(replacementRegistry);
+            reset(registry,java.util.List.of(vanillaEntry,terraEntry));
             captured.registryCache=cache;var beforeReplacement=nativeTransport.install(captured,plan);
-            com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(replacementRegistry,"reset",java.util.List.of(vanillaEntry,terraEntry));
+            reset(replacementRegistry,java.util.List.of(vanillaEntry,terraEntry));
             captured.registryCache=replacementCache;
             require(!nativeTransport.isCurrent(captured,beforeReplacement),"Replaced connection registry is detected");
             require(nativeTransport.canReapply(captured,beforeReplacement),"Clean replacement registry is eligible for automatic repair");
-            com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(replacementRegistry,"reset",java.util.List.of(vanillaEntry,foreign));
+            reset(replacementRegistry,java.util.List.of(vanillaEntry,foreign));
             require(!nativeTransport.canReapply(captured,beforeReplacement),"Replacement registry owned by another integration is preserved");
-            com.dfsek.terra.bukkit.bedrock.GeyserPositionTransport.call(replacementRegistry,"reset",java.util.List.of(vanillaEntry,terraEntry));
+            reset(replacementRegistry,java.util.List.of(vanillaEntry,terraEntry));
             var replacementChange=nativeTransport.install(captured,plan);
             require(nativeTransport.isCurrent(captured,replacementChange) && nativeTransport.ownedMappings(replacementChange)==1,"Replacement connection repaired using official registry API");
             nativeTransport.restore(replacementChange);nativeTransport.restore(beforeReplacement);

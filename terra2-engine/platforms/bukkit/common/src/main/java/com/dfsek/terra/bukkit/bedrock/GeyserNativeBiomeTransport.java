@@ -18,9 +18,15 @@ public final class GeyserNativeBiomeTransport {
         Map.entry("windswept_hills","extreme_hills"),Map.entry("windswept_savanna","savanna_mutated"),Map.entry("wooded_badlands","mesa_plateau_stone"),
         Map.entry("end_barrens","the_end"),Map.entry("end_highlands","the_end"),Map.entry("end_midlands","the_end"),Map.entry("small_end_islands","the_end"),Map.entry("the_void","ocean"));
     private final GeyserPositionTransport transport;
+    private final boolean modern;
     public record Plan(Object packet, Map<String,Integer> ids, Map<String,Object> definitions) {}
     public record Change(Object registry, Map<Integer,Object> original, Map<Integer,Object> installed) {}
-    public GeyserNativeBiomeTransport(GeyserPositionTransport transport){this.transport=transport;}
+    public GeyserNativeBiomeTransport(GeyserPositionTransport transport){
+        this.transport=transport;boolean found;
+        try{transport.type("org.geysermc.geyser.registry.java.JavaRegistryKey");found=true;}
+        catch(ClassNotFoundException absent){found=false;}
+        modern=found;
+    }
     public Plan plan(Map<String,String> references,Map<String,VisualProfile> profiles) throws Exception {
         if(references.isEmpty() || references.size()>1024)throw new IllegalArgumentException("Native preview needs 1..1024 world biomes");
         Object holder=transport.type("org.geysermc.geyser.registry.Registries").getField("BIOMES").get(null);
@@ -69,28 +75,56 @@ public final class GeyserNativeBiomeTransport {
     }
     public Change install(Object session,Plan plan) throws Exception {
         Object registry=registry(session);
-        var entries=new ArrayList<Object>((List<?>)call(registry,"entries"));
+        var entries=new ArrayList<Object>(entries(registry));
         var original=new HashMap<Integer,Object>();var installed=new HashMap<Integer,Object>();
         for(int i=0;i<entries.size();i++) {
             Object entry=entries.get(i);String name=(String)call(call(entry,"key"),"asString");Integer target=plan.ids().get(name);if(target==null)continue;
             int networkId=(Integer)call(entry,"id");if(networkId!=i)throw new IllegalStateException("Unexpected Java registry entry order");
-            Object replacement=transport.type("org.geysermc.geyser.session.cache.registry.RegistryEntryData").getConstructors()[0].newInstance(networkId,call(entry,"key"),target);
+            Object replacement=replacement(entry,target);
             original.put(i,entry);installed.put(i,replacement);entries.set(i,replacement);
         }
         if(original.isEmpty())throw new IllegalStateException("No native Terra biome IDs in this connection. VANILLA_COMPATIBLE cannot use this prototype");
         // Definitions must precede chunks referring to their IDs. Late acceptance requires a real-client test.
-        call(session,"sendUpstreamPacket",plan.packet());call(registry,"reset",entries);
+        call(session,"sendUpstreamPacket",plan.packet());reset(registry,entries);
         return new Change(registry,Map.copyOf(original),Map.copyOf(installed));
     }
     private Object registry(Object session) throws Exception {
-        Object cache=call(session,"getRegistryCache");
-        Object key=transport.type("org.geysermc.geyser.session.cache.registry.JavaRegistries").getField("BIOME").get(null);
+        Object cache=call(session,modern?"javaRegistries":"getRegistryCache");
+        Object key=transport.type(modern?"org.geysermc.geyser.registry.java.JavaRegistries":
+            "org.geysermc.geyser.session.cache.registry.JavaRegistries").getField("BIOME").get(null);
         return call(cache,"registry",key);
+    }
+    private List<?> entries(Object registry) throws Exception {
+        if(!modern)return (List<?>)call(registry,"entries");
+        var result=new ArrayList<Object>();
+        call(registry,"forEachEntry",(java.util.function.Consumer<Object>)result::add);
+        return result;
+    }
+    private Object replacement(Object original,int target) throws Exception {
+        if(!modern)return transport.type("org.geysermc.geyser.session.cache.registry.RegistryEntryData")
+            .getConstructors()[0].newInstance(call(original,"id"),call(original,"key"),target);
+        Object key=transport.type("org.geysermc.geyser.registry.java.JavaRegistries").getField("BIOME").get(null);
+        Object temporary=transport.type("org.geysermc.geyser.registry.java.SimpleJavaRegistry").getConstructors()[0].newInstance(key);
+        call(temporary,"register",call(original,"id"),call(original,"key"),target);call(temporary,"freeze");
+        return ((Optional<?>)call(temporary,"getById",call(original,"id"))).orElseThrow();
+    }
+    /** Rebuild only this connection's mutable biome registry, retaining untouched entry objects. */
+    private void reset(Object registry,List<?> replacement) throws Exception {
+        if(!modern){call(registry,"reset",replacement);return;}
+        var before=entries(registry);
+        try{write(registry,replacement);}
+        catch(Exception | LinkageError failed){
+            try{write(registry,before);}catch(Exception | LinkageError rollback){failed.addSuppressed(rollback);}
+            throw failed;
+        }
+    }
+    private void write(Object registry,List<?> entries) throws Exception {
+        call(registry,"clear");for(Object entry:entries)call(registry,"register",entry);call(registry,"freeze");
     }
     public boolean isCurrent(Object session,Change change) throws Exception {return registry(session)==change.registry();}
     public boolean canReapply(Object session,Change change) throws Exception {
         if(isCurrent(session,change))return canReapply(change);
-        var entries=(List<?>)call(registry(session),"entries");
+        var entries=entries(registry(session));
         for(var e:change.original().entrySet()) {
             if(e.getKey()>=entries.size())return false;
             Object current=entries.get(e.getKey());
@@ -100,12 +134,12 @@ public final class GeyserNativeBiomeTransport {
         return true;
     }
     public int ownedMappings(Change change) throws Exception {
-        var entries=(List<?>)call(change.registry(),"entries");int count=0;
+        var entries=entries(change.registry());int count=0;
         for(var e:change.installed().entrySet())if(e.getKey()<entries.size() && entries.get(e.getKey())==e.getValue())count++;
         return count;
     }
     public boolean canReapply(Change change) throws Exception {
-        var entries=(List<?>)call(change.registry(),"entries");
+        var entries=entries(change.registry());
         for(var e:change.installed().entrySet()) {
             if(e.getKey()>=entries.size())return false;Object current=entries.get(e.getKey());
             if(current==e.getValue())continue;Object original=change.original().get(e.getKey());
@@ -114,10 +148,10 @@ public final class GeyserNativeBiomeTransport {
         return true;
     }
     public int restore(Change change) throws Exception {
-        var entries=new ArrayList<Object>((List<?>)call(change.registry(),"entries"));int restored=0;
+        var entries=new ArrayList<Object>(entries(change.registry()));int restored=0;
         for(var e:change.installed().entrySet()) {
             int i=e.getKey();if(i<entries.size() && entries.get(i)==e.getValue()){entries.set(i,change.original().get(i));restored++;}
         }
-        if(restored>0)call(change.registry(),"reset",entries);return restored;
+        if(restored>0)reset(change.registry(),entries);return restored;
     }
 }

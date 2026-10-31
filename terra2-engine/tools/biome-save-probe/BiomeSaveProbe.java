@@ -40,6 +40,11 @@ public final class BiomeSaveProbe extends JavaPlugin {
                 throw new IllegalStateException("Could not unload test chunk after transient tickets expired");
             }
             report.addProperty("unloaded",true);
+            String unloaded=world.getBiome(320,world.getMinHeight(),320).getKey().toString();
+            String expected=wrapper.biomeCompatibility().identity(wrapper.getPack().getBiomeProvider()
+                .getBiome(320,world.getMinHeight(),320,world.getSeed())).registeredId();
+            if(!unloaded.equals(expected))throw new IllegalStateException("Unloaded biome resolver mismatch: "+unloaded+" expected="+expected);
+            report.addProperty("unloadedResolverChecked",true);
             world.getChunkAt(20,20);
             String after=snapshot(world,wrapper,report);
             if(!before.equals(after))throw new IllegalStateException("Actual saved biomes changed on chunk unload/reload");
@@ -67,13 +72,17 @@ public final class BiomeSaveProbe extends JavaPlugin {
     }
     private String snapshot(World world,BukkitChunkGeneratorWrapper wrapper,JsonObject report)throws Exception {
         var digest=MessageDigest.getInstance("SHA-256");int count=0;Set<String> observed=new TreeSet<>();
-        for(var c:chunks)for(int y=world.getMinHeight();y<world.getMaxHeight();y+=4)for(int dz=0;dz<16;dz+=4)for(int dx=0;dx<16;dx+=4) {
+        for(var c:chunks) {
+          var snapshot=world.getChunkAt(c[0],c[1]).getChunkSnapshot(false,true,false);
+          for(int y=world.getMinHeight();y<world.getMaxHeight();y+=4)for(int dz=0;dz<16;dz+=4)for(int dx=0;dx<16;dx+=4) {
             int x=(c[0]<<4)+dx,z=(c[1]<<4)+dz;
-            String actual=world.getBiome(x,y,z).getKey().toString();
+            String actual=snapshot.getBiome(dx,y,dz).getKey().toString();
             String expected=wrapper.biomeCompatibility().identity(wrapper.getPack().getBiomeProvider().getBiome(x,y,z,world.getSeed())).registeredId();
             if(!actual.equals(expected))throw new IllegalStateException("Actual chunk biome mismatch at "+x+","+y+","+z+": saved="+actual+" expected="+expected);
             digest.update((actual+"\n").getBytes(StandardCharsets.UTF_8));observed.add(actual);count++;
+          }
         }
+        report.addProperty("loadedChunkSnapshots",true);
         var terra=(TerraBukkitPlugin)Bukkit.getPluginManager().getPlugin("Terra2");
         var colors=new TreeMap<>(terra.platform().bedrockBiomeAppearances());
         JsonObject registry=new JsonObject();
