@@ -123,6 +123,8 @@ def run_server(phase):
         def command(s): process.stdin.write(s + '\n'); process.stdin.flush()
         try:
             wait(process, lambda: 'Done (' in log(), 'server ready', 420)
+            if 'Error occurred while enabling Terra2' in log() or 'Disabling Terra2 v' in log():
+                raise RuntimeError('Terra2 failed during startup; inspect ' + str(logfile))
             if phase == 'create':
                 for id, source in [('SmokeNative', 'smoke-pack.zip'), ('DNTNative', 'dnt.zip')]:
                     command(f'terra2 convert {id} {source}')

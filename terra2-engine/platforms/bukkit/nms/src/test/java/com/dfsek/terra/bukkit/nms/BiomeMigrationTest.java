@@ -23,6 +23,34 @@ class BiomeMigrationTest {
         assertNotNull(Reflection.MAPPED_REGISTRY);
         assertNotNull(Reflection.VILLAGER_TYPE);
     }
+    @Test void parsesLegacyAndModernBlockParticleOptions() throws Exception {
+        var legacy=com.dfsek.terra.bukkit.nms.config.BiomeParticleConfigTemplate.parse(
+            "minecraft:falling_dust{block_state:{Name:'minecraft:snow_block'}}");
+        var modern=com.dfsek.terra.bukkit.nms.config.BiomeParticleConfigTemplate.parse(
+            "minecraft:falling_dust{block_state:{id:'minecraft:snow_block'}}");
+        assertEquals(net.minecraft.world.level.block.Blocks.SNOW_BLOCK.defaultBlockState(),
+            ((net.minecraft.core.particles.BlockParticleOption)legacy).getState());
+        assertEquals(((net.minecraft.core.particles.BlockParticleOption)legacy).getState(),
+            ((net.minecraft.core.particles.BlockParticleOption)modern).getState());
+        assertNotNull(com.dfsek.terra.bukkit.nms.config.BiomeParticleConfigTemplate.parse("minecraft:ash"));
+    }
+
+    @Test void wrapsModernEntityLootModifierWithoutChangingChestTables() throws Exception {
+        var entity=net.minecraft.world.level.storage.loot.LootTable.lootTable()
+            .setParamSet(net.minecraft.world.level.storage.loot.parameters.LootContextParamSets.ENTITY).build();
+        var chest=net.minecraft.world.level.storage.loot.LootTable.lootTable()
+            .setParamSet(net.minecraft.world.level.storage.loot.parameters.LootContextParamSets.CHEST).build();
+        var field=net.minecraft.world.level.storage.loot.LootTable.class.getDeclaredField("modifier");
+        field.setAccessible(true);
+        NativeEntityLootBridge.wrap(entity,"test:entity",null);
+        Object wrapped=field.get(entity);
+        assertTrue(((java.util.Optional<?>)wrapped).isPresent());
+        NativeEntityLootBridge.wrap(entity,"test:entity",null);
+        assertSame(wrapped,field.get(entity));
+        NativeEntityLootBridge.wrap(chest,"test:chest",null);
+        assertTrue(((java.util.Optional<?>)field.get(chest)).isEmpty());
+    }
+
     private Biome original() {
         return new Biome.BiomeBuilder().hasPrecipitation(false).temperature(0.7f).downfall(0.2f)
             .setAttribute(EnvironmentAttributes.FOG_COLOR, NativeColor.rgb(0x123456))
