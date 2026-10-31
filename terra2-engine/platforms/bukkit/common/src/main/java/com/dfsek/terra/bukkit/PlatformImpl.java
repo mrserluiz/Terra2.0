@@ -45,7 +45,7 @@ import com.dfsek.terra.bukkit.world.BukkitPlatformBiome;
 public class PlatformImpl extends AbstractPlatform {
 
     public java.util.Map<String, com.google.gson.JsonObject> bedrockBiomeAppearances() {
-        throw new IllegalStateException("A exportação de biomas requer o adaptador nativo Paper 26.2");
+        throw new IllegalStateException("A exportação de biomas requer o adaptador nativo Paper 26.3");
     }
 
     /** Whether world-init installs the native pack biome source before chunk generation. */

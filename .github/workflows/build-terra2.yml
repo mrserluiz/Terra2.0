@@ -19,8 +19,8 @@ permissions:
   contents: read
 
 jobs:
-  official-26-2:
-    name: Official Paper 26.2
+  official-26-3:
+    name: Thin controller / Paper 26.3
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -59,8 +59,8 @@ jobs:
           path: terra2-plugin/target/Terra2-*.jar
           if-no-files-found: error
 
-  compatibility-26-3:
-    name: Compatibility Paper 26.3
+  legacy-controller-26-2:
+    name: Thin controller / legacy Paper 26.2
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -76,11 +76,11 @@ jobs:
           java-version: '25'
           cache: maven
 
-      - name: Test against Paper 26.3
-        run: mvn --batch-mode --no-transfer-progress '-Dpaper.version=[26.3.build,26.4.build)' verify
+      - name: Test thin controller against legacy Paper 26.2
+        run: mvn --batch-mode --no-transfer-progress '-Dpaper.version=[26.2.build,26.3.build)' verify
 
-  recovered-engine-26-2:
-    name: Recovered engine / Paper 26.2
+  native-engine-26-3:
+    name: Native engine / Paper 26.3
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -137,8 +137,8 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: Terra2-engine-experimental-26.2
-          path: terra2-engine/platforms/bukkit/build/libs/Terra2-bukkit-7.3.5-BETA.jar
+          name: Terra2-engine-Paper-26.3
+          path: terra2-engine/platforms/bukkit/build/libs/Terra2-bukkit-7.4.0-BETA.jar
           if-no-files-found: error
 
       - name: Upload real registry biome mappings
@@ -181,7 +181,7 @@ jobs:
 
   bedrock-official-geyser:
     name: Position preview / official Geyser
-    needs: recovered-engine-26-2
+    needs: native-engine-26-3
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -191,12 +191,12 @@ jobs:
           java-version: '25'
       - uses: actions/download-artifact@v4
         with:
-          name: Terra2-engine-experimental-26.2
+          name: Terra2-engine-Paper-26.3
           path: terra2-engine/platforms/bukkit/build/libs
       - name: Resolve Paper API for the runtime probe
         run: |
           mkdir -p /tmp/terra2-probe-api
-          printf '%s\n' '<project><modelVersion>4.0.0</modelVersion><groupId>org.terra2</groupId><artifactId>probe</artifactId><version>1</version><repositories><repository><id>paper</id><url>https://repo.papermc.io/repository/maven-public/</url></repository></repositories><dependencies><dependency><groupId>io.papermc.paper</groupId><artifactId>paper-api</artifactId><version>26.2.build.133-stable</version></dependency></dependencies></project>' > /tmp/terra2-probe-api/pom.xml
+          printf '%s\n' '<project><modelVersion>4.0.0</modelVersion><groupId>org.terra2</groupId><artifactId>probe</artifactId><version>1</version><repositories><repository><id>paper</id><url>https://repo.papermc.io/repository/maven-public/</url></repository></repositories><dependencies><dependency><groupId>io.papermc.paper</groupId><artifactId>paper-api</artifactId><version>26.3.build.231-stable</version></dependency></dependencies></project>' > /tmp/terra2-probe-api/pom.xml
           mvn --batch-mode --no-transfer-progress --file /tmp/terra2-probe-api/pom.xml dependency:copy-dependencies -DoutputDirectory="$HOME/.gradle/caches/terra2-probe-api"
       - name: Test official Geyser registration, packets, position identity and restart
         run: python3 terra2-engine/tools/paper-official-geyser-smoke.py
@@ -212,9 +212,9 @@ jobs:
             terra2-engine/build/official-geyser-smoke/plugins/Terra2/reports/**
           if-no-files-found: warn
 
-  climate-integration-26-2:
+  climate-integration-26-3:
     name: Climate bridge protocol (experimental receiver fixture)
-    needs: recovered-engine-26-2
+    needs: native-engine-26-3
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -235,7 +235,7 @@ jobs:
       - name: Download independently tested Terra2 engine
         uses: actions/download-artifact@v4
         with:
-          name: Terra2-engine-experimental-26.2
+          name: Terra2-engine-Paper-26.3
           path: terra2-engine/platforms/bukkit/build/libs
       - name: Build generic consumer and separate addon
         run: |
@@ -246,7 +246,7 @@ jobs:
       - name: Upload optional integration JARs
         uses: actions/upload-artifact@v4
         with:
-          name: Terra2-climate-bridge-26.2
+          name: Terra2-climate-bridge-26.3
           path: |
             integrations/aeternum/target/Terra2AeternumBridge-1.0.1-BETA.jar
           if-no-files-found: error

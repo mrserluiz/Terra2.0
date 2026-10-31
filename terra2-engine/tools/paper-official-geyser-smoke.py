@@ -8,7 +8,7 @@ SERVER=ROOT/'build/official-geyser-smoke';PLUGINS=SERVER/'plugins';PLUGINS.mkdir
 def fetch(url):
     req=urllib.request.Request(url,headers={'User-Agent':'Terra2-CI/1.0 (https://github.com/mrserluiz/Terra2.0)'})
     with urllib.request.urlopen(req,timeout=90) as r:return r.read()
-build=next(b for b in json.loads(fetch('https://fill.papermc.io/v3/projects/paper/versions/26.2/builds')) if b['id']==133)
+build=next(b for b in json.loads(fetch('https://fill.papermc.io/v3/projects/paper/versions/26.3/builds')) if b['id']==231)
 download=build['downloads']['server:default'];data=fetch(download['url']);assert hashlib.sha256(data).hexdigest()==download['checksums']['sha256'];(SERVER/'paper.jar').write_bytes(data)
 meta=json.loads(fetch('https://download.geysermc.org/v2/projects/geyser/versions/2.11.3/builds/1251'))
 version=meta['version'];number=meta['build'];info=meta['downloads']['spigot']
@@ -20,7 +20,7 @@ fawe=fetch('https://cdn.modrinth.com/data/z4HZZnLr/versions/b9Fl6Ct5/FastAsyncWo
 assert hashlib.sha512(fawe).hexdigest()=='239344f1e906aac37ffed4939ea30a5ba1a1a3935dd4930067e25b8f9864b081ce3ad72473f4a93af8235a70824900649c4450983b2b3dda57d2df655ea3cb4b'
 (PLUGINS/'FastAsyncWorldEdit.jar').write_bytes(fawe)
 
-terra=ROOT/'platforms/bukkit/build/libs/Terra2-bukkit-7.3.5-BETA.jar';shutil.copy(terra,PLUGINS/terra.name)
+terra=ROOT/'platforms/bukkit/build/libs/Terra2-bukkit-7.4.0-BETA.jar';shutil.copy(terra,PLUGINS/terra.name)
 td=PLUGINS/'Terra2';(td/'packs').mkdir(parents=True,exist_ok=True);(td/'bedrock').mkdir(exist_ok=True)
 shutil.copy(ROOT/'tools/fixtures/HYDRAXIA.zip',td/'packs/HYDRAXIA.zip')
 (td/'bedrock/preview.enabled').write_text('terra2-position-preview-v1')
@@ -32,7 +32,7 @@ classes=SERVER/'probe-classes';classes.mkdir(exist_ok=True)
 cp=os.pathsep.join([str(terra)]+[str(p) for p in (pathlib.Path.home()/'.gradle/caches').rglob('*.jar')])
 args=SERVER/'javac.args';args.write_text('\n'.join('"'+s.replace('\\','\\\\').replace('"','\\"')+'"' for s in ['-cp',cp,'-d',str(classes),str(ROOT/'tools/bedrock-probe/OfficialGeyserPreviewProbe.java')]))
 subprocess.run(['javac','@'+str(args)],check=True)
-(classes/'plugin.yml').write_text('name: OfficialGeyserPreviewProbe\nversion: 1\nmain: OfficialGeyserPreviewProbe\napi-version: "26.2"\ndepend: [Terra2, Geyser-Spigot]\n')
+(classes/'plugin.yml').write_text('name: OfficialGeyserPreviewProbe\nversion: 1\nmain: OfficialGeyserPreviewProbe\napi-version: "26.3"\ndepend: [Terra2, Geyser-Spigot]\n')
 subprocess.run(['jar','--create','--file',str(PLUGINS/'OfficialGeyserPreviewProbe.jar'),'-C',str(classes),'.'],check=True)
 (SERVER/'eula.txt').write_text('eula=true\n');(SERVER/'server.properties').write_text('server-ip=127.0.0.1\nonline-mode=false\nview-distance=2\nsimulation-distance=2\nmax-players=1\nspawn-protection=0\n')
 for phase in ('create','restart'):

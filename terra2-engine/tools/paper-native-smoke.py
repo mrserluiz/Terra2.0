@@ -149,8 +149,8 @@ def main():
     jars = list((ROOT / 'platforms/bukkit/build/libs').glob('Terra2-bukkit-*-BETA.jar'))
     if len(jars) != 1: raise RuntimeError('Expected exactly one engine JAR')
     shutil.copy(jars[0], SERVER / 'plugins' / jars[0].name)
-    builds = api('https://fill.papermc.io/v3/projects/paper/versions/26.2/builds')
-    build = next(b for b in builds if b['channel'] == 'STABLE')
+    builds = api('https://fill.papermc.io/v3/projects/paper/versions/26.3/builds')
+    build = next(b for b in builds if b['id'] == 231)
     server = build['downloads']['server:default']
     checksum = server.get('checksums', {}).get('sha256')
     download(server['url'], SERVER / 'paper.jar', 'sha256', checksum)
@@ -167,7 +167,7 @@ def main():
     arguments.write_text('\n'.join('"' + arg.replace('\\', '\\\\').replace('"', '\\"') + '"'
         for arg in ['-cp', cp, '-d', str(classes), str(ROOT / 'tools/native-probe/NativeIntegrationProbe.java')]))
     subprocess.run(['javac', '@' + str(arguments)], check=True)
-    (classes / 'plugin.yml').write_text("name: Terra2NativeProbe\nversion: '1'\nmain: NativeIntegrationProbe\napi-version: '26.2'\ndepend: [Terra2]\ncommands:\n  nativeprobe: {}\n")
+    (classes / 'plugin.yml').write_text("name: Terra2NativeProbe\nversion: '1'\nmain: NativeIntegrationProbe\napi-version: '26.3'\ndepend: [Terra2]\ncommands:\n  nativeprobe: {}\n")
     subprocess.run(['jar', '--create', '--file', str(SERVER / 'plugins/NativeProbe.jar'), '-C', str(classes), '.'], check=True)
     (SERVER / 'eula.txt').write_text('eula=true\n')
     (SERVER / 'server.properties').write_text('online-mode=false\nview-distance=2\nsimulation-distance=2\nmax-players=2\nspawn-protection=0\n')
@@ -177,6 +177,6 @@ def main():
     with (PLUGIN / 'terra2-settings.yml').open('a') as settings:
         settings.write('  terra2_hydraxia_smoke:\n    pack: HYDRAXIA\n')
     run_server('create'); run_server('restart')
-    (SERVER / 'result.json').write_text(json.dumps({'status': 'PASSED', 'paper': '26.2', 'jigsaw': True, 'processors': True, 'nativeLoot': True, 'saveRestart': True}, indent=2))
+    (SERVER / 'result.json').write_text(json.dumps({'status': 'PASSED', 'paper': '26.3', 'jigsaw': True, 'processors': True, 'nativeLoot': True, 'saveRestart': True}, indent=2))
 
 if __name__ == '__main__': main()

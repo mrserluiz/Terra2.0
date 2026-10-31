@@ -1,13 +1,10 @@
 name: Verify Bedrock against an unchanged engine artifact
 on:
-  push:
-    paths: ['.github/workflows/verify-bedrock-artifact.yml']
   workflow_dispatch:
     inputs:
       binary_run:
         description: 'Build run with a successful engine job and identical engine source'
         required: true
-        default: '39041592458'
 permissions:
   contents: read
   actions: read
@@ -16,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ github.token }}
-      BINARY_RUN: ${{ inputs.binary_run || '39041592458' }}
+      BINARY_RUN: ${{ inputs.binary_run }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -30,7 +27,7 @@ jobs:
           binary_sha=$(gh api "repos/${{ github.repository }}/actions/runs/$BINARY_RUN" --jq .head_sha)
           git diff --exit-code "$binary_sha" HEAD -- terra2-engine ':(exclude)terra2-engine/tools/**'
           for attempt in $(seq 1 60); do
-            conclusion=$(gh api "repos/${{ github.repository }}/actions/runs/$BINARY_RUN/jobs" --jq '.jobs[] | select(.name == "Recovered engine / Paper 26.2") | .conclusion')
+            conclusion=$(gh api "repos/${{ github.repository }}/actions/runs/$BINARY_RUN/jobs" --jq '.jobs[] | select(.name == "Native engine / Paper 26.3") | .conclusion')
             if [ "$conclusion" = "success" ]; then exit 0; fi
             if [ "$conclusion" != "null" ] && [ -n "$conclusion" ]; then exit 1; fi
             sleep 5
@@ -38,14 +35,14 @@ jobs:
           exit 1
       - uses: actions/download-artifact@v4
         with:
-          name: Terra2-engine-experimental-26.2
+          name: Terra2-engine-Paper-26.3
           path: terra2-engine/platforms/bukkit/build/libs
           run-id: ${{ env.BINARY_RUN }}
           github-token: ${{ github.token }}
       - name: Resolve Paper API for the runtime probe
         run: |
           mkdir -p /tmp/terra2-probe-api
-          printf '%s\n' '<project><modelVersion>4.0.0</modelVersion><groupId>org.terra2</groupId><artifactId>probe</artifactId><version>1</version><repositories><repository><id>paper</id><url>https://repo.papermc.io/repository/maven-public/</url></repository></repositories><dependencies><dependency><groupId>io.papermc.paper</groupId><artifactId>paper-api</artifactId><version>26.2.build.133-stable</version></dependency></dependencies></project>' > /tmp/terra2-probe-api/pom.xml
+          printf '%s\n' '<project><modelVersion>4.0.0</modelVersion><groupId>org.terra2</groupId><artifactId>probe</artifactId><version>1</version><repositories><repository><id>paper</id><url>https://repo.papermc.io/repository/maven-public/</url></repository></repositories><dependencies><dependency><groupId>io.papermc.paper</groupId><artifactId>paper-api</artifactId><version>26.3.build.231-stable</version></dependency></dependencies></project>' > /tmp/terra2-probe-api/pom.xml
           mvn --batch-mode --no-transfer-progress --file /tmp/terra2-probe-api/pom.xml dependency:copy-dependencies -DoutputDirectory="$HOME/.gradle/caches/terra2-probe-api"
       - name: Test official Geyser registration, packets, position identity and restart
         run: python3 terra2-engine/tools/paper-official-geyser-smoke.py

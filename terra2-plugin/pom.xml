@@ -13,8 +13,8 @@
     <properties>
         <maven.compiler.release>25</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <!-- 26.2 remains the official build target. CI overrides this for 26.3 compatibility checks. -->
-        <paper.version>[26.2.build,26.3.build)</paper.version>
+        <!-- 26.3 is the current target. The separate controller also retains a legacy API compilation check. -->
+        <paper.version>26.3.build.231-stable</paper.version>
         <junit.version>5.11.4</junit.version>
     </properties>
 

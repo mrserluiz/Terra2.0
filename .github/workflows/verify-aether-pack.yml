@@ -22,7 +22,7 @@ jobs:
       - name: Resolve Paper API for the runtime probe
         run: |
           mkdir -p /tmp/terra2-probe-api
-          printf '%s\n' '<project><modelVersion>4.0.0</modelVersion><groupId>org.terra2</groupId><artifactId>probe</artifactId><version>1</version><repositories><repository><id>paper</id><url>https://repo.papermc.io/repository/maven-public/</url></repository></repositories><dependencies><dependency><groupId>io.papermc.paper</groupId><artifactId>paper-api</artifactId><version>26.2.build.133-stable</version></dependency></dependencies></project>' > /tmp/terra2-probe-api/pom.xml
+          printf '%s\n' '<project><modelVersion>4.0.0</modelVersion><groupId>org.terra2</groupId><artifactId>probe</artifactId><version>1</version><repositories><repository><id>paper</id><url>https://repo.papermc.io/repository/maven-public/</url></repository></repositories><dependencies><dependency><groupId>io.papermc.paper</groupId><artifactId>paper-api</artifactId><version>26.3.build.231-stable</version></dependency></dependencies></project>' > /tmp/terra2-probe-api/pom.xml
           mvn --batch-mode --no-transfer-progress --file /tmp/terra2-probe-api/pom.xml dependency:copy-dependencies -DoutputDirectory="$HOME/.gradle/caches/terra2-probe-api"
       - name: Load AETHER, generate islands and verify save/restart
         run: python3 terra2-engine/tools/paper-aether-smoke.py

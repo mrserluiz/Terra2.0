@@ -9,8 +9,8 @@ PLUGINS=SERVER/'plugins'; PLUGINS.mkdir(parents=True,exist_ok=True)
 UA='Terra2-CI/1.0 (https://github.com/mrserluiz/Terra2.0)'
 def fetch(url):
     with urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':UA}),timeout=90) as r: return r.read()
-builds=json.loads(fetch('https://fill.papermc.io/v3/projects/paper/versions/26.2/builds'))
-build=next(b for b in builds if b['id']==133)
+builds=json.loads(fetch('https://fill.papermc.io/v3/projects/paper/versions/26.3/builds'))
+build=next(b for b in builds if b['id']==231)
 download=build['downloads']['server:default']; binary=fetch(download['url'])
 assert hashlib.sha256(binary).hexdigest()==download['checksums']['sha256']
 (SERVER/'paper.jar').write_bytes(binary)
@@ -29,7 +29,7 @@ cp=os.pathsep.join([str(terra),str(aet),(REPO/'integration-aeternum/aeternum-bui
 args=SERVER/'javac.args'
 args.write_text('\n'.join('"'+s.replace('\\','\\\\').replace('"','\\"')+'"' for s in ['-cp',cp,'-d',str(classes),str(ROOT/'tools/climate-probe/ClimateIntegrationProbe.java')]))
 subprocess.run(['javac','@'+str(args)],check=True)
-(classes/'plugin.yml').write_text('name: ClimateIntegrationProbe\nversion: 1\nmain: ClimateIntegrationProbe\napi-version: "26.2"\ndepend: [Terra2, AeternumSeasons]\nsoftdepend: [Terra2AeternumBridge]\n')
+(classes/'plugin.yml').write_text('name: ClimateIntegrationProbe\nversion: 1\nmain: ClimateIntegrationProbe\napi-version: "26.3"\ndepend: [Terra2, AeternumSeasons]\nsoftdepend: [Terra2AeternumBridge]\n')
 subprocess.run(['jar','--create','--file',str(PLUGINS/'ClimateIntegrationProbe.jar'),'-C',str(classes),'.'],check=True)
 (SERVER/'eula.txt').write_text('eula=true\n')
 (SERVER/'server.properties').write_text('online-mode=false\nview-distance=2\nsimulation-distance=2\nmax-players=1\nspawn-protection=0\n')

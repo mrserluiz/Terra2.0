@@ -61,9 +61,9 @@ object Versions {
 //    }
     
     object Bukkit {
-        // 26.2 remains the supported production target. 26.3 is validated separately.
-        const val minecraft = "26.2"
-        const val nms = "$minecraft.build.+"
+        // Native adapter compiled and runtime-tested against the pinned Paper 26.3 build.
+        const val minecraft = "26.3"
+        const val nms = "$minecraft.build.231-stable"
         const val paperBuild = nms
         const val paper = paperBuild
         const val paperLib = "1.0.8"
