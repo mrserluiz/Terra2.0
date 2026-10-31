@@ -139,6 +139,47 @@ class NativeResourceGraphTest {
         assertEquals("Encontrada nesta dimensão", item.get(net.minecraft.core.component.DataComponents.LORE).lines().getFirst().getString());
         assertEquals("test:relic", item.get(net.minecraft.core.component.DataComponents.ITEM_MODEL).toString());
     }
+    @Test void migratesReferencedConditionalModifiersAndUniformCountRanges() throws Exception {
+        fixtures();
+        write("data/test/item_modifier/batch.json", """
+            [{"function":"minecraft:set_count","count":{"min":3,"max":3}}]
+            """);
+        write("data/test/predicate/eligible.json", """
+            [{"condition":"minecraft:random_chance","chance":1.0}]
+            """);
+        write("data/test/loot_table/referenced.json", """
+            {"type":"minecraft:chest","pools":[{"rolls":{"min":1,"max":1},
+              "conditions":[{"condition":"minecraft:reference","name":"test:eligible"}],
+              "entries":[{"type":"minecraft:item","name":"minecraft:stone","functions":[
+                {"function":"minecraft:reference","name":"test:batch","conditions":[
+                  {"condition":"minecraft:random_chance","chance":1.0}]}]}]}]}
+            """);
+        var graph=new NativeResourceGraph(ResourceBundle.read(directory),vanilla());
+        assertTrue(graph.report().valid(),()->String.join("\n",graph.report().errors()));
+        assertEquals(3,roll("test:referenced",graph).getFirst().getCount());
+        write("data/test/loot_table/referenced.json", """
+            {"type":"minecraft:chest","pools":[{"rolls":1,"entries":[{"type":"minecraft:item","name":"minecraft:stone","functions":[
+              {"function":"minecraft:reference","name":"test:batch","conditions":[
+                {"condition":"minecraft:random_chance","chance":0.0}]}]}]}]}
+            """);
+        var skipped=new NativeResourceGraph(ResourceBundle.read(directory),vanilla());
+        assertTrue(skipped.report().valid(),()->String.join("\n",skipped.report().errors()));
+        assertEquals(1,roll("test:referenced",skipped).getFirst().getCount());
+    }
+    @Test void migratesConfiguredFeatureFoldersProvidersAndPlacementOffsets() throws Exception {
+        fixtures();
+        write("data/test/worldgen/configured_feature/grass.json", """
+            {"type":"minecraft:simple_block","config":{"to_place":{"type":"minecraft:weighted_state_provider",
+              "entries":[{"data":{"Name":"minecraft:dirt"},"weight":1}]}}}
+            """);
+        write("data/test/worldgen/placed_feature/grass.json", """
+            {"feature":"test:grass","placement":[{"type":"minecraft:random_offset","xz_spread":0,"y_spread":0}]}
+            """);
+        var graph=new NativeResourceGraph(ResourceBundle.read(directory),vanilla());
+        assertTrue(graph.report().valid(),()->String.join("\n",graph.report().errors()));
+        assertEquals(1,graph.report().decoded().get("minecraft:worldgen/feature"));
+        assertTrue(graph.handledPaths().contains("data/test/worldgen/configured_feature/grass.json"));
+    }
     @Test void decodesInstrumentOptionsAsAnInstrumentTag() throws Exception {
         fixtures();
         write("data/test/tags/instrument/horns.json", "{\"replace\":true,\"values\":[\"minecraft:ponder_goat_horn\"]}");

@@ -22,6 +22,13 @@ class NativeJsonMigrationTest {
         assertEquals(migrated,NativeJsonMigration.migrate(migrated));
         assertTrue(legacy.getAsJsonObject().has("function"));
     }
+    @Test void preservesModernMapDestinationsAndOpaqueCustomData() {
+        var source=JsonParser.parseString("""
+            {"type":"minecraft:exploration_map","destination":["minecraft:mansion"],
+             "components":{"minecraft:custom_data":{"Name":"example","conditions":[1],"functions":[2]}}}
+            """);
+        assertEquals(source,NativeJsonMigration.migrate(source));
+    }
     @Test void migratesNestedEntityChecksWithoutRenamingFeatureOrItemTypes() {
         var source = JsonParser.parseString("""
             {"condition":"entity_properties","entity":"this","predicate":{

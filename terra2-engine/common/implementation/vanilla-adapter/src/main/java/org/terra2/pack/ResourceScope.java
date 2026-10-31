@@ -5,7 +5,7 @@ import java.util.*;
 
 /** Stable private identifiers. Codec types and jigsaw connector labels are never resource aliases. */
 public final class ResourceScope {
-    private static final Set<String> CODEC_FIELDS = Set.of("type", "function", "condition", "processor_type", "predicate_type", "element_type", "start_jigsaw_name",
+    private static final Set<String> CODEC_FIELDS = Set.of("type", "function", "processor_type", "predicate_type", "element_type", "start_jigsaw_name",
         "item_model", "minecraft:item_model", "asset_id", "texture", "translate");
     private final String fingerprint;
     private final Set<String> resources = new HashSet<>(), tags = new HashSet<>();

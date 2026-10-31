@@ -37,6 +37,11 @@ public final class NativeResourceGraph {
     private JsonElement inlineHolderSets(JsonElement json, String field) {
         if(json.isJsonObject()) {
             var object = json.getAsJsonObject(); var result = new JsonObject();
+            if(field.equals("tags") && object.has("id") && object.has("expected") && object.get("id").isJsonPrimitive()
+                && object.get("id").getAsString().startsWith("#")) {
+                result.add("id",tagEntries(Registries.DAMAGE_TYPE,object.get("id").getAsString()));
+                result.add("expected",object.get("expected"));return result;
+            }
             object.entrySet().forEach(entry -> {
                 String name = entry.getKey();
                 if(name.equals("options") && (!object.has("function") && !object.has("type") || !Set.of("minecraft:enchant_randomly", "minecraft:enchant_with_levels", "enchant_randomly", "enchant_with_levels")
@@ -49,6 +54,8 @@ public final class NativeResourceGraph {
         }
         if(!json.isJsonPrimitive() || !json.getAsJsonPrimitive().isString() || !json.getAsString().startsWith("#")) return json;
         return switch(field) {
+            case "destination" -> tagEntries(Registries.STRUCTURE, json.getAsString());
+            case "items" -> tagEntries(Registries.ITEM,json.getAsString());
             case "biomes", "preferred_biomes" -> tagEntries(Registries.BIOME, json.getAsString());
             case "supported_items", "primary_items" -> tagEntries(Registries.ITEM, json.getAsString());
             case "exclusive_set", "options" -> tagEntries(Registries.ENCHANTMENT, json.getAsString());
@@ -135,10 +142,13 @@ public final class NativeResourceGraph {
             for(String path : source.paths()) {
                 if(!path.startsWith("data/") || !path.endsWith(".json")) continue;
                 String namespace = path.split("/")[1]; String prefix = "data/" + namespace + "/";
-                if(codec != null && path.startsWith(prefix + category + "/")) {
-                    String id = namespace + ":" + path.substring((prefix + category + "/").length(), path.length() - 5);
+                String resourceCategory=category.equals("worldgen/feature") && path.startsWith(prefix+"worldgen/configured_feature/")
+                    ? "worldgen/configured_feature":category;
+                if(codec != null && path.startsWith(prefix + resourceCategory + "/")) {
+                    String id = namespace + ":" + path.substring((prefix + resourceCategory + "/").length(), path.length() - 5);
                     var resourceKey = ResourceKey.create(key, Identifier.parse(scope.privateId(id)));
-                    holders.put(resourceKey, Holder.Reference.createStandAlone(parent, resourceKey)); paths.put(resourceKey, path);
+                    if(paths.putIfAbsent(resourceKey,path)!=null)throw new IllegalArgumentException("Duplicate legacy/modern feature resource: "+id);
+                    holders.put(resourceKey, Holder.Reference.createStandAlone(parent, resourceKey));
                 }
                 if(path.startsWith(prefix + "tags/" + category + "/")) {
                     String id = namespace + ":" + path.substring((prefix + "tags/" + category + "/").length(), path.length() - 5);
@@ -163,7 +173,7 @@ public final class NativeResourceGraph {
         }
         void decode() {
             for(var entry : paths.entrySet()) try {
-                JsonElement json = inlineHolderSets(scope.rewrite(NativeJsonMigration.migrate(JsonParser.parseString(source.text(entry.getValue())))), "");
+                JsonElement json = inlineHolderSets(scope.rewrite(NativeJsonMigration.migrate(JsonParser.parseString(source.text(entry.getValue())),key.identifier().getPath())), "");
                 T value = codec.parse(ops, json).getOrThrow();
                 Reflection.REFERENCE.invokeBindValue(holders.get(entry.getKey()), value);
                 decoded.merge(key.identifier().toString(), 1, Integer::sum);
