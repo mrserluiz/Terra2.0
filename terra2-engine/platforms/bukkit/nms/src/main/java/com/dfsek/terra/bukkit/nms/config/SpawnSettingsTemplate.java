@@ -31,18 +31,17 @@ public class SpawnSettingsTemplate implements ObjectTemplate<MobSpawnSettings> {
     @Override
     public MobSpawnSettings get() {
         MobSpawnSettings.Builder builder = new MobSpawnSettings.Builder();
-        for(SpawnTypeConfig spawn : spawns) {
+        for(var category:MobCategory.values())builder.noSpawns(category);
+        for(SpawnTypeConfig spawn : spawns == null ? List.<SpawnTypeConfig>of() : spawns) {
             MobCategory group = spawn.getGroup();
             for(SpawnEntryConfig entry : spawn.getEntries()) {
-                builder.addSpawn(group, entry.getWeight(), entry.getSpawnEntry());
+                builder.addSpawn(entry.getSpawnEntry().type(), group, entry.getWeight(), entry.getSpawnEntry().count());
             }
         }
-        for(SpawnCostConfig cost : costs) {
-            builder.addMobCharge(cost.getType(), cost.getMass(), cost.getGravity());
+        for(SpawnCostConfig cost : costs == null ? List.<SpawnCostConfig>of() : costs) {
+            builder.addMobSpawnCost(cost.getType(), cost.getMass(), cost.getGravity());
         }
-        if(probability != null) {
-            builder.creatureGenerationProbability(probability);
-        }
+        // probability moved to the biome environment attribute in 26.3; the parent template applies it.
 
         return builder.build();
     }

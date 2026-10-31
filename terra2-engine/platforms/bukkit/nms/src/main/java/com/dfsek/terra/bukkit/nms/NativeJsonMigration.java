@@ -3,7 +3,7 @@ package com.dfsek.terra.bukkit.nms;
 import com.google.gson.*;
 import java.util.*;
 
-/** Typed 1.21-era JSON adaptations to 26.2, applied to a detached execution copy. */
+/** Typed legacy JSON adaptations to 26.3, applied to a detached execution copy. */
 public final class NativeJsonMigration {
     private NativeJsonMigration() {}
     public static JsonElement migrate(JsonElement original) { return visit(original.deepCopy()); }
@@ -15,6 +15,17 @@ public final class NativeJsonMigration {
         if(json.isJsonArray()) { var out = new JsonArray(); json.getAsJsonArray().forEach(value -> out.add(visit(value))); return out; }
         if(!json.isJsonObject()) return json;
         var object = json.getAsJsonObject();
+        String densityType=id(object,"type");
+        if(densityType.equals("minecraft:y_clamped_gradient")) {
+            object.addProperty("type","minecraft:gradient");object.addProperty("axis","y");
+            rename(object,"from_y","from_coordinate");rename(object,"to_y","to_coordinate");
+        }
+        if(Set.of("minecraft:add","minecraft:mul","minecraft:min","minecraft:max").contains(densityType)) {
+            rename(object,"argument1","left");rename(object,"argument2","right");
+        }
+        if(Set.of("minecraft:blend_density","minecraft:abs","minecraft:square","minecraft:cube","minecraft:half_negative",
+            "minecraft:quarter_negative","minecraft:squeeze","minecraft:clamp","minecraft:interpolated").contains(densityType))
+            rename(object,"argument","input");
         if(id(object, "condition").equals("minecraft:entity_properties") && object.has("predicate"))
             object.add("predicate", entity(object.getAsJsonObject("predicate")));
         if(id(object, "condition").equals("minecraft:time_check") && !object.has("clock"))
@@ -32,7 +43,16 @@ public final class NativeJsonMigration {
                     && config.get("replaceable").getAsString().equals("#minecraft:small_dripleaf_placeable"))
                 config.addProperty("replaceable", "#minecraft:supports_small_dripleaf");
         }
+        // 26.3 loot codecs use typed conditions/modifiers; inline lists retain all/sequence semantics.
+        String function=id(object,"function");
+        if(object.has("function"))rename(object,"function","type");
+        if(object.has("condition") && object.get("condition").isJsonPrimitive())rename(object,"condition","type");
+        if(!function.equals("minecraft:sequence"))rename(object,"functions","modifier");
+        rename(object,"conditions","condition");
         var result = new JsonObject(); object.entrySet().forEach(entry -> result.add(entry.getKey(), visit(entry.getValue()))); return result;
+    }
+    private static void rename(JsonObject object,String old,String modern) {
+        if(object.has(old) && !object.has(modern))object.add(modern,object.remove(old));
     }
     private static JsonObject entity(JsonObject old) {
         var out = new JsonObject();

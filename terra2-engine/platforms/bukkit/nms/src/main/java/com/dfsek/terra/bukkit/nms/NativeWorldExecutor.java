@@ -36,7 +36,7 @@ public final class NativeWorldExecutor {
     }
     public ChunkGeneratorStructureState placementState(ServerLevel level, ChunkGenerator generator, RandomState random) {
         assertWorld(level);
-        return ChunkGeneratorStructureState.createForNormal(random, level.getSeed(), generator.getBiomeSource(),
+        return ChunkGeneratorStructureState.createForNormal(random, level.getSeed(), generator.getOrigin(random), generator.getBiomeSource(),
             graph.sourceLookup(Registries.STRUCTURE_SET), level.spigotConfig);
     }
     public void verify(ServerLevel level) { assertWorld(level); }
@@ -47,7 +47,7 @@ public final class NativeWorldExecutor {
         assertWorld(level);
         var holder = graph.resource(Registries.STRUCTURE, structureId);
         requirePersistentAlias(registries, holder);
-        return holder.value().generate(holder, level.dimension(), registries, generator, generator.getBiomeSource(), random,
+        return holder.value().generate(holder, level.dimension(), registries, generator, generator.getBiomeSource(), random.createClimateSampler(net.minecraft.world.level.levelgen.densityfunction.SamplerContext.EMPTY_UNCACHED), random,
             templates, level.getSeed(), chunk, references, level, holder.value().biomes()::contains);
     }
     /** Native placement runs the pool elements' full processor lists, block/entity NBT and afterPlace handlers. */

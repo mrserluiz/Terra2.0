@@ -94,6 +94,10 @@ public class VanillaBiomeProperties implements ConfigTemplate, Properties {
     @Default
     private MobSpawnSettings spawnSettings = null;
 
+    @Value("spawning.probability") @Default
+    private Float creatureProbability = null;
+    public Float getCreatureProbability(){return creatureProbability;}
+
     @Value("villager-type")
     @Default
     private ResourceKey<VillagerType> villagerType = null;

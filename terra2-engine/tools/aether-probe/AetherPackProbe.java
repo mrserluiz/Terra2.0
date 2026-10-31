@@ -27,7 +27,7 @@ public final class AetherPackProbe extends JavaPlugin {
   if(observed.size()!=4)throw new IllegalStateException("Four biomes not distributed: "+observed);
   var state=getDataFolder().toPath().resolve("checkpoint.txt");Files.createDirectories(state.getParent());
   var digest=java.security.MessageDigest.getInstance("SHA-256");
-  int solids=0,voids=0,starts=0;var trees=new TreeMap<String,Integer>();
+  int solids=0,voids=0,starts=0,actualBiomeCells=0;var trees=new TreeMap<String,Integer>();
   Object level=world.getClass().getMethod("getHandle").invoke(world);
   var getChunk=level.getClass().getMethod("getChunk",int.class,int.class);
   for(int x=-512;x<=512;x+=128)for(int z=-512;z<=512;z+=128){
@@ -38,6 +38,12 @@ public final class AetherPackProbe extends JavaPlugin {
     var b=c.getBlock(x&15,y,z&15);String data=b.getBlockData().getAsString();digest.update(data.getBytes(java.nio.charset.StandardCharsets.UTF_8));
     if(y<8&&!b.getType().isAir())throw new IllegalStateException("Unexpected blocks below island floor at "+x+","+y+","+z);
     if(y>=8&&y<=128&&!b.getType().isAir())land=true;
+    if((y&3)==0) {
+     String actual=world.getBiome(x,y,z).getKey().toString();
+     String expected=wrapper.biomeCompatibility().identity(pack.getBiomeProvider().getBiome(x,y,z,world.getSeed())).registeredId();
+     if(!actual.equals(expected))throw new IllegalStateException("Saved biome mismatch at "+x+","+y+","+z+": "+actual+" vs "+expected);
+     digest.update(actual.getBytes(java.nio.charset.StandardCharsets.UTF_8));actualBiomeCells++;
+    }
    }
    String biome=pack.getBiomeProvider().getBiome(x,64,z,42).getID();digest.update(biome.getBytes(java.nio.charset.StandardCharsets.UTF_8));
    int logs=0;for(int dx=0;dx<16;dx++)for(int dz=0;dz<16;dz++)for(int y=8;y<150;y++)if(c.getBlock(dx,y,dz).getType().name().endsWith("_LOG"))logs++;
@@ -46,11 +52,17 @@ public final class AetherPackProbe extends JavaPlugin {
   }
   if(trees.values().stream().mapToInt(Integer::intValue).sum()==0)throw new IllegalStateException("Terra vegetation stages did not run");
   if(solids==0||voids==0||starts!=0)throw new IllegalStateException("Expected island/void without native structures: "+solids+"/"+voids+" starts="+starts);
+  var appearances=new TreeMap<>(terra.platform().bedrockBiomeAppearances());
+  for(var e:appearances.entrySet())if(e.getKey().startsWith("terra:aether/")) {
+   var effects=e.getValue().getAsJsonObject("effects");
+   if(!effects.has("grass_color")||!effects.has("foliage_color"))throw new IllegalStateException("AETHER custom colors missing from server registry: "+e.getKey());
+   digest.update((e.getKey()+"="+e.getValue()).getBytes(java.nio.charset.StandardCharsets.UTF_8));
+  }
   String checkpoint=world.getUID()+"|"+HexFormat.of().formatHex(digest.digest());
   if(Files.exists(state)&&!Files.readString(state).equals(checkpoint))throw new IllegalStateException("Saved terrain/biomes changed after restart");
   if(!Bukkit.getWorld("world").getBiome(0,64,0).getKey().getNamespace().equals("minecraft"))throw new IllegalStateException("Primary world was modified");
   world.save();Files.writeString(state,checkpoint);
-  getLogger().info("AETHER_PACK_OK biomes="+observed+" landColumns="+solids+" voidColumns="+voids+" parityBlocks="+parity+" vanillaStarts="+starts+" logsByBiome="+trees+" saveRestart=true visualTest=false");
+  getLogger().info("AETHER_PACK_OK biomes="+observed+" landColumns="+solids+" voidColumns="+voids+" parityBlocks="+parity+" vanillaStarts="+starts+" logsByBiome="+trees+" actualBiomeCells="+actualBiomeCells+" registryColors=true saveRestart=true visualTest=false");
  }catch(Throwable failure){getLogger().log(java.util.logging.Level.SEVERE,"AETHER_PACK_FAILED",failure);}finally{Bukkit.shutdown();}}
  static double reference(com.dfsek.seismic.type.sampler.Sampler noise,long seed,int x,int y,int z){
   int bx=Math.floorDiv(x,8)*8,by=Math.floorDiv(y,4)*4,bz=Math.floorDiv(z,8)*8;

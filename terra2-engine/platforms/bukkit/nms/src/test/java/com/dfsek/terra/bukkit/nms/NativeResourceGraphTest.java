@@ -26,7 +26,7 @@ class NativeResourceGraphTest {
         SharedConstants.tryDetectVersion(); Bootstrap.bootStrap();
         var lookups = new LinkedHashMap<net.minecraft.resources.ResourceKey<? extends Registry<?>>, HolderLookup.RegistryLookup<?>>();
         RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY).listRegistries().forEach(lookup -> lookups.put(lookup.key(), lookup));
-        VanillaRegistries.createLookup().listRegistries().forEach(lookup -> lookups.put(lookup.key(), lookup));
+        VanillaRegistries.createWorldLookup().listRegistries().forEach(lookup -> lookups.put(lookup.key(), lookup));
         LootDataType.values().forEach(type -> { var lookup = emptyLoot(type); lookups.put(lookup.key(), lookup); });
         var provider = HolderLookup.Provider.create(lookups.values().stream());
         BuiltInRegistries.DATA_COMPONENT_INITIALIZERS.build(provider).forEach(net.minecraft.core.component.DataComponentInitializers.PendingComponents::apply);
@@ -88,8 +88,8 @@ class NativeResourceGraphTest {
         var configure = io.papermc.paper.configuration.GlobalConfiguration.class.getDeclaredMethod("set", io.papermc.paper.configuration.GlobalConfiguration.class);
         configure.setAccessible(true); configure.invoke(null, configuration);
         var parameters = new net.minecraft.world.level.storage.loot.LootParams(null,
-            new net.minecraft.util.context.ContextMap.Builder().withParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.ORIGIN,
-                new net.minecraft.world.phys.Vec3(0, 64, 0)).create(net.minecraft.world.level.storage.loot.parameters.LootContextParamSets.CHEST), Map.of(), 0);
+            net.minecraft.util.context.ContextMap.builder().set(net.minecraft.world.level.storage.loot.parameters.LootContextParams.ORIGIN,
+                new net.minecraft.world.phys.Vec3(0, 64, 0)).buildAndValidate(net.minecraft.world.level.storage.loot.parameters.LootContextParamSets.CHEST), Map.of(), 0);
         var constructor = net.minecraft.world.level.storage.loot.LootContext.class.getDeclaredConstructor(
             net.minecraft.world.level.storage.loot.LootParams.class, net.minecraft.util.RandomSource.class, HolderGetter.Provider.class);
         constructor.setAccessible(true);

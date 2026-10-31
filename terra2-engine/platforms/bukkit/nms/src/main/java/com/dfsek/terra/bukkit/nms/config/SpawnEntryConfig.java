@@ -27,7 +27,7 @@ public class SpawnEntryConfig implements ObjectTemplate<SpawnEntryConfig> {
     }
 
     public SpawnerData getSpawnEntry() {
-        return new SpawnerData(type, groupSize.getMin(), groupSize.getMax());
+        return new SpawnerData(type, net.minecraft.util.valueproviders.UniformInt.of(groupSize.getMin(), groupSize.getMax()));
     }
 
     @Override

@@ -25,8 +25,8 @@ class BiomeMigrationTest {
     }
     private Biome original() {
         return new Biome.BiomeBuilder().hasPrecipitation(false).temperature(0.7f).downfall(0.2f)
-            .setAttribute(EnvironmentAttributes.FOG_COLOR, 0x123456)
-            .setAttribute(EnvironmentAttributes.SKY_COLOR, 0xabcdef)
+            .setAttribute(EnvironmentAttributes.FOG_COLOR, NativeColor.rgb(0x123456))
+            .setAttribute(EnvironmentAttributes.SKY_COLOR, NativeColor.rgb(0xabcdef))
             .specialEffects(new BiomeSpecialEffects.Builder().waterColor(0x112233)
                 .grassColorOverride(0x224466).dryFoliageColorOverride(0x334455).build())
             .mobSpawnSettings(MobSpawnSettings.EMPTY)
@@ -40,7 +40,8 @@ class BiomeMigrationTest {
         assertEquals(original.getSpecialEffects(), migrated.getSpecialEffects());
         assertFalse(migrated.hasPrecipitation());
         assertEquals(original.getBaseTemperature(), migrated.getBaseTemperature());
-        assertSame(original.getMobSettings(), migrated.getMobSettings());
+        assertEquals(original.getAttributes().applyModifier(EnvironmentAttributes.NATURAL_MOB_SPAWNS,MobSpawnSettings.EMPTY),
+            migrated.getAttributes().applyModifier(EnvironmentAttributes.NATURAL_MOB_SPAWNS,MobSpawnSettings.EMPTY));
     }
 
     @Test void mapsLegacyColorsWithoutDiscardingOtherAttributes() throws Exception {
@@ -49,8 +50,8 @@ class BiomeMigrationTest {
         fog.setAccessible(true);
         fog.set(properties, 0x987654);
         Biome migrated = NMSBiomeInjector.createBiome(original(), properties);
-        assertEquals(0x987654, migrated.getAttributes().applyModifier(EnvironmentAttributes.FOG_COLOR, 0));
-        assertEquals(0xabcdef, migrated.getAttributes().applyModifier(EnvironmentAttributes.SKY_COLOR, 0));
+        assertEquals(0x987654, NativeColor.rgb24(migrated.getAttributes().applyModifier(EnvironmentAttributes.FOG_COLOR, NativeColor.rgb(0))));
+        assertEquals(0xabcdef, NativeColor.rgb24(migrated.getAttributes().applyModifier(EnvironmentAttributes.SKY_COLOR, NativeColor.rgb(0))));
         assertEquals(0x112233, migrated.getWaterColor());
     }
 }

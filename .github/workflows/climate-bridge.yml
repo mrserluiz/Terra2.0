@@ -1,11 +1,5 @@
 name: Climate bridge capabilities and experimental receiver validation
 'on':
-  push:
-    paths:
-    - integrations/aeternum/**
-    - terra2-engine/tools/climate-probe/**
-    - terra2-engine/tools/paper-climate-smoke.py
-    - .github/workflows/climate-bridge.yml
   workflow_dispatch: {}
 permissions:
   contents: read

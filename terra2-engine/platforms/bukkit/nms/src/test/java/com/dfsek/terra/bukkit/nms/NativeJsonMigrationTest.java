@@ -25,6 +25,10 @@ class NativeJsonMigrationTest {
         assertEquals("minecraft:overworld", next.getAsJsonObject().get("clock").getAsString());
         assertEquals(next, NativeJsonMigration.migrate(next)); assertFalse(old.getAsJsonObject().has("clock"));
         var custom = JsonParser.parseString("{\"condition\":\"time_check\",\"clock\":\"example:custom\",\"value\":12000}");
-        assertEquals(custom, NativeJsonMigration.migrate(custom));
+        var migrated=NativeJsonMigration.migrate(custom);
+        assertEquals("example:custom",migrated.getAsJsonObject().get("clock").getAsString());
+        assertEquals("time_check",migrated.getAsJsonObject().get("type").getAsString());
+        assertEquals(migrated,NativeJsonMigration.migrate(migrated));
+        assertTrue(custom.getAsJsonObject().has("condition"));
     }
 }

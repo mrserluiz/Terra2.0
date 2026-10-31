@@ -14,7 +14,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.Beardifier;
-import net.minecraft.world.level.levelgen.DensityFunction.SinglePointContext;
+import net.minecraft.world.level.levelgen.densityfunction.SamplerContext;
 import net.minecraft.world.level.levelgen.Heightmap.Types;
 import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraft.world.level.levelgen.blending.Blender;
@@ -66,18 +66,6 @@ public class NMSChunkGeneratorDelegate extends ChunkGenerator {
     @Override
     protected @NotNull MapCodec<? extends ChunkGenerator> codec() {
         return MapCodec.assumeMapUnsafe(ChunkGenerator.CODEC);
-    }
-
-    @Override
-    public void applyCarvers(@NotNull WorldGenRegion chunkRegion, long seed, @NotNull RandomState noiseConfig, @NotNull BiomeManager world,
-                             @NotNull StructureManager structureAccessor, @NotNull ChunkAccess chunk) {
-        // no-op
-    }
-
-    @Override
-    public void buildSurface(@NotNull WorldGenRegion region, @NotNull StructureManager structures, @NotNull RandomState noiseConfig,
-                             @NotNull ChunkAccess chunk) {
-        // no-op
     }
 
     @Override
@@ -137,10 +125,11 @@ public class NMSChunkGeneratorDelegate extends ChunkGenerator {
     }
 
     @Override
-    public CompletableFuture<ChunkAccess> fillFromNoise(@NotNull Blender blender,
-                                                        @NotNull RandomState noiseConfig,
-                                                        @NotNull StructureManager structureAccessor, @NotNull ChunkAccess chunk) {
-        return vanilla.fillFromNoise(blender, noiseConfig, structureAccessor, chunk)
+    public CompletableFuture<ChunkAccess> buildTerrain(@NotNull ChunkAccess chunk, @NotNull Blender blender,
+            @NotNull RandomState noiseConfig, @NotNull StructureManager structureAccessor,
+            @NotNull BiomeManager biomeManager, @NotNull WorldGenRegion region,
+            java.util.Set<net.minecraft.core.Holder<net.minecraft.world.level.biome.Biome>> biomes) {
+        return vanilla.buildTerrain(chunk,blender,noiseConfig,structureAccessor,biomeManager,region,biomes)
             .thenApply(c -> {
                 LevelAccessor level = Reflection.STRUCTURE_MANAGER.getLevel(structureAccessor);
                 BiomeProvider biomeProvider = pack.getBiomeProvider();
@@ -165,7 +154,7 @@ public class NMSChunkGeneratorDelegate extends ChunkGenerator {
             for(int z = 0; z < 16; z++) {
                 int depth = 0;
                 for(int y = world.getMaxHeight() - 1; y >= world.getMinHeight(); y--) {
-                    double noise = structureWeightSampler.compute(new SinglePointContext(x + xi, y, z + zi));
+                    double noise = structureWeightSampler.sampleValue(SamplerContext.EMPTY_UNCACHED,x + xi,y,z + zi);
                     if(noise > threshold) {
                         chunk.setBlockState(new BlockPos(x, y, z), ((CraftBlockData) ((BukkitBlockState) delegate
                             .getPalette(x + xi, y, z + zi, world, biomeProvider)
@@ -216,7 +205,7 @@ public class NMSChunkGeneratorDelegate extends ChunkGenerator {
     }
 
     @Override
-    public void addDebugScreenInfo(@NotNull List<String> text, @NotNull RandomState noiseConfig, @NotNull BlockPos pos) {
+    public void addDebugScreenInfo(@NotNull List<String> text, @NotNull RandomState noiseConfig, @NotNull BlockPos pos, @NotNull SamplerContext samplerContext) {
 
     }
 }

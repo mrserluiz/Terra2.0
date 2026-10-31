@@ -54,8 +54,8 @@ public class NMSBiomeProvider extends BiomeSource {
     }
 
     @Override
-    public @NotNull Holder<Biome> getNoiseBiome(int x, int y, int z, @NotNull Sampler sampler) {
-        return biomeRegistry.getOrThrow(key(original(x << 2, y << 2, z << 2)));
+    public net.minecraft.world.level.biome.BiomeResolver createResolver(@NotNull Sampler sampler) {
+        return (x,y,z) -> biomeRegistry.getOrThrow(key(original(x << 2,y << 2,z << 2)));
     }
     public boolean vanillaCompatible() { return compatibility != null && compatibility.vanilla; }
     private com.dfsek.terra.api.world.biome.Biome original(int x, int y, int z) {

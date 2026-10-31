@@ -22,13 +22,14 @@ public final class NativeBedrockBiomes {
             appearance.foliageColorOverride().ifPresent(value -> effects.addProperty("foliage_color", color(value)));
             appearance.dryFoliageColorOverride().ifPresent(value -> effects.addProperty("dry_foliage_color", color(value)));
             var environment = registered.getAttributes();
-            attributes.addProperty("minecraft:visual/sky_color", color(environment.applyModifier(EnvironmentAttributes.SKY_COLOR, 0x78A7FF)));
-            attributes.addProperty("minecraft:visual/fog_color", color(environment.applyModifier(EnvironmentAttributes.FOG_COLOR, 0xC0D8FF)));
-            attributes.addProperty("minecraft:visual/water_fog_color", color(environment.applyModifier(EnvironmentAttributes.WATER_FOG_COLOR, 0x050533)));
+            attributes.addProperty("minecraft:visual/sky_color", color(environment.applyModifier(EnvironmentAttributes.SKY_COLOR, NativeColor.rgb(0x78A7FF))));
+            attributes.addProperty("minecraft:visual/fog_color", color(environment.applyModifier(EnvironmentAttributes.FOG_COLOR, NativeColor.rgb(0xC0D8FF))));
+            attributes.addProperty("minecraft:visual/water_fog_color", color(environment.applyModifier(EnvironmentAttributes.WATER_FOG_COLOR, NativeColor.rgb(0x050533))));
             object.add("effects", effects); object.add("attributes", attributes);
             if(entries.putIfAbsent(id, object) != null) throw new IllegalStateException("ID de bioma duplicado: " + id);
         }));
         return entries;
     }
+    private static String color(org.joml.Vector3fc rgb){return color(NativeColor.rgb24(rgb));}
     private static String color(int rgb) { return "#%06X".formatted(rgb & 0xFFFFFF); }
 }

@@ -39,8 +39,8 @@ public final class NativeResourceGraph {
             var object = json.getAsJsonObject(); var result = new JsonObject();
             object.entrySet().forEach(entry -> {
                 String name = entry.getKey();
-                if(name.equals("options") && (!object.has("function") || !Set.of("minecraft:enchant_randomly", "minecraft:enchant_with_levels", "enchant_randomly", "enchant_with_levels")
-                        .contains(object.get("function").getAsString()))) result.add(name, entry.getValue());
+                if(name.equals("options") && (!object.has("function") && !object.has("type") || !Set.of("minecraft:enchant_randomly", "minecraft:enchant_with_levels", "enchant_randomly", "enchant_with_levels")
+                        .contains(object.get(object.has("function")?"function":"type").getAsString()))) result.add(name, entry.getValue());
                 else result.add(name, inlineHolderSets(entry.getValue(), name));
             }); return result;
         }
@@ -62,15 +62,17 @@ public final class NativeResourceGraph {
 
     public NativeResourceGraph(ResourceBundle source, HolderLookup.Provider base) {
         this.source = source; this.scope = new ResourceScope(source); this.base = base;
-        RegistryDataLoader.WORLDGEN_REGISTRIES.forEach(data -> data.runWithArguments(this::declare));
-        LootDataType.values().forEach(this::declareLoot);
+        RegistryDataLoader.WORLD_REGISTRIES.forEach(data -> data.runWithArguments(this::declare));
+        RegistryDataLoader.RELOADABLE_REGISTRIES.stream()
+            .filter(data->LootDataType.values().anyMatch(type->type.registryKey().equals(data.key())))
+            .forEach(data -> data.runWithArguments(this::declare));
         // Sources for built-in-registry tags (blocks/items/entities) also need a private lookup.
         base.listRegistries().forEach(lookup -> declareTags(lookup));
         ops = RegistryOps.create(JsonOps.INSTANCE, new RegistryOps.RegistryInfoLookup() {
-            @SuppressWarnings("unchecked") public <T> Optional<RegistryOps.RegistryInfo<T>> lookup(ResourceKey<? extends Registry<? extends T>> key) {
+            @SuppressWarnings("unchecked") public <T> Optional<HolderGetter<T>> lookup(ResourceKey<? extends Registry<? extends T>> key) {
                 Node<?> node = nodes.get(key);
-                if(node != null) return Optional.of((RegistryOps.RegistryInfo<T>) node.info());
-                return base.lookup(key).map(RegistryOps.RegistryInfo::fromRegistryLookup);
+                if(node != null) return Optional.of((HolderGetter<T>) node.lookup);
+                return base.lookup(key).map(lookup -> lookup);
             }
             public HolderLookup.Provider lookupForValueCopyViaBuilders() { return provider; }
         });
@@ -110,9 +112,6 @@ public final class NativeResourceGraph {
         var parent = base.lookup(key);
         if(parent.isEmpty()) { errors.add("Missing server registry " + key.identifier()); return; }
         nodes.computeIfAbsent(key, ignored -> new Node<>(key, parent.get(), codec));
-    }
-    private <T extends net.minecraft.world.level.storage.loot.Validatable> void declareLoot(LootDataType<T> type) {
-        declare(type.registryKey(), type.codec());
     }
     @SuppressWarnings("unchecked")
     private <T> void declareTags(HolderLookup.RegistryLookup<T> parent) {
@@ -162,7 +161,6 @@ public final class NativeResourceGraph {
                 public Optional<HolderSet.Named<T>> get(TagKey<T> target) { return tagPaths.containsKey(target) ? Optional.of(tag(target)) : parent.get(target); }
             };
         }
-        RegistryOps.RegistryInfo<T> info() { return new RegistryOps.RegistryInfo<>(parent, lookup, parent.registryLifecycle()); }
         void decode() {
             for(var entry : paths.entrySet()) try {
                 JsonElement json = inlineHolderSets(scope.rewrite(NativeJsonMigration.migrate(JsonParser.parseString(source.text(entry.getValue())))), "");

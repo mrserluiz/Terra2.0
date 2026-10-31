@@ -37,9 +37,9 @@ public class NMSBiomeInjector {
             .grassColorModifier(Objects.requireNonNullElse(vanillaBiomeProperties.getGrassColorModifier(),
                 vanilla.getSpecialEffects().grassColorModifier()));
         // Preserve the vanilla attributes and override only fields explicitly configured by the native pack.
-        if(vanillaBiomeProperties.getFogColor() != null) builder.setAttribute(EnvironmentAttributes.FOG_COLOR, vanillaBiomeProperties.getFogColor());
-        if(vanillaBiomeProperties.getWaterFogColor() != null) builder.setAttribute(EnvironmentAttributes.WATER_FOG_COLOR, vanillaBiomeProperties.getWaterFogColor());
-        if(vanillaBiomeProperties.getSkyColor() != null) builder.setAttribute(EnvironmentAttributes.SKY_COLOR, vanillaBiomeProperties.getSkyColor());
+        if(vanillaBiomeProperties.getFogColor() != null) builder.setAttribute(EnvironmentAttributes.FOG_COLOR, NativeColor.rgb(vanillaBiomeProperties.getFogColor()));
+        if(vanillaBiomeProperties.getWaterFogColor() != null) builder.setAttribute(EnvironmentAttributes.WATER_FOG_COLOR, NativeColor.rgb(vanillaBiomeProperties.getWaterFogColor()));
+        if(vanillaBiomeProperties.getSkyColor() != null) builder.setAttribute(EnvironmentAttributes.SKY_COLOR, NativeColor.rgb(vanillaBiomeProperties.getSkyColor()));
         if(vanillaBiomeProperties.getMusicVolume() != null) builder.setAttribute(EnvironmentAttributes.MUSIC_VOLUME, vanillaBiomeProperties.getMusicVolume());
 
         if(vanillaBiomeProperties.getGrassColor() == null) {
@@ -82,7 +82,8 @@ public class NMSBiomeInjector {
         builder.temperatureAdjustment(
             Objects.requireNonNullElse(vanillaBiomeProperties.getTemperatureModifier(), vanilla.climateSettings.temperatureModifier()));
 
-        builder.mobSpawnSettings(Objects.requireNonNullElse(vanillaBiomeProperties.getSpawnSettings(), vanilla.getMobSettings()));
+        if(vanillaBiomeProperties.getSpawnSettings()!=null)builder.setAttribute(EnvironmentAttributes.NATURAL_MOB_SPAWNS,vanillaBiomeProperties.getSpawnSettings());
+        if(vanillaBiomeProperties.getCreatureProbability()!=null)builder.setAttribute(EnvironmentAttributes.CREATURE_WORLD_GEN_SPAWN_PROBABILITY,vanillaBiomeProperties.getCreatureProbability());
 
         return builder
             .specialEffects(effects.build())
