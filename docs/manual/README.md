@@ -1,6 +1,6 @@
 # Manual do usuário — Terra2.0
 
-**Idioma:** Português (Brasil) · **Build atual:** 7.3.5-BETA · capítulos iniciais: referência histórica 7.0.14-BETA
+**Idioma:** Português (Brasil) · **Build atual:** 7.4.0-BETA (Paper 26.3 / Java 25) · capítulos iniciais: referência histórica 7.0.14-BETA
 
 Este manual documenta o comportamento confirmado na documentação da build de referência. Se seu JAR for mais recente, confira as notas da versão correspondente. Recursos futuros estão identificados como **planejados**, e exemplos conceituais não são comandos válidos.
 
@@ -55,3 +55,5 @@ A ponte de cores nativas exige mundo CUSTOM. A edição de biomas funciona tamb�
 17. [Ativação automática Bedrock e reenvio de copas/colunas completas (7.3.4-BETA)](../releases/7.3.4-BETA.md)
 
 18. [7.3.5 — recuperação de setbiome, diagnóstico por altura e FAWE](../releases/7.3.5-BETA.md)
+
+19. [7.4.0 — porte nativo Paper 26.3 e migração do 26.2](../releases/7.4.0-BETA.md) · Paper 26.2: mantenha a 7.3.5-BETA.

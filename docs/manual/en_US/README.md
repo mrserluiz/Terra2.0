@@ -1,6 +1,6 @@
 # User manual — Terra2.0
 
-**English (en_US)** · **Current build: 7.3.5-BETA** · initial chapters: historical 7.0.14 reference
+**English (en_US)** · **Current build: 7.4.0-BETA (Paper 26.3 / Java 25)** · initial chapters: historical 7.0.14 reference
 
 1. [Installation and configuration](01-installation.md)
 2. [Terra Community Packs](02-community-packs.md)
@@ -29,3 +29,5 @@
 15. [Automatic Bedrock recovery and full-height visible chunk refresh (7.3.4-BETA)](../../releases/7.3.4-BETA.md)
 
 16. [7.3.5 — saved biome recovery, actual-chunk diagnostics and FAWE](../../releases/7.3.5-BETA.md)
+
+17. [7.4.0 — native Paper 26.3 port and migration](../../releases/7.4.0-BETA.md#english-summary) · For Paper 26.2, keep 7.3.5-BETA.

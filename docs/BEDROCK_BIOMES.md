@@ -1,5 +1,8 @@
 # Edições de bioma e diagnóstico — 7.3.5-BETA
 
+
+> **7.4.0 / Paper 26.3:** use Java 25 e Geyser-Spigot oficial **2.12.1 build 1279**. A ponte foi portada para o novo registro por sessão. A calibração permanece global e por bioma; o mcpack recebe manifesto `[7,4,0]`. [Migração e testes da 7.4.0](releases/7.4.0-BETA.md). Referências abaixo a Geyser 2.11.3 / incompatibilidade com 2.12 descrevem as builds antigas, até 7.3.5 / Paper 26.2.
+
 O registro explícito de `/terra2 setbiome` é preservado entre versões do pack quando seus IDs continuam válidos no mesmo mundo. Chunks carregados recuperam somente essas células salvas, sem recalcular o terreno. `/terra2 biome debug` mostra o bioma real e a faixa de altura editada; `/terra2 biome restore` recupera o overlay do chunk atual. O registro do Terra2 prevalece no próximo carregamento caso uma ferramenta externa altere as mesmas células. Sem registro salvo, não há reconstrução automática.
 
 Em mundos CUSTOM, o leitor visual consulta o bioma real do chunk, em vez de prever o passado com o gerador atual. A seleção cuboide continua tridimensional: folhas acima dela não recebem a edição. O manifesto da nova build usa `[7,3,5]`; a calibração global e por bioma é mantida. [Notas, instalação e limites](releases/7.3.5-BETA.md).

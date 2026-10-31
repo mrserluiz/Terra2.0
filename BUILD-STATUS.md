@@ -1,6 +1,12 @@
 # Recovered engine build status
 
-## Current reference: 7.3.5-BETA
+## Current reference: 7.4.0-BETA — native Paper 26.3
+
+[CI 41208537568](https://github.com/mrserluiz/Terra2.0/actions/runs/41208537568) passed all five jobs. The terrain/biome/density/registry/loot/structure adapters target Paper 26.3 build 231 / Java 25. The 26.3 cached fallback biome resolver is rebound with the generator. Native generation and save/restart, biome persistence, AETHER and the official Geyser 2.12.1 build 1279 bridge passed. An unmodified CI JAR also passed migration of a real 26.2 fixture save: 4,608 saved biome cells and all five color profiles retained the original signature across unload/reload and restart. [Release, download and checksum](docs/releases/7.4.0-BETA.md) · [Validation and limits](docs/testing/PAPER_26.3_PORT.md).
+
+Use 7.3.5-BETA for native Paper 26.2. Native datapack conversions must match the 26.3 DataVersion. Geyser 2.11.3 does not enable on 26.3; use the tested official 2.12.1 build. Real client rendering/reconnection and official AeternumSeasons receiver compatibility remain acceptance tests; the climate CI uses an experimental fixture.
+
+## Previous reference: 7.3.5-BETA
 
 [CI 40092905140](https://github.com/mrserluiz/Terra2.0/actions/runs/40092905140) passed all five jobs. Explicit saved biome edits survive compatible pack fingerprint changes; restoration writes only saved cells; CUSTOM visual diagnostics read actual chunk biomes. Paper generation, save/restart, native/vanilla biome projection, AETHER density and official Geyser checks passed. The official FAWE 2.16.1 cuboid adapter was tested at runtime; real player sessions, FastAsyncVoxelSniper brushes and client color rendering remain acceptance tests. [Installation, recovery, limits and checksum](docs/releases/7.3.5-BETA.md). Native target: Paper 26.2 / Java 25; Geyser 2.11.3 build 1251. The climate job remains an experimental receiver fixture.
 

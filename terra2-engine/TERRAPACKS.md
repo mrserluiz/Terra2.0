@@ -1,5 +1,7 @@
 # TerraPacks and per-world compositions
 
+> **7.4.0 / Paper 26.3:** the native resource and template adapters have been ported to DataVersion 5023. Reconvert native packs for this target; old archives are not silently relabeled. [Current migration and validation](../docs/releases/7.4.0-BETA.md). The versioned checkpoints below are historical.
+
 > **Reference server build: 7.0.14-BETA.** The base TerraPack conversion/composition workflow documented below is the 7.0.14 reference behavior. Sections explicitly labeled 7.0.15–7.0.18 describe later development checkpoints and must not be read as capabilities of the 7.0.14 reference JAR.
 
 This build implements an immutable local pack format, an asynchronous conversion
