@@ -59,7 +59,7 @@ public final class TerraPackStore {
         boolean nativeExecutable = nativeBackend != null && nativeBackend.executableOverlay(merged, migration.report(), profile);
         String status = compiled.ready() ? "READY" : nativeExecutable ? "READY_NATIVE" : "BLOCKED";
         var manifest = new JsonObject(); manifest.addProperty("schema", 1); manifest.addProperty("compiler", "terra2-vanilla-1");
-        manifest.addProperty("id", id); manifest.addProperty("status", status); manifest.addProperty("target", "paper-26.2");
+        manifest.addProperty("id", id); manifest.addProperty("status", status); manifest.addProperty("target", "paper-26.3");
         manifest.addProperty("profile", profile.name());
         if(compiled.terrain() != null) manifest.addProperty("sourceDimension", compiled.terrain().dimension());
         else if(dimension != null) manifest.addProperty("sourceDimension", dimension);

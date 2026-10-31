@@ -90,11 +90,18 @@ public final class StructureNbt {
         for(Object rawPalette : rawPalettes) {
             List<State> states = new ArrayList<>();
             for(Object rawState : list(rawPalette)) {
-                var state = compound(rawState); Object name = state.get("Name");
-                if(!(name instanceof String)) throw new IllegalArgumentException("Missing block Name");
+                var state = compound(rawState);
+                if(state.containsKey("Name") && state.containsKey("id") && !Objects.equals(state.get("Name"),state.get("id")))
+                    throw new IllegalArgumentException("Conflicting legacy/modern block IDs");
+                Object name = state.getOrDefault("id",state.get("Name"));
+                if(!(name instanceof String)) throw new IllegalArgumentException("Missing block Name/id");
                 ResourceBundle.identifier((String) name);
                 Map<String, String> properties = new TreeMap<>();
-                if(state.containsKey("Properties")) compound(state.get("Properties")).forEach((key, value) -> {
+                if(state.containsKey("Properties") && state.containsKey("properties")
+                    && !Objects.equals(state.get("Properties"),state.get("properties")))
+                    throw new IllegalArgumentException("Conflicting legacy/modern block properties");
+                Object rawProperties=state.getOrDefault("properties",state.get("Properties"));
+                if(rawProperties!=null) compound(rawProperties).forEach((key, value) -> {
                     if(!(value instanceof String text) || !key.matches("[a-z0-9_]+") || !text.matches("[a-z0-9_]+"))
                         throw new IllegalArgumentException("Invalid block property");
                     properties.put(key, text);

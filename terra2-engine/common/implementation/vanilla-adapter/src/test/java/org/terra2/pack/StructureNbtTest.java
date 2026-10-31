@@ -15,12 +15,16 @@ class StructureNbtTest {
         tag(out, 9, name); out.writeByte(3); out.writeInt(3); out.writeInt(x); out.writeInt(y); out.writeInt(z);
     }
     static byte[] fixture(boolean invalidIndex, boolean outside, boolean compressed) throws IOException {
+        return fixture(invalidIndex,outside,compressed,false);
+    }
+    private static byte[] fixture(boolean invalidIndex, boolean outside, boolean compressed,boolean modern) throws IOException {
         var bytes = new ByteArrayOutputStream();
         try(var out = new DataOutputStream(bytes)) {
-            tag(out, 10, ""); tag(out, 3, "DataVersion"); out.writeInt(4440); vector(out, "size", 2, 1, 1);
+            tag(out, 10, ""); tag(out, 3, "DataVersion"); out.writeInt(modern?5023:4440); vector(out, "size", 2, 1, 1);
             tag(out, 9, "palette"); out.writeByte(10); out.writeInt(2);
-            tag(out, 8, "Name"); out.writeUTF("minecraft:jigsaw"); out.writeByte(0);
-            tag(out, 8, "Name"); out.writeUTF("minecraft:chest"); out.writeByte(0);
+            tag(out, 8, modern?"id":"Name"); out.writeUTF("minecraft:jigsaw");
+            tag(out,10,modern?"properties":"Properties");tag(out,8,"orientation");out.writeUTF("east_up");out.writeByte(0);out.writeByte(0);
+            tag(out, 8, modern?"id":"Name"); out.writeUTF("minecraft:chest"); out.writeByte(0);
             tag(out, 9, "blocks"); out.writeByte(10); out.writeInt(2);
             vector(out, "pos", outside ? 2 : 0, 0, 0); tag(out, 3, "state"); out.writeInt(invalidIndex ? 2 : 0);
             tag(out, 10, "nbt"); tag(out, 8, "pool"); out.writeUTF("test:rooms"); tag(out, 8, "name"); out.writeUTF("test:door"); out.writeByte(0); out.writeByte(0);
@@ -31,6 +35,14 @@ class StructureNbtTest {
         if(!compressed) return bytes.toByteArray();
         var zipped = new ByteArrayOutputStream(); try(var gzip = new GZIPOutputStream(zipped)) { gzip.write(bytes.toByteArray()); }
         return zipped.toByteArray();
+    }
+    @Test void readsModernDataFixedPalettesWithoutLosingPropertiesOrConnectorNbt() throws Exception {
+        var old=StructureNbt.read(fixture(false,false,true,false));
+        var modern=StructureNbt.read(fixture(false,false,true,true));
+        assertEquals(5023,modern.dataVersion());
+        assertEquals(old.palettes(),modern.palettes());
+        assertEquals(old.blocks(),modern.blocks());
+        assertEquals("east_up",modern.palettes().getFirst().getFirst().properties().get("orientation"));
     }
     @Test void decodesCompressedAndRawTemplatesPreservingJigsawAndLootNbt() throws Exception {
         var raw = StructureNbt.read(fixture(false, false, false));
